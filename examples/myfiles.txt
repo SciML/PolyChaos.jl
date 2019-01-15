@@ -1,0 +1,4 @@
+/Users/till/Documents/pcejl/examples/ChiSquared_k1.ipynb 
+/Users/till/Documents/pcejl/examples/ChiSquared_kGreater1.ipynb 
+/Users/till/Documents/pcejl/examples/PCEtutorial.ipynb 
+/Users/till/Documents/pcejl/examples/RandomODE.ipynb 
