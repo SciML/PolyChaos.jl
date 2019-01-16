@@ -9,6 +9,7 @@ makedocs(
     modules = [PolyChaos],
     pages = Any[
         "index.md",
+        "typehierarchy.md",
         "Tutorials" => [
             "Numerical Integration"=>"NumericalIntegration.md",
             "Monic Orthogonal Polynomials"=>"OrthogonalPolynomials_canonical.md",
@@ -18,6 +19,7 @@ makedocs(
                                     "Random ODE" => "RandomODE.md"]
             ],
     "math.md",
+    "functions.md"
     ]
 )
 

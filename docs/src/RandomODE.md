@@ -57,7 +57,7 @@ We begin by defining the random differential equation
 
 ```julia
 x0 = 2.0
-μ, σ = -0.5, 0.05 
+μ, σ = -0.5, 0.05
 tend, Δt = 3.0, 0.01
 ```
 
@@ -85,7 +85,7 @@ t3 = Tensor(3,opq); # \langle \phi_i \phi_j, \phi_k \rangle
 
 # Galerkin-projected random differential equation
 function ODEgalerkin(du,u,p,t)
-   du[:] = [ sum( p[j+1]*u[k+1]*t3.get([j,k,m])/t2.get([m,m]) for j=0:L for k=0:L) for m=0:L ] 
+   du[:] = [ sum( p[j+1]*u[k+1]*t3.get([j,k,m])/t2.get([m,m]) for j=0:L for k=0:L) for m=0:L ]
 end
 
 probgalerkin = ODEProblem(ODEgalerkin,xinit,(0,tend),a)
@@ -122,7 +122,7 @@ Now we can compare the Monte Carlo mean and standard deviation to the expression
 
 
 ```julia
-[ mean(xmc,2)-mean_pce std(xmc,2)-std_pce]
+[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]
 ```
 
 Clearly, the accuracy of PCE deteriorates over time.

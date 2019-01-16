@@ -1,5 +1,4 @@
-
-# Common Random Variables
+# [Common Random Variables](@id CommonRandomVariables)
 Polynomial chaos expansion (PCE) is a Hilbert space technique for random variables with finite variance.
 Mathematically equivalent to Fourier series expansions for periodic signals, PCE allows to characterize a random variable in terms of its PCE coefficients (aka Fourier coefficients).
 That is, the PCE of a random variable $\mathsf{x}$ is given by
