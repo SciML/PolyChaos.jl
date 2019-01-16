@@ -16,8 +16,13 @@ deg(opq::OrthoPolyQ) = deg(opq.op)
 deg(mop::MultiOrthoPoly) = mop.deg
 
 """
-  nw(q::Quad)
-returns nodes and weights of ``q`` in matrix form
+```
+nw(q::Quad)
+nw(opq::OrthoPolyQ)
+nw(opq::Vector{OrthoPolyQ})
+nw(mOP::MultiOrthoPoly)
+```
+returns nodes and weights in matrix form
 """
 function nw(q::Quad)
     [q.nodes q.weights]
@@ -36,8 +41,14 @@ end
 nw(mOP::MultiOrthoPoly) = nw(mOP.uni)
 
 """
-    coeffs(op::OrthoPoly)
-returns recurrence coefficients of ``op`` in matrix form
+```
+coeffs(op::OrthoPoly)
+coeffs(opq::OrthoPolyQ)
+coeffs(op::Vector{OrthoPoly})
+coeffs(opq::Vector{OrthoPolyQ})
+coeffs(mop::MultiOrthoPoly)
+```
+returns recurrence coefficients of in matrix form
 """
 function coeffs(op::OrthoPoly)
     [op.α op.β]
@@ -58,13 +69,14 @@ coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
 
 
 """
-    integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})
-    integrate(f::Function,q::Quad)
-    integrate(f::Function,opq::OrthogonalPolyQ)
+```
+integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})
+integrate(f::Function,q::Quad)
+integrate(f::Function,opq::OrthogonalPolyQ)
+```
+integrate function `f` using quadrature rule specified via `nodes`, `weights`
 
-integrate function ``f`` using quadrature rule specified via ``(nodes,weights)``
-
-Remarks:
+!!! note
 - function ``f`` is assumed to return a scalar
 - interval of integration is "hidden" in ``nodes``
 """
@@ -74,7 +86,18 @@ end
 integrate(f::Function,q::Quad)::Float64 = integrate(f,q.nodes,q.weights)
 integrate(f::Function,opq::OrthoPolyQ)::Float64 = integrate(f,opq.quad)
 
-issymmetric(m::Measure)::Bool = m.symmetric
+"""
+```
+issymmetric(m::Measure)::Bool
+issymmetric(op::OrthoPoly)::Bool
+issymmetric(q::Quad)::Bool
+issymmetric(opq::OrthoPolyQ)::Bool
+```
+is measure symmetric (around any point in the domain)?
+"""
+function issymmetric(m::Measure)::Bool
+    m.symmetric
+end
 issymmetric(op::OrthoPoly)::Bool = issymmetric(op.meas)
 issymmetric(q::Quad)::Bool = issymmetric(q.meas)
 function issymmetric(opq::OrthoPolyQ)::Bool

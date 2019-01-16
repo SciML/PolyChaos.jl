@@ -23,20 +23,22 @@ rm_legendre01(N::Int)
 rm_jacobi(N::Int,a::Float64,b::Float64)
 rm_jacobi01(N::Int,a::Float64,b::Float64)
 rm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)
+stieltjes
+lanczos
 ```
 
-# Scalar Products
+## Scalar Products
 ```@docs
 computeSP2
 computeSP
 ```
 
-# Evaluating Orthogonal Polynomials
+## Evaluating Orthogonal Polynomials
 ```@docs
 evaluate
 ```
 
-# Quadrature Rules
+## Quadrature Rules
 ```@docs
 fejer
 fejer2
@@ -47,4 +49,24 @@ quadpts_gaussian
 quadpts_logistic
 quadpts_uniform01
 quadgp
+```
+
+## Polynomial Chaos
+```@docs
+mean
+var
+std
+sampleMeasure
+evaluatePCE
+samplePCE
+calculateAffinePCE
+convert2affinePCE
+```
+
+## Auxiliary Functions
+```@docs
+nw
+coeffs
+integrate
+issymmetric
 ```

@@ -1,6 +1,6 @@
 using Documenter
-push!(LOAD_PATH,"C:\\Users\\la5373\\Documents\\Code\\pcejl\\src")
-push!(LOAD_PATH,"..\\src\\")
+# push!(LOAD_PATH,"C:\\Users\\la5373\\Documents\\Code\\pcejl\\src")
+# push!(LOAD_PATH,"..\\src\\")
 using PolyChaos
 
 makedocs(

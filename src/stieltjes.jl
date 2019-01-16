@@ -9,7 +9,15 @@ function removeZeroWeights(n::Vector{Float64},w::Vector{Float64})
     nw[:,1], nw[:,2]
 end
 
-function stieltjes(N,nodes_,weights_)
+"""
+    stieltjes(N::Int64,nodes::Vector{Float64},weights::Vector{Float64})
+Description based on W. Gautschi *OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS
+AND RELATED QUADRATURE RULES*
+Given the discrete inner product (with nodes and weights) the function
+generates the first`N` recurrence coefficients of the
+corresponding discrete orthogonal polynomials.
+"""
+function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
     tiny = 10*floatmin()
     huge = 0.1*floatmax()
     α, β = zeros(Float64,N), zeros(Float64,N)
@@ -40,20 +48,18 @@ function stieltjes(N,nodes_,weights_)
 end
 
 """
-  Lanczos algorithm.
+  lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
+Description based on W. Gautschi *OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS
+AND RELATED QUADRATURE RULES*
 
-    Given the discrete inner product whose nodes are contained
-    in the first column, and whose weights are contained in the
-    second column, of the nx2 array xw, the call ab=LANCZOS(n,xw)
-    generates the first n recurrence coefficients ab of the
-    corresponding discrete orthogonal polynomials. The n alpha-
-    coefficients are stored in the first column, the n beta-
-    coefficients in the second column, of the nx2 array ab.
+Given the discrete inner product (with nodes and weights) the function
+generates the first `N` recurrence coefficients of the
+corresponding discrete orthogonal polynomials.
 
-    The script is adapted from the routine RKPW in
-    W.B. Gragg and W.J. Harrod, ``The numerically stable
-    reconstruction of Jacobi matrices from spectral data'',
-    Numer. Math. 44 (1984), 317-335.
+The script is adapted from the routine RKPW in
+W.B. Gragg and W.J. Harrod, ``The numerically stable
+reconstruction of Jacobi matrices from spectral data'',
+Numer. Math. 44 (1984), 317-335.
 """
 function lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
     @assert length(nodes_)==length(weights_)>0 "inconsistent number of nodes and weights"

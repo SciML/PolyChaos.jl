@@ -8,11 +8,6 @@ export  convert2affinePCE,
         var,
         std
 
-#####################################################################
-#####################################################################
-#####################################################################
-## Functions related to PCE
-
 """
     calculateAffinePCE(α::Vector{Float64})::Vector{Float64}
 Computes the affine PCE coefficients ``x_0`` and ``x_1`` from recurrence coefficients ``\alpha``.
@@ -32,8 +27,10 @@ function calculateAffinePCE(i::Int64,mop::MultiOrthoPoly)
 end
 
 """
-    convert2affinePCE(a::Vector{Float64},α0::Float64)
-    convert2affinePCE(name::String,p1::Float64,p2::Float64,d::Dict=Dict();kind::Symbol=:lbub)
+```
+convert2affinePCE(a::Vector{Float64},α0::Float64)
+convert2affinePCE(name::String,p1::Float64,p2::Float64,d::Dict=Dict();kind::Symbol=:lbub)
+```
 Computes the affine PCE coefficients ``x_0`` and ``x_1`` from
 ```math
 X = a_1 + a_2 \\Xi = x_0 + x_1 \\phi_1(\\Xi),
@@ -120,22 +117,6 @@ function assign2multi(x::Vector{Float64},i::Int64,ind::Matrix{Int64})
     return y
 end
 
-
-##############################################################################
-##############################################################################
-##############################################################################
-
-# function sampleMeasure(n::Int64,w::Function,s::Tuple{Float64,Float64})
-# end
-# function sampleMeasure(n::Int64,m::Measure)
-#     if classical PDF --> use Distributions
-#     else --> use adaptiveRejectionSampling
-# end
-
-##############################################################################
-##############################################################################
-##############################################################################
-
 function sampleMeasure_byName(n::Int64,name::String,d::Dict=Dict())::Vector{Float64}
     @assert n>=1 "invalid number $n of samples."
     name = lowercase(name)
@@ -173,6 +154,33 @@ function sampleMeasure_byFun(n::Int64,w::Function,dom::Tuple{Float64,Float64};me
     end
 end
 
+"""
+__Univariate__
+```
+sampleMeasure(n::Int64,name::String,w::Function,dom::Tuple{Float64,Float64},symm::Bool,d::Dict;method::String="adaptiverejection")
+sampleMeasure(n::Int64,m::Measure;method::String="adaptiverejection")
+sampleMeasure(n::Int64,op::OrthoPoly;method::String="adaptiverejection")
+sampleMeasure(n::Int64,opq::OrthoPolyQ;method::String="adaptiverejection")
+```
+Draw `n` samples from the measure `m` described by its
+- `name`
+- weight function `w`,
+- domain `dom`,
+- symmetry property `symm`,
+- and, if applicable, parameters stored in the dictionary `d`.
+By default an adaptive rejection sampling method is used (from [AdaptiveRejectionSampling.jl](https://github.com/mauriciogtec/AdaptiveRejectionSampling.jl)),
+unless it is a common random variable for which [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is used.
+
+The function is multiply dispatched to accept `OrthoPoly` or `OrthoPolyQ`.
+
+__Multivariate__
+```
+sampleMeasure(n::Int64,m::MultiMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
+sampleMeasure(n::Int64,mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
+```
+Multivariate extension which provides array of samples with `n` rows and
+as many columns as the multimeasure has univariate measures.
+"""
 function sampleMeasure(n::Int64,name::String,w::Function,dom::Tuple{Float64,Float64},symm::Bool,d::Dict;method::String="adaptiverejection")
     # symmetry is currently not exploited, but could be for rejection sampling
     name = lowercase(name)
@@ -205,10 +213,13 @@ end
 sampleMeasure(n::Int64,mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)]) = sampleMeasure(n,mop.meas;method=method)
 
 """
-generate samples of random variable with PCE coefficients `x` w.r.t. orthogonal
-basis (alpha,beta) for germ points `xi`
-
-univariate setup
+    evaluatePCE(x::Vector{Float64},ξ::Vector{Float64},α::Vector{Float64},β::Vector{Float64})
+Evaluation of polynomial chaos expansion
+```math
+\\mathsf{x} = \\sum_{i=0}^{L} x_i \\phi_i{\\xi_j},
+```
+where `L+1 = length(x)` and ``x_j`` is the ``j``th sample where ``j=1,\\dots,m``
+with `m = length(ξ)`.
 """
 function evaluatePCE(x::Vector{Float64},ξ::Vector{Float64},α::Vector{Float64},β::Vector{Float64})
     @assert length(α)==length(β) "inconsistent number of recurrence coefficients"
@@ -225,6 +236,7 @@ function evaluatePCE(x::Vector{Float64},ξ::Vector{Float64},α::Vector{Float64},
     end
     ϕ*x
 end
+evaluatePCE(x::Vector{Float64},ξ::Float64,α::Vector{Float64},β::Vector{Float64}) = evaluatePCE(x,[ξ],α,β)
 evaluatePCE(x::Vector{Float64},ξ::Vector{Float64},op::OrthoPoly) = evaluatePCE(x,ξ,op.α,op.β)
 evaluatePCE(x::Vector{Float64},ξ::Vector{Float64},opq::OrthoPolyQ) = evaluatePCE(x,ξ,opq.op)
 
@@ -245,6 +257,20 @@ function evaluatePCE(x::Vector{Float64},ξ::Matrix{Float64},mOP::MultiOrthoPoly)
     evaluatePCE(x,ξ,a,b,mOP.ind)
 end
 
+"""
+__Univariate__
+```
+samplePCE(n::Int64,x::Vector{Float64},op::OrthoPoly;method::String="adaptiverejection")
+samplePCE(n::Int64,x::Vector{Float64},opq::OrthoPolyQ;method::String="adaptiverejection")
+```
+Combines [`sampleMeasure`](@ref) and [`evaluatePCE`](@ref), i.e. it first draws `n` samples
+from the measure, then evaluates the PCE for those samples.
+
+__Multivariate__
+```
+samplePCE(n::Int64,x::Vector{Float64},mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
+```
+"""
 function samplePCE(n::Int64,x::Vector{Float64},op::OrthoPoly;method::String="adaptiverejection")
     ξ = sampleMeasure(n,op;method=method)
     evaluatePCE(x,ξ,op)
@@ -257,6 +283,18 @@ function samplePCE(n::Int64,x::Vector{Float64},mop::MultiOrthoPoly;method::Vecto
     evaluatePCE(x,ξ,mop)
 end
 
+"""
+__Univariate__
+```
+mean(x::Vector{Float64},op::OrthoPoly)
+mean(x::Vector{Float64},opq::OrthoPolyQ)
+```
+__Multivariate__
+```
+mean(x::Vector{Float64},mop::MultiOrthoPoly)
+```
+compute mean of random variable with PCE `x`
+"""
 function mean(x::Vector{Float64},op::OrthoPoly)::Float64
     x[1]*computeSP2(0,op.β)
 end
@@ -266,6 +304,18 @@ function mean(x::Vector{Float64},mop::MultiOrthoPoly)::Float64
     x[1]*computeSP(zeros(Int64,nunc),mop)
 end
 
+"""
+__Univariate__
+```
+var(x::Vector{Float64},op::OrthoPoly)
+var(x::Vector{Float64},opq::OrthoPolyQ)
+```
+__Multivariate__
+```
+var(x::Vector{Float64},mop::MultiOrthoPoly)
+```
+compute variance of random variable with PCE `x`
+"""
 function var(x::Vector{Float64},op::OrthoPoly)::Float64
     t2 = computeSP2(op)
     @assert length(t2)>=length(x) "cannot compute variance; too many PCE coefficients"
@@ -280,7 +330,21 @@ function var(x::Vector{Float64},mop::MultiOrthoPoly)::Float64
     sum( x[i]^2*t2.get([i-1,i-1]) for i=2:length(x))
 end
 
-std(x::Vector{Float64},op::OrthoPoly)::Float64 = sqrt(var(x,op))
+"""
+__Univariate__
+```
+std(x::Vector{Float64},op::OrthoPoly)
+std(x::Vector{Float64},opq::OrthoPolyQ)
+```
+__Multivariate__
+```
+std(x::Vector{Float64},mop::MultiOrthoPoly)
+```
+compute standard deviation of random variable with PCE `x`
+"""
+function std(x::Vector{Float64},op::OrthoPoly)::Float64
+    sqrt(var(x,op))
+end
 std(x::Vector{Float64},opq::OrthoPolyQ)::Float64 = std(x,opq.op)
 std(x::Vector{Float64},mop::MultiOrthoPoly)::Float64 = sqrt(var(x,mop))
 
