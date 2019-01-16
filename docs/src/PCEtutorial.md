@@ -47,7 +47,7 @@ If a quadrature rule is required, this can be added by calling `OrthoPolyQ`
 
 ```julia
 myopqs = Dict()
-for (i,name) in enumerate(names)
+for (i,name) in enumerate(polynames)
     myopqs[name]=OrthoPolyQ(name,d,pars[i])
 end
 ```

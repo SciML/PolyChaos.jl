@@ -1,3 +1,5 @@
+export calculateMultiIndices, findUnivariateIndices
+
 function calculateMultiIndices(d::Int, n::Int)
     #d denotes dimension of random variables/number of sources of uncertainty,
     #n the maximum degree of multivariate basis

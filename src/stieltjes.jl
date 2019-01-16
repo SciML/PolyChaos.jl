@@ -1,3 +1,5 @@
+export stieltjes, lanczos
+
 function removeZeroWeights(n::Vector{Float64},w::Vector{Float64})
     nw = [n w]
     inds = findall(w->abs(w)>=1e3*eps(), nw[:,2])

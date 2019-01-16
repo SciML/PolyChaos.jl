@@ -1,3 +1,13 @@
+export  fejer,
+        fejer2,
+        clenshaw_curtis,
+        quadgp,
+        golubwelsch,
+        quadpts_beta01,
+        quadpts_gamma,
+        quadpts_gaussian,
+        quadpts_logistic,
+        quadpts_uniform01
 
 """
     fejer(N::Int64)

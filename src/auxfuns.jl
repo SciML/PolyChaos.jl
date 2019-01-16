@@ -1,3 +1,12 @@
+export  coeffs,
+        nw,
+        dim,
+        deg,
+        multi2uni,
+        getentry,
+        issymmetric,
+        integrate
+
 dim(op::OrthoPoly)::Int64 = op.deg+1
 dim(opq::OrthoPolyQ) = dim(opq.op)
 dim(mop::MultiOrthoPoly) = mop.dim

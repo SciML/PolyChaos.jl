@@ -1,3 +1,11 @@
+export  OrthoPoly,
+        MultiOrthoPoly,
+        Quad,
+        OrthoPolyQ,
+        Measure,
+        MultiMeasure,
+        Tensor
+
 struct Measure
     name::String
     w::Function

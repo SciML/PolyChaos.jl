@@ -1,5 +1,12 @@
-export convert2affinePCE, calculateAffinePCE, assign2multi, evaluatePCE,
-       sampleMeasure, samplePCE, mean, var, std
+export  convert2affinePCE,
+        calculateAffinePCE,
+        assign2multi,
+        evaluatePCE,
+        sampleMeasure,
+        samplePCE,
+        mean,
+        var,
+        std
 
 #####################################################################
 #####################################################################

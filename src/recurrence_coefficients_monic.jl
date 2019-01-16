@@ -1,4 +1,17 @@
-
+export  r_scale,
+        rm_logistic,
+        rm_laguerre,
+        rm_logisticsum,
+        rm_hermite,
+        rm_hermite_prob,
+        rm_laguerre,
+        rm_jacobi,
+        rm_jacobi01,
+        rm_hahn,
+        rm_meixner_pollaczek,
+        rm_legendre,
+        rm_legendre01,
+        rm_compute
 """
     r_scale(c::Float64,β::Vector{Float64},α::Vector{Float64})
 Given the recursion coefficients `(α,β)` for a system of orthogonal polynomials that are orthogonal with respect to some positive weight ``m(t)``,

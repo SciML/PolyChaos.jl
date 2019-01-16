@@ -1,16 +1,4 @@
-# using DynamicPolynomials
-# function evaluate(n::Int64,x::DynamicPolynomials.PolyVar,a,b)
-#     @assert n>=0 "Degree n has to be non-negative (currently n=$n)."
-#     # p = Array{DynamicPolynomials.Polynomial{true,Float64}}(n+1)
-#     p = Array{Any}(n+1)
-#     p[1] = 1
-#     if n==0 return p end
-#     p[2] = (x-a[1])*p[1] - b[1]*0
-#     for k=2:n
-#         p[k+1] = (x-a[k])*p[k]-b[k]*p[k-1]
-#     end
-#     return p
-# end
+export evaluate
 
 """
 __Univariate__

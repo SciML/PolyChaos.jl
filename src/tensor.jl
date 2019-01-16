@@ -1,3 +1,5 @@
+export computeTensorizedSP
+
 function computeTensorizedSP(m::Int64,
                              α::Vector{Vector{Float64}},β::Vector{Vector{Float64}},
                              nodes::Vector{Vector{Float64}},weights::Vector{Vector{Float64}},

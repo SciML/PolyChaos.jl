@@ -1,3 +1,10 @@
+export  w_gaussian,
+        w_uniform01,
+        w_logistic,
+        build_w_beta,
+        build_w_gamma,
+        build_w_hermite
+
 function w_legendre(t)
     -1. <= t <= 1. ? 1. : (error("$t not in support"))
 end
