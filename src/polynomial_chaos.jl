@@ -100,7 +100,7 @@ function convert2affinePCE(name::String,p1::Float64,p2::Float64,d::Dict=Dict();k
     end
     convert2affinePCE(a1,a2,α[1])
 end
-convert2affinePCE(name::String,p1::Float64,p2::Float64;kind::Symbol=:lbub) = convert2affinePCE(name,p1,p2,Dict();kind=kind)
+# convert2affinePCE(name::String,p1::Float64,p2::Float64;kind::Symbol=:lbub) = convert2affinePCE(name,p1,p2,Dict();kind=kind)
 
 function assign2multi(x::Vector{Float64},i::Int64,ind::Matrix{Int64})
     l,p = size(ind)
