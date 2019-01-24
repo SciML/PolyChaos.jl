@@ -1,9 +1,21 @@
-export  w_gaussian,
+export  w_legendre,
+        build_w_jacobi,
+        build_w_jacobi01,
+        w_jacobi,
+        w_jacobi01,
+        w_laguerre,
+        w_hermite,
+        build_w_genhermite,
+        build_w_genlaguerre,
+        w_meixner_pollaczek,
+        build_w_meixner_pollaczek,
+
+        w_gaussian,
         w_uniform01,
         w_logistic,
+        w_genhermite,
         build_w_beta,
-        build_w_gamma,
-        build_w_hermite
+        build_w_gamma
 
 function w_legendre(t)
     -1. <= t <= 1. ? 1. : (error("$t not in support"))
@@ -15,7 +27,16 @@ function build_w_jacobi(a,b)
     return t->w_jacobi(t,a,b)
 end
 function w_jacobi(t,a,b)
-    -1. <=t<= 1. ? (w(t) = (1-t)^a*(1+t)) : (error("$t not in support"))
+    -1. <=t<= 1. ? ((1-t)^a*(1+t)^b) : (error("$t not in support"))
+end
+
+function build_w_jacobi01(a,b)
+    @assert a > -1. && b > -1. "Invalid shape parameters"
+    # return w(t) = (1-Float64(t))^a*(1+Float64(t))
+    return t->w_jacobi01(t,a,b)
+end
+function w_jacobi01(t,a,b)
+    0. <=t<= 1. ? ((1-t)^a*t^b) : (error("$t not in support"))
 end
 
 function w_hermite(t)
@@ -27,7 +48,7 @@ function build_w_genhermite(mu)
     return t->w_genhermite(t,mu)
 end
 function w_genhermite(t,μ::Float64)
-    abs(t)^(2μ)*exp(-t^2)
+    abs(t)^(2*μ)*exp(-t^2)
 end
 function build_w_genlaguerre(a)
     @assert a>-1 "Invalid shape parameter"

@@ -15,7 +15,7 @@ Fejer's first quadrature rule.
 """
 function fejer(N::Int64)
     @assert N>=1
-    θ = (2*collect(1:N)-1)*pi/(2*N)
+    θ = (2*collect(1:N).-1)*pi/(2*N)
     t = cos.(θ)
     w = [ 2/N*( 1 - 2*sum( cos(2*n*θ[ν])/(4*n^2-1) for n=1:floor(Int,N/2)) ) for ν=1:N]
     return t, w
@@ -31,7 +31,7 @@ function fejer2(n::Int64)
     l=length(N);
     m=n-l;
     K=collect(0:m-1);
-    v0=[2 ./N./(N-2);  1/N[end]; zeros(m)];
+    v0=[2 ./ N ./(N.-2);  1/N[end]; zeros(m)];
     v2=-v0[1:end-1]-v0[end:-1:2];
     wf2=real(ifft(v2));
     return x, [ wf2; wf2[1] ]

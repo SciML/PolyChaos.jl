@@ -22,14 +22,15 @@ function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
     huge = 0.1*floatmax()
     α, β = zeros(Float64,N), zeros(Float64,N)
     nodes, weights = removeZeroWeights(nodes_,weights_)
+    # nodes, weights = nodes_, weights_
     Ncap = length(nodes)
     @assert N>0 && N<=Ncap "N is out of range."
-    s0 = sum(weights)
+    s0::Float64 = sum(weights)
     α[1] = dot(nodes,weights)/s0
     β[1] = s0
 
     if N==1  return (α, β) end
-    p1, p2 = zeros(Ncap), ones(Ncap)
+    p0, p1, p2 = zeros(Float64,Ncap), zeros(Float64,Ncap), ones(Float64,Ncap)
     for k=1:N-1
         p0 = p1
         p1 = p2
@@ -46,6 +47,7 @@ function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
     end
     return α, β
 end
+
 
 """
   lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})

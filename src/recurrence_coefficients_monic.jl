@@ -38,8 +38,10 @@ function rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nqua
     # display((b,maximum(b)))
     # the following assertions are taken from Theorem 1.28 from
     # Gautschi, W. "Orthogonal Polynomials: Computation and Approximation"
-    @assert lb<minimum(a) && maximum(a)< ub "Not all recurrence coefficients α are elements of the support s=($lb,$ub)."
-    @assert 0<minimum(b) && maximum(b[2:end])<=max(lb^2,ub^2) "Not all recurrence coefficients β are elements of the interval (0, max(lb^2,ub^2)) = (0,$(max(lb^2,ub^2))), namely ($(minimum(b)), $(maximum(b)))."
+    @assert lb<minimum(a) && maximum(a)< ub "Not all recurrence coefficients α ($(minimum(a)),$(maximum(b))) are elements of the support s=($lb,$ub)."
+    if length(b)>=2
+        @assert 0<minimum(b) && maximum(b[2:end])<=max(lb^2,ub^2) "Not all recurrence coefficients β are elements of the interval (0, max(lb^2,ub^2)) = (0,$(max(lb^2,ub^2))), namely ($(minimum(b)), $(maximum(b)))."
+    end
     return a,b
 end
 
@@ -102,9 +104,7 @@ function rm_hermite(N::Int,mu::Float64)
     # nh[1:2:N]=nh[1:2:N]+mu;
     return zeros(N+1), [m0; nh]
 end
-function rm_hermite(N::Int)
-    rm_hermite(N,0.)
-end
+rm_hermite(N::Int) = rm_hermite(N,0.)
 
 
 """
