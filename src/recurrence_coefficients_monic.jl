@@ -43,7 +43,7 @@ function rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nqua
     return a,b
 end
 
-rm_compute(m::Measure;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis) = rm_compute(m.w,m.dom[1],m.dom[2];Npoly=Npoly,Nquad=Nquad,quadrature=quadrature)
+rm_compute(m::Measure;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2];Npoly=Npoly,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
 
 ##
 function rm_logisticsum(n::Int,p1::Vector{Float64},p2::Vector{Float64};Mmax::Int=100,eps0::Real=1e-9)

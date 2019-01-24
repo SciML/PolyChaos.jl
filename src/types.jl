@@ -152,18 +152,18 @@ function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
 end
 
 # general constructor
-function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec)
+function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
   @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
-  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad)
+  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
   return OrthoPoly(name,deg,a,b,m)
 end
 
-function OrthoPoly(name::String,deg::Int64,w::Function,s::Tuple{Real,Real},symm::Bool,d::Dict=Dict();Nrec=deg+1,Nquad=10*Nrec)
+function OrthoPoly(name::String,deg::Int64,w::Function,s::Tuple{Real,Real},symm::Bool,d::Dict=Dict();Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
   @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
   m = Measure(name,w,s,symm,d)
-  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad)
+  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
   return OrthoPoly(name,deg,a,b,m)
 end
 
@@ -297,8 +297,6 @@ struct MultiOrthoPoly
 name::Vector{String}
 deg::Int64
 dim::Int64
-# w::Function
-# supp::Vector{Tuple{Float64,Float64}}
 ind::Matrix{Int64} # multi-index
 meas::MultiMeasure
 uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
