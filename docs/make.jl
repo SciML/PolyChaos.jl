@@ -1,5 +1,5 @@
-using Pkg
-Pkg.add("Documenter")
+# using Pkg
+# Pkg.add("Documenter")
 using Documenter, PolyChaos
 
 makedocs(
