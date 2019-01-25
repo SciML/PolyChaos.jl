@@ -1,5 +1,5 @@
-using Pkg
-Pkg.add("Documenter")
+# using Pkg
+# Pkg.add("Documenter")
 using Documenter, PolyChaos
 
 makedocs(
@@ -13,9 +13,9 @@ makedocs(
     doctest = true,
     pages = Any[
         "index.md",
-        "TypeHierarchy.md",
+        "type_hierarchy.md",
         "Usage" => [
-            "Numerical Integration"=>"NumericalIntegration.md",
+            "Numerical Integration"=>"numerical_integration.md",
             "Monic Orthogonal Polynomials"=>"OrthogonalPolynomials_canonical.md",
             "Scalar Products" => "ScalarProducts.md",
             "Polynomial Chaos" => [ "Basic Usage" => "PCEtutorial.md",
