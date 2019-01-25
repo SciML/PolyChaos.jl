@@ -105,18 +105,6 @@ git-tree-sha1 = "a6db1c69925cdc53aafb38caec4446be26e0c617"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 version = "0.21.0"
 
-[[DocumenterLaTeX]]
-deps = ["Documenter", "Test"]
-git-tree-sha1 = "653299370be20ff580bccd707dc9f360c0852d7f"
-uuid = "cd674d7a-5f81-5cf3-af33-235ef1834b99"
-version = "0.2.0"
-
-[[DocumenterTools]]
-deps = ["Base64", "DocStringExtensions", "LibGit2", "Pkg", "Test"]
-git-tree-sha1 = "f5803a9c2c23ff226e8eab2df7ac4c75e77a0d53"
-uuid = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
-version = "0.1.0"
-
 [[FFTW]]
 deps = ["AbstractFFTs", "BinaryProvider", "Compat", "Conda", "Libdl", "LinearAlgebra", "Reexport", "Test"]
 git-tree-sha1 = "29cda58afbf62f35b1a094882ad6c745a47b2eaa"
