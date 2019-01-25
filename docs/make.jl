@@ -1,8 +1,4 @@
-using Documenter
-# push!(LOAD_PATH,"C:\\Users\\la5373\\Documents\\Code\\pcejl\\src")
-# push!(LOAD_PATH,"..\\src\\")
-using PolyChaos
-using DocumenterLaTeX
+using Documenter, PolyChaos
 
 makedocs(
     sitename = "PolyChaos",
@@ -39,5 +35,5 @@ makedocs(
 )=#
 
 deploydocs(
-    repo = "https://github.com/timueh/PolyChaos.jl.git",
+    repo = "github.com/timueh/PolyChaos.jl.git",
 )
