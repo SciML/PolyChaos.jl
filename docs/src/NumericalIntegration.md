@@ -1,4 +1,4 @@
-# Numerical Integration
+# [Numerical Integration](@id NumericalIntegration)
 ```@setup usePolyChaos
 using PolyChaos
 n = 5; f(t) = sin(t)

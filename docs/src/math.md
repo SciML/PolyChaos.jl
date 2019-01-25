@@ -1,4 +1,4 @@
-# Mathematical Background
+# [Mathematical Background](@id MathematicalBackground)
 
 This section is heavily based on the book "Orthogonal Polynomials: Computation and Approximation" by Walter Gautschi (Oxford University Press)
 
@@ -13,7 +13,7 @@ We always work with absolutely continuous measures for which we write $\mathrm{d
 ```
 - has finite moments of all orders
 ```math
-\mu_r(\mathrm{d}\lambda = \int_{\mathcal{W}} t^r \mathrm{d} \lambda (t), \quad r = 0, 1, 2, \dots \quad \text{with}\: \mu_0 > 0.
+\mu_r(\mathrm{d}\lambda) = \int_{\mathcal{W}} t^r \mathrm{d} \lambda (t), \quad r = 0, 1, 2, \dots \quad \text{with}\: \mu_0 > 0.
 ```
 
 For any pair of integrable functions $u, v$, their scalar product relative to $\mathrm{d} \lambda$ is defined as

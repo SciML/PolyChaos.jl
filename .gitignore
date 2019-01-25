@@ -4,3 +4,4 @@
 deps/deps.jl
 .DS_Store
 .ipynb_checkpoints
+docs/build

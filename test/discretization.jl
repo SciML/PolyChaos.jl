@@ -2,6 +2,9 @@
 # example is based on Walter Gautschi "Orthogonal Polynomials: Computation and Approximation"
 # examples 2.36
 
+using PolyChaos, Test
+import LinearAlgebra: norm
+
 nodes = [40, 80, 160, 320]
 tol = 1e-14
 

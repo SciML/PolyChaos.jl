@@ -2,7 +2,7 @@
 using PolyChaos, Test
 import LinearAlgebra: norm
 tol=1e-4
-N = collect(1:5)
+N = collect(1:6)
 # hermite
 mu = 0.:0.2:1
 

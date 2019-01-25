@@ -1,3 +1,4 @@
+
 # Type Hierarchy
 
 Let's look at the types `PolyChaos` provides.
@@ -44,7 +45,6 @@ For example, the probability density of the Beta distribution on $\Omega = [0,1]
 w(x) = \frac{1}{B(\alpha,\beta)} x^{\alpha-1} (1-x)^{\beta-1}.
 ```
 
-[This tutorial shows the above in action](@ref UnivariateMonicOrthogonalPolynomials)
 
 ## OrthoPoly
 Given an absolutely continuous measure we are wondering what are the monic polynomials $\phi_i: \Omega \rightarrow \mathbb{R}$ that are orthogonal relative to this very measure?
@@ -74,8 +74,6 @@ These recurrence coefficients are the single most important piece of information
 For several common measures, there exist analytic formulae.
 These are built-in to `PolyChaos` and should be used whenever possible.
 
-[This tutorial shows the above in action](@ref UnivariateMonicOrthogonalPolynomials)
-
 ## Quad
 Quadrature rules are intricately related to orthogonal polynomials.
 An $n$-point quadrature rule is a pair of so-called nodes $t_k$ and weights $w_k$ for $k=1,\dots,n$ that allow to solve integrals relative to the measure
@@ -100,8 +98,6 @@ The fields of `Quad` are
 
 with obvious meanings.
 
-[This tutorial shows the above in action](@ref NumericalIntegration)
-
  ## OrthoPolyQ
 As you would expect from the figure at the top, the type `OrthoPolyQ` is an amalgamation of `OrthoPoly` and `Quad`.
 It has just those two fields
@@ -112,10 +108,6 @@ It has just those two fields
 | `quad::Quad` | Quadrature rule |
 
 Clearly, the underlying measures have to be the same.
-
-[This tutorial shows the above in action.](@ref ComputationOfScalarProducts)
-
-[Make sure to check out this tutorial too.](@ref NumericalIntegration)
 
 ## MultiMeasure
 So far, everything was univariate, the weight of the measure was mapping real numbers to real numbers.
@@ -138,8 +130,6 @@ The type `MultiMeasure` serves this purpose, with its fields
 All fields from `Measure` appear in vectorized versions (except for the weight $w$, which is the weight of the product measure)
 The only *new* field is `w_uni`, which stacks the univariate weight functions.
 
-[This tutorial shows the above in action](@ref MultivariateMonicOrthogonalPolynomials)
-
 ## MultiOrthoPoly
 Just as we did in the univariate case, we use `MultiMeasure` as a building block for multivariate orthogonal polynomials.
 The type `MultiOrthoPoly` combines product measures with the respective orthogonal polynomials and their quadrature rules.
@@ -156,11 +146,13 @@ Its fields are
 
 The names of the univariate bases are stored in `names`; the maximum degree of the basis is `deg`; the overall dimension of the multivariate basis is `dim`; the multi-index `ind` maps the $j$-th multivariate basis to the elements of the univariate bases; the product measure is stored in `meas`; finally, all univariate bases are collected in `uni`.
 
-[This tutorial shows the above in action](@ref MultivariateMonicOrthogonalPolynomials)
+This creates a product measure of three univariate measures.
+The maximum degree is 4, which leads to an overall basis dimension of 35.
+For a more detailed discussion please [click here](MultivariateMonicOrthogonalPolynomials).
 
 ## Tensor
 The last type we need to address is `Tensor`.
-It is used to store the results of scalar products.
+It is used to store the results of scalar products, [see here](ComputationOfScalarProducts).
 Its fields are
 
 | Name | Meaning |
@@ -173,4 +165,13 @@ Its fields are
 The *dimension* $m$ of the tensor is the number of terms that appear in the scalar product.
 Let's assume we set $m = 3$, hence have $\langle \phi_{i} \phi_{j}, \phi_{k} \rangle$, then the concrete entry is obtained as `Tensor.get([i,j,k])`.
 
-[This tutorial shows the above in action](@ref ComputationOfScalarProducts)
+
+```julia
+using PolyChaos
+op = OrthoPoly("gaussian",4)
+```
+
+
+```julia
+
+```

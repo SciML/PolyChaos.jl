@@ -1,4 +1,4 @@
-# Univariate Monic Orthogonal Polynomials
+# [Univariate Monic Orthogonal Polynomials](@id UnivariateMonicOrthogonalPolynomials)
 Univariate monic orthogonal polynomials make up the core building block of the package.
 These are real polynomials $\{ \pi_k \}_{k \geq 0}$, which are univariate $\pi_k: \mathbb{R} \rightarrow \mathbb{R}$ and orthogonal relative to a nonnegative weight function $w: \mathbb{R} \rightarrow \mathbb{R}_{\geq 0}$, and which have a leading coefficient equal to one:
 ```math
@@ -98,7 +98,6 @@ size(coeffs(op_),1)==N
 ```
 
 ## Arbitrary Weights
-
 If you are given a weight function $w$ that does not belong to the Table above, it is still possible to generate the respective univariate monic orthogonal polynomials.
 First, we define the measure by specifying a name, the weight, the support, symmetry, and parameters
 
@@ -125,8 +124,7 @@ By default, the recurrence coefficients are computed using the [Stieltjes procue
 Hence, the choice of `Nquad` influences accuracy.
 
 
-# Multivariate Monic Orthogonal Polynomials
-
+## [Multivariate Monic Orthogonal Polynomials](@id MultivariateMonicOrthogonalPolynomials)
 Suppose we have $p$ systems of univariate monic orthogonal polynomials,
 ```math
 \{ \pi_k^{(1)} \}_{k\geq 0}, \: \{ \pi_k^{(2)} \}_{k\geq 0}, \dots, \{ \pi_k^{(p)} \}_{k\geq 0},
