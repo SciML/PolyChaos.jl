@@ -9,7 +9,7 @@ makedocs(
     # format = LaTeX(),
     modules = [PolyChaos],
     authors = "Tillmann Muehlpfordt",
-    repo = "https://github.com/timueh/PolyChaos",
+    # repo = "https://github.com/timueh/PolyChaos",
     doctest = true,
     pages = Any[
         "index.md",
