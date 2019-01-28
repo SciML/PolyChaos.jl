@@ -30,6 +30,6 @@ makedocs(
 
 
 deploydocs(
-    repo = "github.com/timueh/PolyChaos",
+    repo = "github.com/timueh/PolyChaos.git",
     target = "build",
 )
