@@ -3,12 +3,12 @@
 using Documenter, PolyChaos
 
 makedocs(
-    sitename = "PolyChaos",
+    sitename = "PolyChaos.jl",
     format = Documenter.HTML(),
     assets = ["assets/myfont.css"],
     # format = LaTeX(),
-    modules = [PolyChaos],
-    authors = "Tillmann Muehlpfordt",
+    modules = [PolyChaos.jl],
+    authors = "tillmann.muehlpfordt@kit.edu",
     # repo = "github.com/timueh/PolyChaos.jl.git",
     doctest = true,
     pages = Any[
@@ -30,6 +30,6 @@ makedocs(
 
 
 deploydocs(
-    repo = "github.com/timueh/PolyChaos.git",
+    repo = "github.com/timueh/PolyChaos.jl.git",
     target = "build",
 )
