@@ -9,7 +9,7 @@ makedocs(
     # format = LaTeX(),
     modules = [PolyChaos],
     authors = "Tillmann Muehlpfordt",
-    repo = "github.com/timueh/PolyChaos.jl.git",
+    # repo = "github.com/timueh/PolyChaos.jl.git",
     doctest = true,
     pages = Any[
         "index.md",
@@ -29,14 +29,7 @@ makedocs(
 )
 
 
-# Documenter can also automatically deploy documentation to gh-pages.
-# See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
-#=deploydocs(
-    repo = "<repository url>"
-)=#
-
 deploydocs(
-    repo = "github.com/timueh/PolyChaos.jl.git",
+    repo = "github.com/timueh/PolyChaos.git",
     target = "build",
 )
