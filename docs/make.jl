@@ -7,7 +7,7 @@ makedocs(
     format = Documenter.HTML(),
     assets = ["assets/myfont.css"],
     # format = LaTeX(),
-    modules = [PolyChaos.jl],
+    modules = [PolyChaos],
     authors = "tillmann.muehlpfordt@kit.edu",
     # repo = "github.com/timueh/PolyChaos.jl.git",
     doctest = true,
