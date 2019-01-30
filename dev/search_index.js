@@ -613,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.rm_hermite_prob",
     "category": "method",
-    "text": "rm_hermite_prob(N::Int)\n\nCreates N recurrence coefficients for monic probabilists\' Hermite polynomials that are orthogonal on (-inftyinfty) relative to w(t) = frac1sqrt2 pi mathrme^-t^2\n\n\n\n\n\n"
+    "text": "rm_hermite_prob(N::Int)\n\nCreates N recurrence coefficients for monic probabilists\' Hermite polynomials that are orthogonal on (-inftyinfty) relative to w(t) = mathrme^-05t^2\n\n\n\n\n\n"
 },
 
 {
@@ -781,7 +781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.quadpts_logistic",
     "category": "function",
-    "text": "quadpts_logistic(N::Int64)\n\nget quadrature points for logistic weight function on (-inftyinfty)\n\n\n\n\n\nQuadrature rule for weight function\n    w(t) = c3*c2*exp(-c2*(t-c1))/(exp(-c2*(t-c1)))^2\n\nThe default value for c3 is one, c3=1, and\n    w(t) = c2*exp(-c2*(t-c1))/(1+exp(-c2*(t-c1)))^2.\nIn that case w(t) is the probability density function of\n    Y = 1/c2*X + c1, with c2>0\nwhere X has the standard logistic density\n    ρ(t) = exp(-x)/(1+exp(-x))^2\n\nA value c3!=1 is needed, for example, when constructing sums of logistic densities.\n\n\n\n\n\n"
+    "text": "quadpts_logistic(N::Int,c1::Real,c2::Real,c3::Real=1.)\nquadpts_logistic(N::Int64)\n\nN-point quadrature rule for weight function\n\n    w(t) = c_3 c_2fracexp(-c_2(t-c_1))(1+exp(-c_2(t-c_1)))^2\n\nThe default value for c3 is one. In that case w(t) is the probability density function of\n\n    Y = frac1c_2 X + c_1 quad c_20\n\nwhere X has the standard logistic density\n\n    ρ(t) = fracexp(-t)(1+exp(-t))^2\n\nThe N-point quadrature rule for ρ(t) is computed by calling quadpts_logistic(N::Int64).\n\n\n\n\n\n"
 },
 
 {
@@ -805,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.gauss",
     "category": "function",
-    "text": "gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})\ngauss(α::Vector{Float64},β::Vector{Float64})\ngauss(N::Int64,op::OrthoPoly)\ngauss(op::OrthoPoly)\n\nGauss quadrature rule, also known as Golub-Welsch algorithm\n\ngauss()generates theNGauss quadrature nodes and weights for a given weight function. The weight function is represented by theN` recurrence coefficients for the monic polynomials orthogonal with respect to the weight function.\n\nnote: Note\nIf no N is provided, then N = length(α).\n\n\n\n\n\n"
+    "text": "gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})\ngauss(α::Vector{Float64},β::Vector{Float64})\ngauss(N::Int64,op::OrthoPoly)\ngauss(op::OrthoPoly)\n\nGauss quadrature rule, also known as Golub-Welsch algorithm\n\ngauss() generates the N Gauss quadrature nodes and weights for a given weight function. The weight function is represented by the N recurrence coefficients for the monic polynomials orthogonal with respect to the weight function.\n\nnote: Note\nIf no N is provided, then N = length(α).\n\n\n\n\n\n"
 },
 
 {
@@ -813,7 +813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.radau",
     "category": "function",
-    "text": "radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(N::Int64,op::OrthoPoly,end0::Float64)\nradau(op::OrthoPoly,end0::Float64)\n\nGauss-Radau quadrature rule. Given a weight function encoded by the  n+1 recurrence coefficients for the associated orthogonal polynomials, the first column of ab containing the n+1 alpha-coefficients and the second column the n+1 beta- coefficients, the call xw=RADAU(n,ab,end0) generates the nodes and weights xw of the (n+1)-point Gauss-Radau quadrature rule for the weight function w having a prescribed node end0 (typically at one of the end points of the support interval of w, or outside thereof). The n+1 nodes, in increasing order, are stored in the first column, the n+1 corresponding weights in the second column, of the (n+1)x2 array xw.\n\nnote: Note\nIf no N is specified, then N = length(α)-1.\n\nnote: Note\nReference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi\n\n\n\n\n\n"
+    "text": "radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(N::Int64,op::OrthoPoly,end0::Float64)\nradau(op::OrthoPoly,end0::Float64)\n\nGauss-Radau quadrature rule. Given a weight function encoded by the recurrence coefficients (α,β)for the associated orthogonal polynomials, the function generates the nodes and weights (n+1)-point Gauss-Radau quadrature rule for the weight function having a prescribed node end0 (typically at one of the end points of the support interval of w, or outside thereof).\n\nnote: Note\nIf no N is specified, then N = length(α)-1.\n\nnote: Note\nReference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi\n\n\n\n\n\n"
 },
 
 {
@@ -829,7 +829,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.radau_laguerre",
     "category": "function",
-    "text": "radau_laguerre(N::Int64,a::Float64)\nradau_laguerre(N::Int64) = radau_laguerre(N,0.)\n\nGauss-Radau quadrature rule for Laguerre weight function, which generates the (n+1)-point Gauss-Radau rule for the Laguerre weight function on 0infty with parameter a.\n\nnotebook: Notebook\nREFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and Laguerre weight functions\'\', Math. Comput. Simulation 54 (2000), 403-412.\n\n\n\n\n\n"
+    "text": "radau_laguerre(N::Int64,a::Float64)\nradau_laguerre(N::Int64) = radau_laguerre(N,0.)\n\nGauss-Radau quadrature rule for Laguerre weight function, which generates the (n+1)-point Gauss-Radau rule for the Laguerre weight function on 0infty with parameter a.\n\nnote: Note\nREFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and Laguerre weight functions\'\', Math. Comput. Simulation 54 (2000), 403-412.\n\n\n\n\n\n"
 },
 
 {
