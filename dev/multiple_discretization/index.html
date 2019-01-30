@@ -15,17 +15,17 @@ print(&quot;Fejer error:\t$(abs(int_exact-int_fejer))\twith $N nodes&quot;)</cod
 end
 n,w = quad_gaussleg(N,γ)
 int_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))
-print(&quot;Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Gauss-Legendre error:	1.569226315865443	with 1000 nodes</code></pre></div><p>Even worse! Well, we can factor out <span>$\frac{1}{\sqrt{1-t^2}}$</span>, making the integral amenable to a Gauss-Chebyshev rule. So, let&#39;s give it anothery try.</p><div><pre><code class="language-julia">function quad_gausscheb(N::Int64,γ::Float64)
+print(&quot;Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Gauss-Legendre error:	1.569226315865443	with 1000 nodes</code></pre></div><p>Even worse! Well, we can factor out <span>$\frac{1}{\sqrt{1-t^2}}$</span>, making the integral amenable to a Gauss-Chebyshev rule. So, let&#39;s give it anothery try.</p><pre><code class="language-">function quad_gausscheb(N::Int64,γ::Float64)
     a,b = rm_chebyshev1(N)
     n,w = golubwelsch(a,b)
 end
 n,w = quad_gausscheb(N,γ)
 int_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))
 # int=sum(xw(:,2).*(1+sqrt(1-xw(:,1).^2)))
-print(&quot;Gauss-Chebyshev error:\t$(abs(int_exact-int_gausscheb))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Gauss-Chebyshev error:	4.112336209338707e-7	with 1000 nodes</code></pre></div><p>Okay, that&#39;s better, but it took us a lot of nodes to get this result. Is there a different way? Indeed, there is. As we have noticed, the weight <span>$w$</span> has a lot in common with Gauss-Legendre <em>and</em> Gauss-Chebyshev. We can decompose the integral as follows</p><div>\[\int_{-1}^1 f(t) w(t) \mathrm{d}t = \sum_{i=1}^{m} \int_{-1}^{1} f(t) w_i(t) \mathrm{d} t,\]</div><p>with</p><div>\[\begin{align*}
+print(&quot;Gauss-Chebyshev error:\t$(abs(int_exact-int_gausscheb))\twith $N nodes&quot;)</code></pre><p>Okay, that&#39;s better, but it took us a lot of nodes to get this result. Is there a different way? Indeed, there is. As we have noticed, the weight <span>$w$</span> has a lot in common with Gauss-Legendre <em>and</em> Gauss-Chebyshev. We can decompose the integral as follows</p><div>\[\int_{-1}^1 f(t) w(t) \mathrm{d}t = \sum_{i=1}^{m} \int_{-1}^{1} f(t) w_i(t) \mathrm{d} t,\]</div><p>with</p><div>\[\begin{align*}
 w_1(t) &amp;= \gamma \\
 w_2(t) &amp;= (1-\gamma) \frac{1}{\sqrt{1-t^2}}.
-\end{align*}\]</div><p>To the weight <span>$w_1$</span> we can apply Gauss-Legendre quadrature, to the weight <span>$w_2$</span> we can apply Gauss-Chebyshev quadrature (with tiny modifications). This <em>discretization</em> of the measure can be used in our favor. The function <code>mcdiscretization()</code> takes the <span>$m$</span> discretization rules as an input</p><div><pre><code class="language-julia">function quad_gaussleg_mod(N::Int,γ::Float64)
+\end{align*}\]</div><p>To the weight <span>$w_1$</span> we can apply Gauss-Legendre quadrature, to the weight <span>$w_2$</span> we can apply Gauss-Chebyshev quadrature (with tiny modifications). This <em>discretization</em> of the measure can be used in our favor. The function <code>mcdiscretization()</code> takes the <span>$m$</span> discretization rules as an input</p><pre><code class="language-">function quad_gaussleg_mod(N::Int,γ::Float64)
     n,w = quad_gaussleg(N,γ)
     return n,γ*w
 end
@@ -38,28 +38,12 @@ N = 8
 a,b = mcdiscretization(N,[n-&gt;quad_gaussleg_mod(n,γ); n-&gt;quad_gausscheb_mod(n,γ)])
 n,w = golubwelsch(a,b)
 int_mc = sum(w)
-print(&quot;Discretization error:\t$(abs(int_exact-int_mc))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Discretization error:	5.329070518200751e-15	with 8 nodes</code></pre></div><p>Et voilà, no error with fewer nodes. (For this example, we&#39;d need in fact just a single node.)</p><p>The function <code>mcdiscretization()</code> is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight <span>$w$</span>. Let&#39;s inspect the values of the recurrence coefficients a little more. For <span>$\gamma = 0$</span>, we are in the world of Chebyshev polynomials, for <span>$\gamma = 1$</span>, we enter the realm of Legendre polynomials. And in between? That&#39;s exactly where the weight <span>$w$</span> comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let&#39;s verify this by plotting the recurrence coefficients for several values of <span>$\gamma$</span>.</p><div><pre><code class="language-julia">Γ = 0:0.1:1;
+print(&quot;Discretization error:\t$(abs(int_exact-int_mc))\twith $N nodes&quot;)</code></pre><p>Et voilà, no error with fewer nodes. (For this example, we&#39;d need in fact just a single node.)</p><p>The function <code>mcdiscretization()</code> is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight <span>$w$</span>. Let&#39;s inspect the values of the recurrence coefficients a little more. For <span>$\gamma = 0$</span>, we are in the world of Chebyshev polynomials, for <span>$\gamma = 1$</span>, we enter the realm of Legendre polynomials. And in between? That&#39;s exactly where the weight <span>$w$</span> comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let&#39;s verify this by plotting the recurrence coefficients for several values of <span>$\gamma$</span>.</p><pre><code class="language-">Γ = 0:0.1:1;
 ab = [ mcdiscretization(N,[n-&gt;quad_gaussleg_mod(n,gam); n-&gt;quad_gausscheb_mod(n,gam)]) for gam in Γ ];
 bb = hcat([ ab[i][2] for i=1:length(Γ)]...);
 b_leg = rm_legendre(N)[2];
 b_cheb = rm_chebyshev1(N)[2]
-bb[:,1]-b_cheb</code></pre><pre><code class="language-none">8-element Array{Float64,1}:
-  1.2434497875801753e-14
-  3.1086244689504383e-15
- -7.494005416219807e-16
-  5.551115123125783e-16
-  1.0547118733938987e-15
-  4.440892098500626e-16
- -1.3877787807814457e-15
-  6.661338147750939e-16</code></pre></div><div><pre><code class="language-julia">bb[:,end]-b_leg</code></pre><pre><code class="language-none">8-element Array{Float64,1}:
- -4.440892098500626e-16
-  3.3306690738754696e-16
- -8.326672684688674e-16
-  4.440892098500626e-16
-  7.771561172376096e-16
-  2.220446049250313e-16
- -9.992007221626409e-16
-  9.43689570931383e-16</code></pre></div><p>Let&#39;s plot these values to get a better feeling.</p><pre><code class="language-">using PyPlot
+bb[:,1]-b_cheb</code></pre><pre><code class="language-">bb[:,end]-b_leg</code></pre><p>Let&#39;s plot these values to get a better feeling.</p><pre><code class="language-">using PyPlot
 figure(1);
 grid(true);
 semilogy(Γ,bb&#39;);
