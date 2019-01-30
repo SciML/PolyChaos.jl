@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "Measure",
     "category": "section",
-    "text": "It all begins with a measure, more specifically absolutely continuous measures. What are the fields of such a type measure?Field Meaning\nname::String Name of measure\nw::Function Weight function w Omega rightarrow mathbbR\ndom::Tuple{Float64,Float64} Domain $ \\Omega$\nsymmetric::Bool Is w symmetric relative to some m in Omega, hence w(m-x) = w(m+x) for all x in Omega?\npars::Dict Additional parameters (e.g. shape parameters for Beta distributionThey are a name, a weight function w Omega rightarrow mathbbR with domain Omega (dom). If the weight function is symmetric relative to some m in Omega, the field symmetric should be set to true. Symmetry relative to m means thatforall x in Omega quad w(m-x) = w(m+x)For example, the Gaussian probability densityw(x) = frac1sqrt2pi mathrme^-x^22is symmetric relative to the origin m=0. If the weight function has any parameters, then they are stored in the dictionary pars. For example, the probability density of the Beta distribution on Omega = 01 has two positive shape parameters alpha beta  0w(x) = frac1B(alphabeta) x^alpha-1 (1-x)^beta-1This tutorial shows the above in action"
+    "text": "It all begins with a measure, more specifically absolutely continuous measures. What are the fields of such a type measure?Field Meaning\nname::String Name of measure\nw::Function Weight function w Omega rightarrow mathbbR\ndom::Tuple{Float64,Float64} Domain $ \\Omega$\nsymmetric::Bool Is w symmetric relative to some m in Omega, hence w(m-x) = w(m+x) for all x in Omega?\npars::Dict Additional parameters (e.g. shape parameters for Beta distributionThey are a name, a weight function w Omega rightarrow mathbbR with domain Omega (dom). If the weight function is symmetric relative to some m in Omega, the field symmetric should be set to true. Symmetry relative to m means thatforall x in Omega quad w(m-x) = w(m+x)For example, the Gaussian probability densityw(x) = frac1sqrt2pi mathrme^-x^22is symmetric relative to the origin m=0. If the weight function has any parameters, then they are stored in the dictionary pars. For example, the probability density of the Beta distribution on Omega = 01 has two positive shape parameters alpha beta  0w(x) = frac1B(alphabeta) x^alpha-1 (1-x)^beta-1This tutorial shows the above in action."
 },
 
 {
@@ -190,6 +190,22 @@ var documenterSearchIndex = {"docs": [
     "title": "Multivariate Monic Orthogonal Polynomials",
     "category": "section",
     "text": "Suppose we have p systems of univariate monic orthogonal polynomials, pi_k^(1) _kgeq 0   pi_k^(2) _kgeq 0 dots  pi_k^(p) _kgeq 0each system being orthogonal relative to the weights w^(1) w^(2) dots w^(p) with supports mathcalW^(1) mathcalW^(2) dots mathcalW^(p). Also, let d^(i) be the maximum degree of the i-th system of univariate orthogonal polynomials. We would like to construct a p-variate monic basis  psi_k _k geq 0 with psi mathbbR^p rightarrow mathbbR of degree at most 0 leq d leq min_i=1dotsk d^(i). Further, this basis shall be orthogonal relative to the product measure w mathcalW = mathcalW^(1) otimes mathcalW^(2) mathcalW^(1) cdots otimes mathcalW^(p) rightarrow mathbbR_geq 0 given byw(t) = prod_i=1^p w^(i)(t_i)hence satisfieslangle psi_k psi_l rangle = int_mathcalW psi_k(t) psi_l(t) w(t) mathrmd t =\nbegincases\n0  k neq l text and kl geq 0 \n psi_k ^2  0  k = l geq 0\nendcasesFor this, there exists the composite struct MultiOrthoPoly. Let\'s consider an example where we mix classical orthogonal polynomials with an arbitrary weight.deg = [3,5,6,4]\nd = minimum(deg)\n\nop1 = OrthoPoly(\"gaussian\",deg[1])\nop2 = OrthoPoly(\"uniform01\",deg[2])\nop3 = OrthoPoly(\"beta01\",deg[3],Dict(:shape_a=>2,:shape_b=>1.2))\nops = [op1,op2,op3,my_op]\nmop = MultiOrthoPoly(ops,d)The total number of  basis polynomials is stored in the field dim. The univariate basis polynomials making up the multivariate basis are stored in the field uni.mop.uniThe field ind contains the multi-index, i.e. row i stores what combination of univariate polynomials makes up the i-th multivariate polynomial. For example,i = 11\nmop.ind[i+1,:]translates mathematically topsi_11(t) = pi_0^(1)(t_1) pi_1^(2)(t_2) pi_0^(3)(t_3) pi_1^(4)(t_4)Notice that there is an offset by one, because the basis counting starts at 0, but Julia is 1-indexed. The underlying measure of mop is now of type MultiMeasure, and stored in the field measmop.measThe weight w can be evaluated as expectedmop.meas.w(0.5*ones(length(ops)))"
+},
+
+{
+    "location": "multiple_discretization/#",
+    "page": "Multiple Discretization",
+    "title": "Multiple Discretization",
+    "category": "page",
+    "text": "using PolyChaos, LinearAlgebra\nγ = 0.5;\nint_exact = 1+pi/2; # exact value of the integral\nfunction my_w(t::Float64,γ::Float64)\n    γ + (1-γ)*1/sqrt(1-t^2)\nend\nN = 1000;\nn,w = fejer(N);\nint_fejer = dot(w,my_w.(n,γ))\nprint(\"Fejer error:\\t$(abs(int_exact-int_fejer))\\twith $N nodes\")\nfunction quad_gaussleg(N::Int,γ::Float64)\n    a,b=rm_legendre(N)\n    n,w=golubwelsch(a,b)\nend\nn,w = quad_gaussleg(N,γ)\nint_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))\nprint(\"Gauss-Legendre error:\\t$(abs(int_exact-int_gaussleg))\\twith $N nodes\")\nfunction quad_gausscheb(N::Int64,γ::Float64)\n    a,b = rm_chebyshev1(N)\n    n,w = golubwelsch(a,b)\nend\nn,w = quad_gausscheb(N,γ)\nint_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))\nprint(\"Gauss-Chebyshev error:\\t$(abs(int_exact-int_gausscheb))\\twith $N nodes\")\nfunction quad_gaussleg_mod(N::Int,γ::Float64)\n    n,w = quad_gaussleg(N,γ)\n    return n,γ*w\nend\nfunction quad_gausscheb_mod(N::Int,γ::Float64)\n            n,w = quad_gausscheb(N,γ)\n    return n,(1-γ)*w\nend\nN = 8\na,b = mcdiscretization(N,[n->quad_gaussleg_mod(n,γ); n->quad_gausscheb_mod(n,γ)])\nn,w = golubwelsch(a,b)\nint_mc = sum(w)\nprint(\"Discretization error:\\t$(abs(int_exact-int_mc))\\twith $N nodes\")\nΓ = 0:0.1:1;\nab = [ mcdiscretization(N,[n->quad_gaussleg_mod(n,gam); n->quad_gausscheb_mod(n,gam)]) for gam in Γ ];\nbb = hcat([ ab[i][2] for i=1:length(Γ)]...);\nb_leg = rm_legendre(N)[2];\nb_cheb = rm_chebyshev1(N)[2]\nbb[:,1]-b_cheb\nbb[:,end]-b_leg\nusing PyPlot\nfigure(1);\ngrid(true);\nsemilogy(Γ,bb\');\n[ plot(0.,b_cheb[i],\"x\") for i=1:N ];\n[ plot(1.,b_leg[i],\"o\") for i=1:N ];\nttl = latexstring(\"N=$N  Recurrence Coefficients Interpolating from Chebyshev to Legendre\");\nxlabel(L\"\\gamma\");\nylabel(L\"\\beta\");\ntitle(\"N=$N β-Recurrence Coefficients Interpolating from Chebyshev to Legendre\");"
+},
+
+{
+    "location": "multiple_discretization/#Multiple-Discretization-1",
+    "page": "Multiple Discretization",
+    "title": "Multiple Discretization",
+    "category": "section",
+    "text": "This tutorial shows how to compute recurrence coefficients for non-trivial weight functions, and how they are being used for quadrature. The method we use is called multiple discretization, and follows W. Gautschi\'s book \"Orthogonal Polynomials: Computation and Approximation\", specifically Section 2.2.4, and Example 2.38.Suppose we have the weight functionforall t in -11 gamma in 01 quad w(tgamma) = gamma + (1-gamma) frac1sqrt1-t^2and we would like to solveint_-1^1 f(t) w(tc) mathrmdt = sum_nu=1^N f(tau_nu) w_nuby some quadrature rule. We will see that ad-hoc quadrature rules will fail to solve the integral even for the simplest choice f equiv 1. However, finding the recurrence coefficients of the underlying orthogonal polynomials, and then finding the quadrature rule will be the way to go.Let us first try to solve the integral for f equiv 1 by Fejer\'s rule.using PolyChaos, LinearAlgebra\nγ = 0.5;\nint_exact = 1+pi/2; # exact value of the integral\nfunction my_w(t::Float64,γ::Float64)\n    γ + (1-γ)*1/sqrt(1-t^2)\nend\n\nN = 1000;\nn,w = fejer(N);\nint_fejer = dot(w,my_w.(n,γ))\nprint(\"Fejer error:\\t$(abs(int_exact-int_fejer))\\twith $N nodes\")Clearly, that is not satisfying. Well, the term gamma of the weight w makes us think of Gauss-Legendre integration, so let\'s try it instead.function quad_gaussleg(N::Int,γ::Float64)\n    a,b=rm_legendre(N)\n    n,w=golubwelsch(a,b)\nend\nn,w = quad_gaussleg(N,γ)\nint_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))\nprint(\"Gauss-Legendre error:\\t$(abs(int_exact-int_gaussleg))\\twith $N nodes\")Even worse! Well, we can factor out frac1sqrt1-t^2, making the integral amenable to a Gauss-Chebyshev rule. So, let\'s give it anothery try.function quad_gausscheb(N::Int64,γ::Float64)\n    a,b = rm_chebyshev1(N)\n    n,w = golubwelsch(a,b)\nend\nn,w = quad_gausscheb(N,γ)\nint_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))\n# int=sum(xw(:,2).*(1+sqrt(1-xw(:,1).^2)))\nprint(\"Gauss-Chebyshev error:\\t$(abs(int_exact-int_gausscheb))\\twith $N nodes\")Okay, that\'s better, but it took us a lot of nodes to get this result. Is there a different way? Indeed, there is. As we have noticed, the weight w has a lot in common with Gauss-Legendre and Gauss-Chebyshev. We can decompose the integral as followsint_-1^1 f(t) w(t) mathrmdt = sum_i=1^m int_-1^1 f(t) w_i(t) mathrmd twithbeginalign*\nw_1(t) = gamma \nw_2(t) = (1-gamma) frac1sqrt1-t^2\nendalign*To the weight w_1 we can apply Gauss-Legendre quadrature, to the weight w_2 we can apply Gauss-Chebyshev quadrature (with tiny modifications). This discretization of the measure can be used in our favor. The function mcdiscretization() takes the m discretization rules as an inputfunction quad_gaussleg_mod(N::Int,γ::Float64)\n    n,w = quad_gaussleg(N,γ)\n    return n,γ*w\nend\nfunction quad_gausscheb_mod(N::Int,γ::Float64)\n            n,w = quad_gausscheb(N,γ)\n    return n,(1-γ)*w\nend\n\nN = 8\na,b = mcdiscretization(N,[n->quad_gaussleg_mod(n,γ); n->quad_gausscheb_mod(n,γ)])\nn,w = golubwelsch(a,b)\nint_mc = sum(w)\nprint(\"Discretization error:\\t$(abs(int_exact-int_mc))\\twith $N nodes\")Et voilà, no error with fewer nodes. (For this example, we\'d need in fact just a single node.)The function mcdiscretization() is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight w. Let\'s inspect the values of the recurrence coefficients a little more. For gamma = 0, we are in the world of Chebyshev polynomials, for gamma = 1, we enter the realm of Legendre polynomials. And in between? That\'s exactly where the weight w comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let\'s verify this by plotting the recurrence coefficients for several values of gamma.Γ = 0:0.1:1;\nab = [ mcdiscretization(N,[n->quad_gaussleg_mod(n,gam); n->quad_gausscheb_mod(n,gam)]) for gam in Γ ];\nbb = hcat([ ab[i][2] for i=1:length(Γ)]...);\nb_leg = rm_legendre(N)[2];\nb_cheb = rm_chebyshev1(N)[2]\nbb[:,1]-b_chebbb[:,end]-b_legLet\'s plot these values to get a better feeling.using PyPlot\nfigure(1);\ngrid(true);\nsemilogy(Γ,bb\');\n[ plot(0.,b_cheb[i],\"x\") for i=1:N ];\n[ plot(1.,b_leg[i],\"o\") for i=1:N ];\nttl = latexstring(\"N=$N  Recurrence Coefficients Interpolating from Chebyshev to Legendre\");\nxlabel(L\"\\gamma\");\nylabel(L\"\\beta\");\ntitle(\"N=$N β-Recurrence Coefficients Interpolating from Chebyshev to Legendre\");(Image: type hierarchy)The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials. The interpolating line in between stands for the β recursion coefficients of w(tgamma)."
 },
 
 {
@@ -597,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.rm_hermite_prob",
     "category": "method",
-    "text": "rm_hermite_prob(N::Int)\n\nCreates N recurrence coefficients for monic probabilists\' Hermite polynomials that are orthogonal on (-inftyinfty) relative to w(t) = frac1sqrt2 pi mathrme^-t^2\n\n\n\n\n\n"
+    "text": "rm_hermite_prob(N::Int)\n\nCreates N recurrence coefficients for monic probabilists\' Hermite polynomials that are orthogonal on (-inftyinfty) relative to w(t) = mathrme^-05t^2\n\n\n\n\n\n"
 },
 
 {
@@ -765,7 +781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.quadpts_logistic",
     "category": "function",
-    "text": "quadpts_logistic(N::Int64)\n\nget quadrature points for logistic weight function on (-inftyinfty)\n\n\n\n\n\nQuadrature rule for weight function\n    w(t) = c3*c2*exp(-c2*(t-c1))/(exp(-c2*(t-c1)))^2\n\nThe default value for c3 is one, c3=1, and\n    w(t) = c2*exp(-c2*(t-c1))/(1+exp(-c2*(t-c1)))^2.\nIn that case w(t) is the probability density function of\n    Y = 1/c2*X + c1, with c2>0\nwhere X has the standard logistic density\n    ρ(t) = exp(-x)/(1+exp(-x))^2\n\nA value c3!=1 is needed, for example, when constructing sums of logistic densities.\n\n\n\n\n\n"
+    "text": "quadpts_logistic(N::Int,c1::Real,c2::Real,c3::Real=1.)\nquadpts_logistic(N::Int64)\n\nN-point quadrature rule for weight function\n\n    w(t) = c_3 c_2fracexp(-c_2(t-c_1))(1+exp(-c_2(t-c_1)))^2\n\nThe default value for c3 is one. In that case w(t) is the probability density function of\n\n    Y = frac1c_2 X + c_1 quad c_20\n\nwhere X has the standard logistic density\n\n    ρ(t) = fracexp(-t)(1+exp(-t))^2\n\nThe N-point quadrature rule for ρ(t) is computed by calling quadpts_logistic(N::Int64).\n\n\n\n\n\n"
 },
 
 {
@@ -785,11 +801,59 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "functions/#PolyChaos.gauss",
+    "page": "Functions",
+    "title": "PolyChaos.gauss",
+    "category": "function",
+    "text": "gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})\ngauss(α::Vector{Float64},β::Vector{Float64})\ngauss(N::Int64,op::OrthoPoly)\ngauss(op::OrthoPoly)\n\nGauss quadrature rule, also known as Golub-Welsch algorithm\n\ngauss() generates the N Gauss quadrature nodes and weights for a given weight function. The weight function is represented by the N recurrence coefficients for the monic polynomials orthogonal with respect to the weight function.\n\nnote: Note\nIf no N is provided, then N = length(α).\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#PolyChaos.radau",
+    "page": "Functions",
+    "title": "PolyChaos.radau",
+    "category": "function",
+    "text": "radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(N::Int64,op::OrthoPoly,end0::Float64)\nradau(op::OrthoPoly,end0::Float64)\n\nGauss-Radau quadrature rule. Given a weight function encoded by the recurrence coefficients (α,β)for the associated orthogonal polynomials, the function generates the nodes and weights (n+1)-point Gauss-Radau quadrature rule for the weight function having a prescribed node end0 (typically at one of the end points of the support interval of w, or outside thereof).\n\nnote: Note\nIf no N is specified, then N = length(α)-1.\n\nnote: Note\nReference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#PolyChaos.radau_jacobi",
+    "page": "Functions",
+    "title": "PolyChaos.radau_jacobi",
+    "category": "function",
+    "text": "radau_jacobi(N::Int64,a::Float64,b::Float64;endpoint::String=\"left\")\nendpoint in [\"left\", \"right\"]\nradau_jacobi(N::Int64,a::Float64;endpoint::String=\"left\") = radau_jacobi(N,a,a;endpoint=endpoint)\nradau_jacobi(N::Int64;endpoint::String=\"left\") = radau_jacobi(N,0.;endpoint=endpoint)\n\nGauss-Radau quadrature rule for Jacobi weight function, which generates the (n+1)-point Gauss-Radau rule for the Jacobi weight function on [-1,1] with parameters a and b.\n\nnote: Note\nREFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and Laguerre weight functions\'\', Math. Comput. Simulation 54 (2000), 403-412.\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#PolyChaos.radau_laguerre",
+    "page": "Functions",
+    "title": "PolyChaos.radau_laguerre",
+    "category": "function",
+    "text": "radau_laguerre(N::Int64,a::Float64)\nradau_laguerre(N::Int64) = radau_laguerre(N,0.)\n\nGauss-Radau quadrature rule for Laguerre weight function, which generates the (n+1)-point Gauss-Radau rule for the Laguerre weight function on 0infty with parameter a.\n\nnote: Note\nREFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and Laguerre weight functions\'\', Math. Comput. Simulation 54 (2000), 403-412.\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#PolyChaos.lobatto",
+    "page": "Functions",
+    "title": "PolyChaos.lobatto",
+    "category": "function",
+    "text": "lobatto(N::Int64,α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)\nlobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)\nlobatto(N::Int64,op::OrthoPoly,endl::Float64,endr::Float64)\nlobatto(op::OrthoPoly,endl::Float64,endr::Float64)\n\nGauss-Lobatto quadrature rule. Given a weight function encoded by the recurrence coefficients for the associated orthogonal polynomials, the function generates the nodes and weights of the (N+2)-point Gauss-Lobatto quadrature rule for the weight function, having two prescribed nodes endl, endr (typically the left and right end points of the support interval, or points to the left resp. to the right therof).\n\nnote: Note\nIf no N is specified, then N = length(α)-2.\n\nnote: Note\nReference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#PolyChaos.lobatto_jacobi",
+    "page": "Functions",
+    "title": "PolyChaos.lobatto_jacobi",
+    "category": "function",
+    "text": "lobatto_jacobi(N::Int64,a::Float64,b::Float64)\nlobatto_jacobi(N::Int64,a::Float64) = lobatto_jacobi(N,a,a)\nlobatto_jacobi(N::Int64) = lobatto_jacobi(N,0.)\n\nGauss-Lobatto quadrature rule for Jacobi weight function, which generates the (n+2)-point Gauss- Lobatto rule for the Jacobi weight function on -11 with parameters a and b.\n\nnote: Note\nREFERENCE: W. Gautschi,``High-order Gauss-Lobatto formulae\'\', Numer. Algorithms 25 (2000), 213-222.\n\n\n\n\n\n"
+},
+
+{
     "location": "functions/#Quadrature-Rules-1",
     "page": "Functions",
     "title": "Quadrature Rules",
     "category": "section",
-    "text": "fejer\nfejer2\nclenshaw_curtis\nquadpts_beta01\nquadpts_gamma\nquadpts_gaussian\nquadpts_logistic\nquadpts_uniform01\nquadgp"
+    "text": "fejer\nfejer2\nclenshaw_curtis\nquadpts_beta01\nquadpts_gamma\nquadpts_gaussian\nquadpts_logistic\nquadpts_uniform01\nquadgp\ngauss\nradau\nradau_jacobi\nradau_laguerre\nlobatto\nlobatto_jacobi"
 },
 
 {

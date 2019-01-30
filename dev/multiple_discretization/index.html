@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Multiple Discretization · PolyChaos.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="../index.html"><img class="logo" src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><h1>PolyChaos.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Overview</a></li><li><a class="toctext" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="toctext">Usage</span><ul><li><a class="toctext" href="../numerical_integration/">Numerical Integration</a></li><li><a class="toctext" href="../orthogonal_polynomials_canonical/">Monic Orthogonal Polynomials</a></li><li class="current"><a class="toctext" href>Multiple Discretization</a><ul class="internal"></ul></li><li><a class="toctext" href="../scalar_products/">Scalar Products</a></li><li><span class="toctext">Polynomial Chaos</span><ul><li><a class="toctext" href="../pce_tutorial/">Basic Usage</a></li><li><a class="toctext" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="toctext" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="toctext" href="../random_ode/">Random ODE</a></li></ul></li></ul></li><li><a class="toctext" href="../math/">Mathematical Background</a></li><li><a class="toctext" href="../functions/">Functions</a></li></ul></nav><article id="docs"><header><nav><ul><li>Usage</li><li><a href>Multiple Discretization</a></li></ul><a class="edit-page" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/multiple_discretization.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Multiple Discretization</span><a class="fa fa-bars" href="#"></a></div></header><div></div><h1><a class="nav-anchor" id="Multiple-Discretization-1" href="#Multiple-Discretization-1">Multiple Discretization</a></h1><p>This tutorial shows how to compute recurrence coefficients for non-trivial weight functions, and how they are being used for quadrature. The method we use is called <em>multiple discretization</em>, and follows W. Gautschi&#39;s book &quot;Orthogonal Polynomials: Computation and Approximation&quot;, specifically Section 2.2.4, and Example 2.38.</p><p>Suppose we have the weight function</p><div>\[\forall t \in [-1,1], \gamma \in [0,1]: \quad w(t;\gamma) = \gamma + (1-\gamma) \frac{1}{\sqrt{1-t^2}},\]</div><p>and we would like to solve</p><div>\[\int_{-1}^{1} f(t) w(t;c) \mathrm{d}t = \sum_{\nu=1}^{N} f(\tau_\nu) w_\nu\]</div><p>by some quadrature rule. We will see that ad-hoc quadrature rules will fail to solve the integral even for the simplest choice <span>$f \equiv 1$</span>. However, finding the recurrence coefficients of the underlying orthogonal polynomials, and then finding the quadrature rule will be the way to go.</p><p>Let us first try to solve the integral for <span>$f \equiv 1$</span> by Fejer&#39;s rule.</p><div><pre><code class="language-julia">using PolyChaos, LinearAlgebra
+γ = 0.5;
+int_exact = 1+pi/2; # exact value of the integral
+function my_w(t::Float64,γ::Float64)
+    γ + (1-γ)*1/sqrt(1-t^2)
+end
+
+N = 1000;
+n,w = fejer(N);
+int_fejer = dot(w,my_w.(n,γ))
+print(&quot;Fejer error:\t$(abs(int_exact-int_fejer))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Fejer error:	0.00034489625618583375	with 1000 nodes</code></pre></div><p>Clearly, that is not satisfying. Well, the term <span>$\gamma$</span> of the weight <span>$w$</span> makes us think of Gauss-Legendre integration, so let&#39;s try it instead.</p><div><pre><code class="language-julia">function quad_gaussleg(N::Int,γ::Float64)
+    a,b=rm_legendre(N)
+    n,w=golubwelsch(a,b)
+end
+n,w = quad_gaussleg(N,γ)
+int_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))
+print(&quot;Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Gauss-Legendre error:	1.569226315865443	with 1000 nodes</code></pre></div><p>Even worse! Well, we can factor out <span>$\frac{1}{\sqrt{1-t^2}}$</span>, making the integral amenable to a Gauss-Chebyshev rule. So, let&#39;s give it anothery try.</p><div><pre><code class="language-julia">function quad_gausscheb(N::Int64,γ::Float64)
+    a,b = rm_chebyshev1(N)
+    n,w = golubwelsch(a,b)
+end
+n,w = quad_gausscheb(N,γ)
+int_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))
+# int=sum(xw(:,2).*(1+sqrt(1-xw(:,1).^2)))
+print(&quot;Gauss-Chebyshev error:\t$(abs(int_exact-int_gausscheb))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Gauss-Chebyshev error:	4.112336209338707e-7	with 1000 nodes</code></pre></div><p>Okay, that&#39;s better, but it took us a lot of nodes to get this result. Is there a different way? Indeed, there is. As we have noticed, the weight <span>$w$</span> has a lot in common with Gauss-Legendre <em>and</em> Gauss-Chebyshev. We can decompose the integral as follows</p><div>\[\int_{-1}^1 f(t) w(t) \mathrm{d}t = \sum_{i=1}^{m} \int_{-1}^{1} f(t) w_i(t) \mathrm{d} t,\]</div><p>with</p><div>\[\begin{align*}
+w_1(t) &amp;= \gamma \\
+w_2(t) &amp;= (1-\gamma) \frac{1}{\sqrt{1-t^2}}.
+\end{align*}\]</div><p>To the weight <span>$w_1$</span> we can apply Gauss-Legendre quadrature, to the weight <span>$w_2$</span> we can apply Gauss-Chebyshev quadrature (with tiny modifications). This <em>discretization</em> of the measure can be used in our favor. The function <code>mcdiscretization()</code> takes the <span>$m$</span> discretization rules as an input</p><div><pre><code class="language-julia">function quad_gaussleg_mod(N::Int,γ::Float64)
+    n,w = quad_gaussleg(N,γ)
+    return n,γ*w
+end
+function quad_gausscheb_mod(N::Int,γ::Float64)
+            n,w = quad_gausscheb(N,γ)
+    return n,(1-γ)*w
+end
+
+N = 8
+a,b = mcdiscretization(N,[n-&gt;quad_gaussleg_mod(n,γ); n-&gt;quad_gausscheb_mod(n,γ)])
+n,w = golubwelsch(a,b)
+int_mc = sum(w)
+print(&quot;Discretization error:\t$(abs(int_exact-int_mc))\twith $N nodes&quot;)</code></pre><pre><code class="language-none">Discretization error:	5.329070518200751e-15	with 8 nodes</code></pre></div><p>Et voilà, no error with fewer nodes. (For this example, we&#39;d need in fact just a single node.)</p><p>The function <code>mcdiscretization()</code> is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight <span>$w$</span>. Let&#39;s inspect the values of the recurrence coefficients a little more. For <span>$\gamma = 0$</span>, we are in the world of Chebyshev polynomials, for <span>$\gamma = 1$</span>, we enter the realm of Legendre polynomials. And in between? That&#39;s exactly where the weight <span>$w$</span> comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let&#39;s verify this by plotting the recurrence coefficients for several values of <span>$\gamma$</span>.</p><div><pre><code class="language-julia">Γ = 0:0.1:1;
+ab = [ mcdiscretization(N,[n-&gt;quad_gaussleg_mod(n,gam); n-&gt;quad_gausscheb_mod(n,gam)]) for gam in Γ ];
+bb = hcat([ ab[i][2] for i=1:length(Γ)]...);
+b_leg = rm_legendre(N)[2];
+b_cheb = rm_chebyshev1(N)[2]
+bb[:,1]-b_cheb</code></pre><pre><code class="language-none">8-element Array{Float64,1}:
+  1.2434497875801753e-14
+  3.1086244689504383e-15
+ -7.494005416219807e-16
+  5.551115123125783e-16
+  1.0547118733938987e-15
+  4.440892098500626e-16
+ -1.3877787807814457e-15
+  6.661338147750939e-16</code></pre></div><div><pre><code class="language-julia">bb[:,end]-b_leg</code></pre><pre><code class="language-none">8-element Array{Float64,1}:
+ -4.440892098500626e-16
+  3.3306690738754696e-16
+ -8.326672684688674e-16
+  4.440892098500626e-16
+  7.771561172376096e-16
+  2.220446049250313e-16
+ -9.992007221626409e-16
+  9.43689570931383e-16</code></pre></div><p>Let&#39;s plot these values to get a better feeling.</p><pre><code class="language-">using PyPlot
+figure(1);
+grid(true);
+semilogy(Γ,bb&#39;);
+[ plot(0.,b_cheb[i],&quot;x&quot;) for i=1:N ];
+[ plot(1.,b_leg[i],&quot;o&quot;) for i=1:N ];
+ttl = latexstring(&quot;N=$N  Recurrence Coefficients Interpolating from Chebyshev to Legendre&quot;);
+xlabel(L&quot;\gamma&quot;);
+ylabel(L&quot;\beta&quot;);
+title(&quot;N=$N β-Recurrence Coefficients Interpolating from Chebyshev to Legendre&quot;);</code></pre><p><img src="../multiple_discretization_files/multiple_discretization_10_0.png" alt="type hierarchy"/></p><p>The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials. The interpolating line in between stands for the β recursion coefficients of <span>$w(t;\gamma)$</span>.</p><footer><hr/><a class="previous" href="../orthogonal_polynomials_canonical/"><span class="direction">Previous</span><span class="title">Monic Orthogonal Polynomials</span></a><a class="next" href="../scalar_products/"><span class="direction">Next</span><span class="title">Scalar Products</span></a></footer></article></body></html>
