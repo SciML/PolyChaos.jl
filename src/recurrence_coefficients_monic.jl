@@ -11,6 +11,7 @@ export  r_scale,
         rm_meixner_pollaczek,
         rm_legendre,
         rm_legendre01,
+        rm_chebyshev1,
         rm_compute
 """
     r_scale(c::Float64,β::Vector{Float64},α::Vector{Float64})
@@ -110,7 +111,7 @@ rm_hermite(N::Int) = rm_hermite(N,0.)
 """
     rm_hermite_prob(N::Int)
 Creates `N` recurrence coefficients for monic probabilists' Hermite polynomials
-that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{1}{\\sqrt{2 \\pi}} \\mathrm{e}^{-t^2}``
+that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{-0.5t^2}``
 """
 function rm_hermite_prob(N::Int)
     @assert N>=0 "parameter(s) out of range."
@@ -217,6 +218,21 @@ Creates `N` recurrence coefficients for monic Legendre polynomials
 that are orthogonal on ``(0,1)`` relative to ``w(t) = 1``.
 """
 rm_legendre01(N::Int) = rm_jacobi01(N)
+
+
+function rm_chebyshev1(N::Int64)
+    @assert N>=0 "N has to be non-negative"
+    α::Vector{Float64}, β::Vector{Float64} = zeros(Float64,N), zeros(Float64,N)
+    if N==1
+        β[1] = pi
+    elseif N==2
+        β[1:2] = [pi; 0.5]
+    elseif N>2
+        β[1:2] = [pi; 0.5]
+        β[3:end] = 0.25*ones(N-2)
+    end
+    return α, β
+end
 #     rm_hahn(N::Int,a::Float64,b::Float64)
 #     rm_hahn(N::Int,a::Float64)
 #     rm_hahn(N::Int)

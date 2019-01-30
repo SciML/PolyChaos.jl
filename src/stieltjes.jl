@@ -209,7 +209,7 @@ function mcdiscretization(N::Int64,
     Mi=floor(Int64,(2*N-1)/δ);
     while any(abs.(β-b).>ε*abs.(β))
         b=copy(β);
-        @show kount=kount+1;
+        kount=kount+1;
         kount>1 ? Δ=2^(floor(Int64,kount/5))*N : ()
         Mi+=Δ;
         Mi>Nmax ? error("Mi=$Mi exceeds Nmax=$Nmax") : ()
@@ -225,7 +225,9 @@ function mcdiscretization(N::Int64,
             xx[Ntot+1:Ntot+mp], ww[Ntot+1:Ntot+mp] = discretemeasure[:,1], discretemeasure[:,2]
         end
         α,β = discretization(N,xx,ww)
-        @show sum(ww)
+        # @show sum(ww)
         end
-        return α, β
+    # printstyled("\nSuccess: ",color=:green)
+    # print("converged after $kount iteration(s).\n\n")
+    return α, β
 end

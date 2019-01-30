@@ -200,10 +200,6 @@ function quadpts_gamma(Nquad::Int64,α::Float64)
 end
 quadpts_gamma(op::OrthoPoly,Nquad::Int64) = quadpts_gamma(Nquad,op.pars[:shape])
 
-"""
-    quadpts_logistic(N::Int64)
-get quadrature points for logistic weight function on ``(-\\infty,\\infty)``
-"""
 function quadpts_logistic(N::Int64)
     # get recursion coefficients
     α, β = rm_logistic(N)
@@ -214,17 +210,24 @@ end
 quadpts_logistic(op::OrthoPoly,N::Int64) = quadpts_logistic(N)
 
 """
-    Quadrature rule for weight function
-        w(t) = c3*c2*exp(-c2*(t-c1))/(exp(-c2*(t-c1)))^2
+    quadpts_logistic(N::Int,c1::Real,c2::Real,c3::Real=1.)
+    quadpts_logistic(N::Int64)
+`N`-point quadrature rule for weight function
+```math
+    w(t) = c_3 c_2\\frac{\\exp(-c_2(t-c_1))}{(1+\\exp(-c_2(t-c_1)))^2}
+```
 
-    The default value for c3 is one, c3=1, and
-        w(t) = c2*exp(-c2*(t-c1))/(1+exp(-c2*(t-c1)))^2.
-    In that case w(t) is the probability density function of
-        Y = 1/c2*X + c1, with c2>0
-    where X has the standard logistic density
-        ρ(t) = exp(-x)/(1+exp(-x))^2
+The default value for c3 is one.
+In that case ``w(t)`` is the probability density function of
+```math
+    Y = \\frac{1}{c_2 X + c_1}, \\quad c_2>0
+```
+where X has the standard logistic density
+```math
+    ρ(t) = \\frac{\\exp(-t)}{(1+\\exp(-t))^2}
+```
+The `N`-point quadrature rule for ``ρ(t)`` is computed by calling `quadpts_logistic(N::Int64)`.
 
-    A value c3!=1 is needed, for example, when constructing sums of logistic densities.
 """
 function quadpts_logistic(N::Int,c1::Real,c2::Real,c3::Real=1.)
     @assert abs(1/c2)>=1000*eps() "Value for c2 almost zero."
@@ -242,10 +245,9 @@ end
     gauss(α::Vector{Float64},β::Vector{Float64})
     gauss(N::Int64,op::OrthoPoly)
     gauss(op::OrthoPoly)
-
 Gauss quadrature rule, also known as Golub-Welsch algorithm
 
-`gauss()`` generates the `N` Gauss quadrature nodes and weights for a given weight function.
+`gauss()` generates the `N` Gauss quadrature nodes and weights for a given weight function.
 The weight function is represented by the `N` recurrence coefficients for the monic polynomials orthogonal
 with respect to the weight function.
 
@@ -262,24 +264,19 @@ end
 gauss(α::Vector{Float64},β::Vector{Float64}) = gauss(length(α),α,β)
 gauss(N::Int64,op::OrthoPoly) = gauss(N::Int64,op.α,op.β)
 gauss(op::OrthoPoly) = gauss(op.α,op.β)
+
 """
     radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)
     radau(α::Vector{Float64},β::Vector{Float64},end0::Float64)
     radau(N::Int64,op::OrthoPoly,end0::Float64)
     radau(op::OrthoPoly,end0::Float64)
-
 Gauss-Radau quadrature rule.
-Given a weight function encoded by the  n+1 recurrence coefficients for the associated
-orthogonal polynomials, the first column of ab containing the
-n+1 alpha-coefficients and the second column the n+1 beta-
-coefficients, the call xw=RADAU(n,ab,end0) generates the
-nodes and weights xw of the (n+1)-point Gauss-Radau
-quadrature rule for the weight function w having a prescribed
-node end0 (typically at one of the end points of the support
-interval of w, or outside thereof). The n+1 nodes, in
-increasing order, are stored in the first column, the n+1
-corresponding weights in the second column, of the (n+1)x2
-array xw.
+Given a weight function encoded by the recurrence coefficients `(α,β)`for the associated
+orthogonal polynomials, the function generates the
+nodes and weights `(n+1)`-point Gauss-Radau
+quadrature rule for the weight function having a prescribed
+node `end0` (typically at one of the end points of the support
+interval of w, or outside thereof).
 
 !!! note
     If no `N` is specified, then `N = length(α)-1`.
@@ -302,9 +299,9 @@ function radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)
     gauss(N+1,ab0[:,1],ab0[:,2])
 end
 radau(α::Vector{Float64},β::Vector{Float64},end0::Float64) = radau(length(α)-1,α,β,end0)
-
 radau(N::Int64,op::OrthoPoly,end0::Float64) = radau(N,op.α,op.β,end0)
 radau(op::OrthoPoly,end0::Float64) = radau(op.α,op.β,end0::Float64)
+
 """
     radau_jacobi(N::Int64,a::Float64,b::Float64;endpoint::String="left")
     endpoint in ["left", "right"]
@@ -343,7 +340,7 @@ Gauss-Radau quadrature rule for Laguerre weight function, which
 generates the `(n+1)`-point Gauss-Radau
 rule for the Laguerre weight function on ``[0,\\infty]`` with parameter `a`.
 
-!!! notebook
+!!! note
     REFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and
     Laguerre weight functions'', Math. Comput. Simulation 54
     (2000), 403-412.
