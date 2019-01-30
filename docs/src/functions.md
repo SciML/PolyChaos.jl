@@ -11,6 +11,7 @@ All of these provide *monic orthogonal polynomials* relative to the weights.
 
 !!! note
     The number `N` of recurrence coefficients has to be positive for all functions below.
+
 ```@docs
 r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})
 rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)
@@ -49,6 +50,12 @@ quadpts_gaussian
 quadpts_logistic
 quadpts_uniform01
 quadgp
+gauss
+radau
+radau_jacobi
+radau_laguerre
+lobatto
+lobatto_jacobi
 ```
 
 ## Polynomial Chaos

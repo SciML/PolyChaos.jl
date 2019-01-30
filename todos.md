@@ -11,13 +11,20 @@
     - gamma distribution needs to be double checked → construction of basis for feasible rates other than 1
     - code generation for random linear ODEs
     - ~~migrate to `Julia 1.1`~~
-    - ~~extend code tests~~
+    - extend code tests:
+      - take Gautschi's code, execute in `Matlab`, save in a File and compare against `Julia` code, for `gauss`,
+          `radau`,
+          `radau_jacobi`,
+          `radau_laguerre`,
+          `lobatto`,
+          `lobatto_jacobi`
+      - ade `codedev`
     - remove dependencies on `FastGaussQuadrature.jl`, for example: for few nodes, the golub welsch algorithm is used which we have implemented ourselves.
   - documentation:
       - have automated way to convert from notebook to `@repl` ⟶ see `docs/src/conversion.jl`
       - quickstart
       - examples:
-        - quadrature rules (fejer, fejer2, clenshaw-curtis)
+        - quadrature rules (fejer, fejer2, clenshaw-curtis, gauss, radau, lobatto)
         - discretization procedures (stieltjes, lanczos), see `test/discretization.jl`
         - multi-discretization
         - `quadgp()`

@@ -17,6 +17,7 @@ makedocs(
         "Usage" => [
             "Numerical Integration"=>"numerical_integration.md",
             "Monic Orthogonal Polynomials"=>"orthogonal_polynomials_canonical.md",
+            "Multiple Discretization" => "multiple_discretization.md",
             "Scalar Products" => "scalar_products.md",
             "Polynomial Chaos" => [ "Basic Usage" => "pce_tutorial.md",
                                     "Chi Squared, One DOF" => "chi_squared_k1.md",

@@ -1,4 +1,3 @@
-
 function convertMathMode!(name::String)
     # expects markdown files as input
     @assert getFileEnding(name)=="md" "no markdown file provided"
@@ -37,7 +36,7 @@ function convertJuliaMode!(name::String,envname::String)
     first = true
     for (i,line) in enumerate(lines)
         if line=="```julia"
-            lines[i] = "```@repl $envname"
+            lines[i] = "```@example $envname"
         end
         print(fout,lines[i]*"\n")
     end
@@ -91,7 +90,7 @@ Workflow to get markdown file from Julia notebook
 """
 function notebook2markdown(fname::String)
     @assert getFileEnding(fname)=="ipynb" "no ipynb file provided"
-    run(`jupyter-nbconvert $fname --to markdown`) # ipynb to markdown
+    run(`jupyter-nbconvert --ClearOutputPreprocessor.enabled=True --inplace $fname --to markdown`) # ipynb to markdown
     # remove file ending (if any)
     name = removeFileEnding(fname)
     file_text = convertMathMode!("$name.md")
@@ -119,7 +118,7 @@ function notebook2markdown_repl(fname::String;envname::String="mysetup")
     text = [ readlines(file_setup); readlines(file_text) ]
     rm(file_text)
     rm(file_setup)
-    fout = open("myfile.md","w")
+    fout = open(name*".md","w")
     [ print(fout,line*"\n") for line in text]
     close(fout)
 end

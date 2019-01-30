@@ -43,8 +43,7 @@ For example, the probability density of the Beta distribution on $\Omega = [0,1]
 ```math
 w(x) = \frac{1}{B(\alpha,\beta)} x^{\alpha-1} (1-x)^{\beta-1}.
 ```
-
-[This tutorial shows the above in action](@ref UnivariateMonicOrthogonalPolynomials)
+[This tutorial shows the above in action.](@ref UnivariateMonicOrthogonalPolynomials)
 
 ## OrthoPoly
 Given an absolutely continuous measure we are wondering what are the monic polynomials $\phi_i: \Omega \rightarrow \mathbb{R}$ that are orthogonal relative to this very measure?
