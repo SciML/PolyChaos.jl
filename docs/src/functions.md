@@ -26,6 +26,7 @@ rm_jacobi01(N::Int,a::Float64,b::Float64)
 rm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)
 stieltjes
 lanczos
+mcdiscretization
 ```
 
 ## Scalar Products

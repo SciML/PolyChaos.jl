@@ -123,84 +123,43 @@ function mcdis_twologistics(n::Int,p1::Vector{Float64},p2::Vector{Float64};Mmax:
 end
 
 """
-    mcdiscretization()
-This routine performs a sequence of discretizations of the
-given weight function (or measure), each discretization being
-followed by an application of the Stieltjes, or Lanczos,
-procedure to produce approximations to the desired recurrence
-coefficients. The fineness of the discretization is
-characterized by a discretization parameter `N`. The support of
-the continuous part of the weight function is decomposed into
-a given number `mc` of subintervals (some or all of which may
-be identical). The routine then applies to each subinterval
-an `N`-point quadrature rule to discretize the weight function
-on that subinterval. The discrete part of the weight function
-(if there is any) is added on to the discretized continuous
-weight function. The sequence of discretizations, if chosen
-judiciously, leads to convergence of the recurrence
-coefficients for the discretized measures to those of the
-given measure. If convergence to within a prescribed accuracy
-`eps0` occurs before `N` reaches its maximum allowed value `Nmax`,
-then the value of `N` that yields convergence is output as
-`Ncap`, and so is the number of iterations, `kount`. If there is
-no convergence, the routine displays the message "Ncap
-exceeds Nmax in mcdis" prior to exiting.
+    mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)
+This routine returns ``N`` recurrence coefficients of the polynomials that are
+orthogonal relative to a weight function ``w`` that
+is decomposed as a sum of ``m`` weights ``w_i`` with domains ``[a_i,b_i]`` for ``i=1,\\dots,m``,
+```math
+w(t) = \\sum_{i}^{m} w_i(t) \\quad \\text{with } \\operatorname{dom}(w_i) = [a_i, b_i].
+```
+For each weight ``w_i`` and its domain ``[a_i, b_i]`` the function `mcdiscretization()`
+expects a quadrature rule of the form
+    nodes::Vector{Float64}, weights::Vector{Float64} = my_quad_i(N::Int64)
+all of which are stacked in the parameter `quad`
+    quad = [ my_quad_1, ..., my_quad_m ]
+If the weight function has a discrete part (specified by `discretemeasure`)
+it is added on to the discretized continuous weight function.
 
-The choice between the Stieltjes and the Lanczos procedure is
-made by setting the parameter `discretization`.
+The function `mcdiscretization()` performs a sequence of discretizations of the
+given weight ``w(t)``, each discretization being
+followed by an application of the Stieltjes or Lanczos procedure
+(keyword `discretization in [stieltjes, lanczos]`) to produce approximations to the desired recurrence
+coefficients.
+The function applies to each subinterval ``i`` an `N`-point quadrature rule (the ``i``th entry of `quad`)
+to discretize the weight function ``w_i`` on that subinterval.
+If the procedure converges to within a prescribed accuracy
+`ε` before `N` reaches its maximum allowed value `Nmax`.
+If the function does not converge, the function prompts an error message.
 
-The details of the discretization are to be specified prior
-to calling the procedure. They are embodied in the following
-global parameters:
+The keyword `gaussquad` should be set to `true` if Gauss quadrature rules
+are available *for all* ``m`` weights ``w_i(t)`` with ``i = 1, \\dots, m``.
 
-mc     = the number of component intervals
-mp     = the number of points in the discrete part of the
-         measure (mp=0 if there is none)
-iq     = a parameter to be set equal to 1, if the user
-         provides his or her own quadrature routine, and
-         different from 1 otherwise
-δ = a parameter whose default value is 1, but is
-         preferably set equal to 2, if iq=1 and the user
-         provides Gauss-type quadrature routines
-
-The component intervals have to be specified (in the order
-left to right) by a global mcx2 array AB=[[a1 b1];[a2 b2];
-...;[amc bmc]],  where for infinite extreme intervals a1=-Inf
-resp. bmc=Inf. The discrete spectrum (if mp>0) is similarly
-specified by a global mpx2 array DM=[[x1 y1];[x2 y2];...;
-;[xmp ymp]] containing the abscissae and jumps.
-
-If the user provides his or her own quadrature routine
-"quadown", the routine mcdis must be called with the input
-parameter "quad" replaced by "@quadown", otherwise with
-"quad" replaced by "@quadgp", a general-purpose routine
-provided in the package. The quadrature routine must have
-the form
-
-                         function xw=quad(N,i)
-
-where N is the number of nodes and i identifies the interval
-to which the routine is to be applied.
-
-The routine mcdis also applies to measures given originally
-in multi-component form.
-
+For further information, please see W. Gautschi "Orthogonal Polynomials: Approximation
+and Computation", Section 2.2.4.
 """
-function mcdiscretization(N::Int64,
-                        quads::Vector{},
-                        discretemeasure::Matrix{Float64}=zeros(0,2);
-                        discretization::Function=stieltjes,
-                        Nmax::Integer=300,
-                        ε::Float64=1e-8,
-                        gaussquad::Bool=false)
+function mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)
     @assert Nmax>0 && Nmax>N "invalid choice of Nmax=$Nmax."
     @assert ε>0 "invalid choice of ε=$ε"
     @assert discretization in [stieltjes, lanczos] "unknown discretization $discretization"
     @assert length(quads)>0 "no quadrature rule specified"
-    # @assert quadrature in [clenshaw_curtis, fejer, fejer2] "unknown quadrature $quadrature"
-    # @assert size(AB)==(mc,2) "dimensions of continuous intervals are off"
-    # @assert size(DM)==(mp,2) "dimensions of discrete intervals are off"
-    # f='Ncap exceeds Nmax in mcdis with irout=%2.0f\n';
     δ::Int64=1
     gaussquad ? δ=2 : ()
     mc, mp = size(quads,1), size(discretemeasure,1)
@@ -225,7 +184,6 @@ function mcdiscretization(N::Int64,
             xx[Ntot+1:Ntot+mp], ww[Ntot+1:Ntot+mp] = discretemeasure[:,1], discretemeasure[:,2]
         end
         α,β = discretization(N,xx,ww)
-        # @show sum(ww)
         end
     # printstyled("\nSuccess: ",color=:green)
     # print("converged after $kount iteration(s).\n\n")

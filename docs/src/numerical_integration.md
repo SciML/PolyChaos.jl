@@ -17,6 +17,8 @@ I := \int_{0}^{1} f(t) \mathrm{d} t \approx \sum_{k=1}^n w_k f(t_k),
 ```
 where we choose $f(t) = \sin(t)$, and $n = 5$.
 
+Make sure to check out [this tutorial](@ref QuadratureRules) too.
+
 ### Variant 0
 ```@repl
 using PolyChaos
@@ -80,4 +82,4 @@ We see that the different variants provide slightly different results:
 ```
 with `I0` and `I2` being the same and more accurate than `I1`.
 The increased accuracy is based on the fact that for `I0` and `I2` the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials.
-The quadrature for `I1` is based on an general-purpose method that can be significantly less accurate.
+The quadrature for `I1` is based on an general-purpose method that can be significantly less accurate, see also [the next tutorial](@ref QuadratureRules).
