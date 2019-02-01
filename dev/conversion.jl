@@ -105,6 +105,7 @@ function notebook2markdown_repl(fname::String;envname::String="mysetup")
     # remove file ending (if any)
     name = removeFileEnding(fname)
     # create ```setup mysetup ``` entry
+    run(`jupyter-nbconvert $fname --ClearOutputPreprocessor.enabled=True --inplace`)
     run(`jupyter-nbconvert $fname --to python`) # ipynb to python
     run(`mv $name.py $name.jl`) # python to julia
     removeComments!("$name.jl")

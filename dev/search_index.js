@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Numerical Integration",
     "title": "Numerical Integration",
     "category": "section",
-    "text": "using PolyChaos\nn = 5; f(t) = sin(t)\nopq = OrthoPolyQ(\"uniform01\",n-1);\nI0 = integrate(f,opq);\nm = Measure(\"uniform01\");\nq = Quad(n-1,m);\nI1 = integrate(f,q)\nop = OrthoPoly(\"uniform01\",n-1)\nq = Quad(n,op)\nI2 = integrate(f,q)The goal of this tutorial is to solve an integral using Gauss quadrature,I = int_0^1 f(t) mathrmd t approx sum_k=1^n w_k f(t_k)where we choose f(t) = sin(t), and n = 5."
+    "text": "using PolyChaos\nn = 5; f(t) = sin(t)\nopq = OrthoPolyQ(\"uniform01\",n-1);\nI0 = integrate(f,opq);\nm = Measure(\"uniform01\");\nq = Quad(n-1,m);\nI1 = integrate(f,q)\nop = OrthoPoly(\"uniform01\",n-1)\nq = Quad(n,op)\nI2 = integrate(f,q)The goal of this tutorial is to solve an integral using Gauss quadrature,I = int_0^1 f(t) mathrmd t approx sum_k=1^n w_k f(t_k)where we choose f(t) = sin(t), and n = 5.Make sure to check out this tutorial too."
 },
 
 {
@@ -149,20 +149,84 @@ var documenterSearchIndex = {"docs": [
     "page": "Numerical Integration",
     "title": "Comparison",
     "category": "section",
-    "text": "We see that the different variants provide slightly different results:1-cos(1) .- [I0 I1 I2]with I0 and I2 being the same and more accurate than I1. The increased accuracy is based on the fact that for I0 and I2 the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials. The quadrature for I1 is based on an general-purpose method that can be significantly less accurate."
+    "text": "We see that the different variants provide slightly different results:1-cos(1) .- [I0 I1 I2]with I0 and I2 being the same and more accurate than I1. The increased accuracy is based on the fact that for I0 and I2 the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials. The quadrature for I1 is based on an general-purpose method that can be significantly less accurate, see also the next tutorial."
+},
+
+{
+    "location": "quadrature_rules/#",
+    "page": "Quadrature Rules",
+    "title": "Quadrature Rules",
+    "category": "page",
+    "text": "using PolyChaos, LinearAlgebra\nmy_f(t) = t^2\na, b = 1.23, 3.45 # shape parameters of Jacobi weight\nint_exact = 0.353897; # reference value \nN = 4\nα, β = rm_jacobi(N,a,b)\nn_gauss, w_gauss = gauss(N,α,β)\nint_gauss = dot(w_gauss,my_f.(n_gauss))\nprint(\"first point:\\t $(n_gauss[1])\\n\")\nprint(\"end point:\\t $(n_gauss[end])\\n\")\nprint(\"error Gauss:\\t $(int_gauss-int_exact)\\n\")\nn_radau, w_radau = radau(N-1,α,β,1.)\nint_radau = dot(w_radau,my_f.(n_radau))\nprint(\"first point:\\t $(n_radau[1])\\n\")\nprint(\"end point:\\t $(n_radau[end])\\n\")\nprint(\"error Radau:\\t $(int_radau-int_exact)\")\nn_lob, w_lob = lobatto(N-2,α,β,-1.,1.)\nint_lob = dot(w_lob,my_f.(n_lob))\nprint(\"first point:\\t $(n_lob[1])\\n\")\nprint(\"end point:\\t $(n_lob[end])\\n\")\nprint(\"error Lobatto:\\t $(int_lob-int_exact)\")\nn_fej, w_fej = fejer(N)\nint_fej = dot(w_fej,my_f.(n_fej).*(1 .- n_fej).^a.*(1 .+ n_fej).^b)\nprint(\"first point:\\t $(n_fej[1])\\n\")\nprint(\"end point:\\t $(n_fej[end])\\n\")\nprint(\"error Fejer:\\t $(int_fej-int_exact)\")\nn_fej2, w_fej2 = fejer2(N)\nint_fej2 = dot(w_fej2,my_f.(n_fej2).*(1 .- n_fej2).^a.*(1 .+ n_fej2).^b)\nprint(\"first point:\\t $(n_fej2[1])\\n\")\nprint(\"end point:\\t $(n_fej2[end])\\n\")\nprint(\"error Fejer2:\\t $(int_fej2-int_exact)\")\nn_cc, w_cc = clenshaw_curtis(N)\nint_cc = dot(w_cc,my_f.(n_cc).*(1 .- n_cc).^a.*(1 .+ n_cc).^b)\nprint(\"first point:\\t\\t $(n_cc[1])\\n\")\nprint(\"end point:\\t\\t $(n_cc[end])\\n\")\nprint(\"error Clenshaw-Curtis:\\t $(int_cc-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#QuadratureRules-1",
+    "page": "Quadrature Rules",
+    "title": "Quadrature Rules",
+    "category": "section",
+    "text": "In this tutorial we investigate how recurrence coefficients of orthogonal polynomials lead to quadrature rules.We want to solve the integralI = int_-1^1 f(t) w(t) mathrmd twith the weight functionw(t) = (1-t)^a (1+t)^bfor all t in -11 and ab-1. For the function f we choosef(t) = t^2To solve the integral we do the following:Choose number of nodes N;\nGenerate recurrence coefficients;\nGenerate quadrature rule from those recurrence coefficients.We will compare Gauss quadrature to Gauss-Radau quadrature and Gauss-Lobatto quadrature.Make sure to check out this tutorial too.Let\'s begin:using PolyChaos, LinearAlgebra\nmy_f(t) = t^2\na, b = 1.23, 3.45 # shape parameters of Jacobi weight\nint_exact = 0.353897; # reference value Now we compute N recurrence coefficients.N = 4\nα, β = rm_jacobi(N,a,b)"
+},
+
+{
+    "location": "quadrature_rules/#Gauss-1",
+    "page": "Quadrature Rules",
+    "title": "Gauss",
+    "category": "section",
+    "text": "The first quadrature rule is Gauss quadrature. This method goes back to Golub and Welsch.n_gauss, w_gauss = gauss(N,α,β)\nint_gauss = dot(w_gauss,my_f.(n_gauss))\nprint(\"first point:\\t $(n_gauss[1])\\n\")\nprint(\"end point:\\t $(n_gauss[end])\\n\")\nprint(\"error Gauss:\\t $(int_gauss-int_exact)\\n\")Since Gauss quadrature has a degree of exactness of 2N-1, the value of the integral is exact."
+},
+
+{
+    "location": "quadrature_rules/#Gauss-Radau-1",
+    "page": "Quadrature Rules",
+    "title": "Gauss-Radau",
+    "category": "section",
+    "text": "Gauss-Radau quadrature is a variant of Gauss quadrature that allows to specify a value of a node that has to be included. We choose to include the right end point t = 10.n_radau, w_radau = radau(N-1,α,β,1.)\nint_radau = dot(w_radau,my_f.(n_radau))\nprint(\"first point:\\t $(n_radau[1])\\n\")\nprint(\"end point:\\t $(n_radau[end])\\n\")\nprint(\"error Radau:\\t $(int_radau-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#Gauss-Lobatto-1",
+    "page": "Quadrature Rules",
+    "title": "Gauss-Lobatto",
+    "category": "section",
+    "text": "Next, we look at Gauss-Lobatto quadrature, which allows to include two points. We choose to include the left and end point of the interval, which are t in -10 10.n_lob, w_lob = lobatto(N-2,α,β,-1.,1.)\nint_lob = dot(w_lob,my_f.(n_lob))\nprint(\"first point:\\t $(n_lob[1])\\n\")\nprint(\"end point:\\t $(n_lob[end])\\n\")\nprint(\"error Lobatto:\\t $(int_lob-int_exact)\")There are other quadratures that we subsume as all-purpose quadrature rules. These include Fejér\'s first and second rule, and Clenshaw-Curtis quadrature."
+},
+
+{
+    "location": "quadrature_rules/#Fejér\'s-First-Rule-1",
+    "page": "Quadrature Rules",
+    "title": "Fejér\'s First Rule",
+    "category": "section",
+    "text": "Fejér\'s first rule does not include the end points of the interval.n_fej, w_fej = fejer(N)\nint_fej = dot(w_fej,my_f.(n_fej).*(1 .- n_fej).^a.*(1 .+ n_fej).^b)\nprint(\"first point:\\t $(n_fej[1])\\n\")\nprint(\"end point:\\t $(n_fej[end])\\n\")\nprint(\"error Fejer:\\t $(int_fej-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#Fejér\'s-Second-Rule-1",
+    "page": "Quadrature Rules",
+    "title": "Fejér\'s Second Rule",
+    "category": "section",
+    "text": "Fejér\'s second rule does include the end points of the interval.n_fej2, w_fej2 = fejer2(N)\nint_fej2 = dot(w_fej2,my_f.(n_fej2).*(1 .- n_fej2).^a.*(1 .+ n_fej2).^b)\nprint(\"first point:\\t $(n_fej2[1])\\n\")\nprint(\"end point:\\t $(n_fej2[end])\\n\")\nprint(\"error Fejer2:\\t $(int_fej2-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#Clenshaw-Curtis-1",
+    "page": "Quadrature Rules",
+    "title": "Clenshaw-Curtis",
+    "category": "section",
+    "text": "Clenshaw-Curtis quadrature is similar to Féjer\'s second rule, as in it includes the end points of the integration interval. For the same number of nodes it is also more accurate than Féjer\'s rules, generally speaking.n_cc, w_cc = clenshaw_curtis(N)\nint_cc = dot(w_cc,my_f.(n_cc).*(1 .- n_cc).^a.*(1 .+ n_cc).^b)\nprint(\"first point:\\t\\t $(n_cc[1])\\n\")\nprint(\"end point:\\t\\t $(n_cc[end])\\n\")\nprint(\"error Clenshaw-Curtis:\\t $(int_cc-int_exact)\")As we can see, for the same number of nodes N, the quadrature rules based on the recurrence coefficients can greatly outperform the all-purpose quadratures. So, whenever possible, use quadrature rules based on recurrence coefficients of the orthogonal polynomials relative to the underlying measure. Make sure to check out this tutorial too."
 },
 
 {
     "location": "orthogonal_polynomials_canonical/#",
-    "page": "Monic Orthogonal Polynomials",
-    "title": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
+    "title": "Univariate Monic Orthogonal Polynomials",
     "category": "page",
     "text": ""
 },
 
 {
     "location": "orthogonal_polynomials_canonical/#UnivariateMonicOrthogonalPolynomials-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Univariate Monic Orthogonal Polynomials",
     "category": "section",
     "text": "Univariate monic orthogonal polynomials make up the core building block of the package. These are real polynomials  pi_k _k geq 0, which are univariate pi_k mathbbR rightarrow mathbbR and orthogonal relative to a nonnegative weight function w mathbbR rightarrow mathbbR_geq 0, and which have a leading coefficient equal to one:beginaligned\npi_k(t) = t^k + a_k-1 t^k-1 + dots + a_1 t + a_0 quad forall k = 0 1 dots \nlangle pi_k pi_l rangle = int_mathbbR pi_k(t) pi_l(t) w(t) mathrmdt =\nbegincases\n0  k neq l text and kl geq 0 \n pi_k ^2  0  k = l geq 0\nendcases\nendalignedThese univariate monic orthogonal polynomials satisfy the paramount three-term recurrence relationbeginaligned\npi_k+1(t) = (t - alpha_k) pi_k(t) - beta_k pi_k-1(t) quad k= 0 1 dots \npi_o(t) = 1 \npi_-1(t) = 0\nendalignedHence, every system of n univariate monic orthogonal polynomials  pi_k _k=0^n is isomorphic to its recurrence coefficients  alpha_k beta_k _k=0^n."
@@ -170,7 +234,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "orthogonal_polynomials_canonical/#Classical-Orthogonal-Polynomials-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Classical Orthogonal Polynomials",
     "category": "section",
     "text": "The so-called classical orthogonal polynomials are polynomials named after famous mathematicians who each discovered a special family of orthogonal polynomials, for example Hermite polynomials or Jacobi polynomials. For classical orthogonal polynomials there exist closed-form expressions of–-among others–-the recurrence coefficients. Also quadrature rules for classical orthogonal polynomials are well-studied (with dedicated packages such as FastGaussQuadrature.jl. However, more often than not these classical orthogonal polynomials are neither monic nor orthogonal, hence not normalized in any sense. For example, there is a distinction between the probabilists\' Hermite polynomials and the physicists\' Hermite polynomials. The difference is in the weight function w(t) relative to which the polynomials are orthogonal:beginaligned\ntextProbabilists w(t) = frac1sqrt2 pi  exp left( - fract^22 right) \ntextPhysicists w(t) =  exp left( - t^2 right)\nendalignedTo streamline the computations, all classical orthogonal polynomials are converted to monic orthogonal polynomials (for which, of course, the closed-form expressions persist). Currently, the following weight functions (hence classical orthogonal polynomials) are supported:Name Weight w(t) Parameters Support Classical polynomial\nhermite $ \\exp \\left( - t^2 \\right)$ - (-infty infty) Hermite\ngenhermite $ \\lvert t \\rvert^{2 \\mu}\\exp \\left( - t^2 \\right)$ mu  -frac12 (-infty infty) Generalized Hermite\nlegendre 1 - (-11) Legendre\njacobi (1-t)^alpha (1+t)^beta alpha beta  -1 (-11) Jacobi\nlaguerre exp(-t) - (0infty) Laguerre\ngenlaguerre t^alphaexp(-t) alpha-1 (0infty) Generalized Laguerre\nmeixnerpollaczek frac12 pi exp((2phi-pi)t) lvertGamma(lambda + mathrmit)rvert^2 lambda  0 0phipi (-inftyinfty) Meixner-PollaczekAdditionally, the following weight functions that are equivalent to probability density functions are supported:Name Weight w(t) Parameters Support Classical polynomial\ngaussian frac1sqrt2 pi  exp left( - fract^22 right) - (-infty infty) Probabilists\' Hermite\nuniform01 1 - (01) Legendre\nbeta01 frac1B(alphabeta)  t^alpha-1 (1-t)^beta-1 alpha beta  0 (01) Jacobi\ngamma fracbeta^alphaGamma(alpha) t^alpha-1 exp(-beta t) alpha beta  0 (0infty) Laguerre\nlogistic fracexp(-t)(1+exp(-t))^2 - (-inftyinfty) -To generate the orthogonal polynomials up to maximum degree deg, simply callusing PolyChaos\ndeg = 4\nop = OrthoPoly(\"gaussian\",deg)This generates opas an OrthoPoly type with the underlying Gaussian measure op.meas. The recurrence coefficients are accessible via coeffs().coeffs(op)By default, the constructor for OrthoPoly generates deg+1 recurrence coefficients. Sometimes, some other number Nrec may be required. This is why Nrec is a keyword for the constructor OrthoPoly.N = 100\nop_ = OrthoPoly(\"logistic\",deg;Nrec=N)Let\'s check whether we truly have more coefficients:size(coeffs(op_),1)==N"
@@ -178,7 +242,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "orthogonal_polynomials_canonical/#Arbitrary-Weights-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Arbitrary Weights",
     "category": "section",
     "text": "If you are given a weight function w that does not belong to the Table above, it is still possible to generate the respective univariate monic orthogonal polynomials. First, we define the measure by specifying a name, the weight, the support, symmetry, and parameterssupp = (-1,1)\nfunction w(t)\n    supp[1]<=t<=supp[2] ? (1. + t) : error(\"$t not in support\")\nend\nmy_meas = Measure(\"my_meas\",w,supp,false,Dict())Notice: it is advisable to define the weight such that an error is thrown for arguments outside of the support.Now, we want to construct the univariate monic orthogonal polynomials up to degree deg relative to m. The constructor ismy_op = OrthoPoly(\"my_op\",deg,my_meas;Nquad=200)By default, the recurrence coefficients are computed using the Stieltjes procuedure with Clenshaw-Curtis quadrature (with Nquad nodes and weights). Hence, the choice of Nquad influences accuracy."
@@ -186,7 +250,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "orthogonal_polynomials_canonical/#MultivariateMonicOrthogonalPolynomials-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Multivariate Monic Orthogonal Polynomials",
     "category": "section",
     "text": "Suppose we have p systems of univariate monic orthogonal polynomials, pi_k^(1) _kgeq 0   pi_k^(2) _kgeq 0 dots  pi_k^(p) _kgeq 0each system being orthogonal relative to the weights w^(1) w^(2) dots w^(p) with supports mathcalW^(1) mathcalW^(2) dots mathcalW^(p). Also, let d^(i) be the maximum degree of the i-th system of univariate orthogonal polynomials. We would like to construct a p-variate monic basis  psi_k _k geq 0 with psi mathbbR^p rightarrow mathbbR of degree at most 0 leq d leq min_i=1dotsk d^(i). Further, this basis shall be orthogonal relative to the product measure w mathcalW = mathcalW^(1) otimes mathcalW^(2) mathcalW^(1) cdots otimes mathcalW^(p) rightarrow mathbbR_geq 0 given byw(t) = prod_i=1^p w^(i)(t_i)hence satisfieslangle psi_k psi_l rangle = int_mathcalW psi_k(t) psi_l(t) w(t) mathrmd t =\nbegincases\n0  k neq l text and kl geq 0 \n psi_k ^2  0  k = l geq 0\nendcasesFor this, there exists the composite struct MultiOrthoPoly. Let\'s consider an example where we mix classical orthogonal polynomials with an arbitrary weight.deg = [3,5,6,4]\nd = minimum(deg)\n\nop1 = OrthoPoly(\"gaussian\",deg[1])\nop2 = OrthoPoly(\"uniform01\",deg[2])\nop3 = OrthoPoly(\"beta01\",deg[3],Dict(:shape_a=>2,:shape_b=>1.2))\nops = [op1,op2,op3,my_op]\nmop = MultiOrthoPoly(ops,d)The total number of  basis polynomials is stored in the field dim. The univariate basis polynomials making up the multivariate basis are stored in the field uni.mop.uniThe field ind contains the multi-index, i.e. row i stores what combination of univariate polynomials makes up the i-th multivariate polynomial. For example,i = 11\nmop.ind[i+1,:]translates mathematically topsi_11(t) = pi_0^(1)(t_1) pi_1^(2)(t_2) pi_0^(3)(t_3) pi_1^(4)(t_4)Notice that there is an offset by one, because the basis counting starts at 0, but Julia is 1-indexed. The underlying measure of mop is now of type MultiMeasure, and stored in the field measmop.measThe weight w can be evaluated as expectedmop.meas.w(0.5*ones(length(ops)))"
@@ -210,15 +274,15 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#",
-    "page": "Scalar Products",
-    "title": "Scalar Products",
+    "page": "Computation of Scalar Products",
+    "title": "Computation of Scalar Products",
     "category": "page",
     "text": ""
 },
 
 {
     "location": "scalar_products/#ComputationOfScalarProducts-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Computation of Scalar Products",
     "category": "section",
     "text": "By now, we are able to construct orthogonal polynomials, and to construct quadrature rules for a given nonnegative weight function, respectively. Now we combine both ideas to solve integrals involving the orthogonal polynomialslangle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\n= int phi_i_1(t) phi_i_2(t) cdots phi_i_m-1(t) phi_i_m(t) w(t) mathrmd tboth for the univariate and multivariate case. The integrand is a polynomial (possibly multivariate) that can be solved exactly with the appropriate Gauss quadrature rules.note: Note\nTo simplify notation we drop the integration interval. It is clear from the context."
@@ -226,7 +290,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Univariate-Polynomials-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Univariate Polynomials",
     "category": "section",
     "text": ""
@@ -234,7 +298,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Classical-Polynomials-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Classical Polynomials",
     "category": "section",
     "text": "Let\'s begin with a univariate basis for some classical orthogonal polynomialusing PolyChaos\ndeg, n = 4, 20\ns_α, s_β = 2.1, 3.2\nop = OrthoPoly(\"beta01\",deg,Dict(:shape_a=>s_α,:shape_b=>s_β);Nrec=n)To add the corresponding quadrature rule there is the composite struct OrthoPolyQ whose simplest constructor readsopq = OrthoPolyQ(op,n)By default, an n-point Gauss quadrature rule is create relative to the underlying measure op.meas, where n is the number of recurrence coefficients stored in op.α and op.β. The type OrthoPolyQ has just two fields: an OrthoPoly, and a Quad.To compute the squared norms phi_k ^2 = langle phi_k phi_k  rangle\n= int phi_k(t) phi_k(t) w(t) mathrmd tof the basis we call computeSP2()normsq = computeSP2(opq)For the general caselangle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\n= int phi_i_1(t) phi_i_2(t) cdots phi_i_m-1(t) phi_i_m(t) w(t) mathrmd tthere exists a type Tensor that requires only two arguments: the dimension m geq 1, and an OrthoPolyQm = 3\nt = Tensor(3,opq)To get the desired entries, Tensorcomes with a get() function that is called for some index a in mathbbN_0^m that has the entries a = i_1 i_2 dots i_m. For examplet.get([1,2,3])Or using comprehensionT = [ t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]Notice that we can cross-check the results.using LinearAlgebra\n@show normsq == LinearAlgebra.diag(T[:,:,1])\n@show normsq == LinearAlgebra.diag(T[:,1,:])\n@show normsq == LinearAlgebra.diag(T[1,:,:])Also, normsq can be computed analogously in Tensor formatt2 = Tensor(2,opq)\n@show normsq == [ t2.get([i,i]) for i=0:dim(opq)-1]"
@@ -242,7 +306,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Arbitrary-Weights-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Arbitrary Weights",
     "category": "section",
     "text": "Of course, the type OrthoPolyQ can be constructed for arbitrary weights w(t). In this case we have to compute the orthogonal basis and the respective quadrature rule. Let\'s re-work the above example by hand.using SpecialFunctions\nsupp = (0,1)\nfunction w(t)\n    supp[1]<=t<=supp[2] ? (t^(s_α-1)*(1-t)^(s_β-1)/SpecialFunctions.beta(s_α,s_β)) : error(\"$t not in support\")\nend\nmy_meas = Measure(\"my_meas\",w,supp,false,Dict())\nmy_op = OrthoPoly(\"my_op\",deg,my_meas;Nrec=n)\nmy_quad = Quad(n,my_op)\nmy_opq = OrthoPolyQ(my_op,my_quad)Now we can compute the squared norms  phi_k ^2my_normsq = computeSP2(my_opq)And the tensormy_t = Tensor(m,my_opq)\nmy_T = [ my_t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]Let\'s compare the results:@show abs.(normsq-my_normsq)\n@show norm(T-my_T)note: Note\nThe possibility to create quadrature rules for arbitrary weights should be reserved to cases different from classical ones."
@@ -250,7 +314,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Multivariate-Polynomials-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Multivariate Polynomials",
     "category": "section",
     "text": "For multivariate polynomials the syntax for Tensor is very much alike, except that we are dealing with the type MultiOrthoPoly now.mop = MultiOrthoPoly([opq,my_opq],deg)mt2 = Tensor(2,mop)\nmt3 = Tensor(3,mop)\nmT2 = [ mt2.get([i,i]) for i=0:dim(mop)-1 ]Notice that mT2 carries the elements of the 2-dimensional tensors for the univariate bases opq and my_opq. The encoding is given by the multi-index mop.indmop.indTo cross-check the results we can distribute the multi-index back to its univariate indices with the help of findUnivariateIndices.ind_opq = findUnivariateIndices(1,mop.ind)\nind_my_opq = findUnivariateIndices(2,mop.ind)@show mT2[ind_opq] - normsq\n@show mT2[ind_my_opq] - my_normsq;"
@@ -681,11 +745,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "functions/#PolyChaos.mcdiscretization",
+    "page": "Functions",
+    "title": "PolyChaos.mcdiscretization",
+    "category": "function",
+    "text": "mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)\n\nThis routine returns N recurrence coefficients of the polynomials that are orthogonal relative to a weight function w that is decomposed as a sum of m weights w_i with domains a_ib_i for i=1dotsm,\n\nw(t) = sum_i^m w_i(t) quad textwith  operatornamedom(w_i) = a_i b_i\n\nFor each weight w_i and its domain a_i b_i the function mcdiscretization() expects a quadrature rule of the form     nodes::Vector{Float64}, weights::Vector{Float64} = myquadi(N::Int64) all of which are stacked in the parameter quad     quad = [ myquad1, ..., myquadm ] If the weight function has a discrete part (specified by discretemeasure) it is added on to the discretized continuous weight function.\n\nThe function mcdiscretization() performs a sequence of discretizations of the given weight w(t), each discretization being followed by an application of the Stieltjes or Lanczos procedure (keyword discretization in [stieltjes, lanczos]) to produce approximations to the desired recurrence coefficients. The function applies to each subinterval i an N-point quadrature rule (the ith entry of quad) to discretize the weight function w_i on that subinterval. If the procedure converges to within a prescribed accuracy ε before N reaches its maximum allowed value Nmax. If the function does not converge, the function prompts an error message.\n\nThe keyword gaussquad should be set to true if Gauss quadrature rules are available for all m weights w_i(t) with i = 1 dots m.\n\nFor further information, please see W. Gautschi \"Orthogonal Polynomials: Approximation and Computation\", Section 2.2.4.\n\n\n\n\n\n"
+},
+
+{
     "location": "functions/#Recurrence-Coefficients-for-Monic-Orthogonal-Polynomials-1",
     "page": "Functions",
     "title": "Recurrence Coefficients for Monic Orthogonal Polynomials",
     "category": "section",
-    "text": "The functions below provide analytic expressions for the recurrence coefficients of common orthogonal polynomials. All of these provide monic orthogonal polynomials relative to the weights.note: Note\nThe number N of recurrence coefficients has to be positive for all functions below.r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})\nrm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)\nrm_logistic(N::Int)\nrm_hermite(N::Int,mu::Float64)\nrm_hermite_prob(N::Int)\nrm_laguerre(N::Int,a::Float64)\nrm_legendre(N::Int)\nrm_legendre01(N::Int)\nrm_jacobi(N::Int,a::Float64,b::Float64)\nrm_jacobi01(N::Int,a::Float64,b::Float64)\nrm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)\nstieltjes\nlanczos"
+    "text": "The functions below provide analytic expressions for the recurrence coefficients of common orthogonal polynomials. All of these provide monic orthogonal polynomials relative to the weights.note: Note\nThe number N of recurrence coefficients has to be positive for all functions below.r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})\nrm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)\nrm_logistic(N::Int)\nrm_hermite(N::Int,mu::Float64)\nrm_hermite_prob(N::Int)\nrm_laguerre(N::Int,a::Float64)\nrm_legendre(N::Int)\nrm_legendre01(N::Int)\nrm_jacobi(N::Int,a::Float64,b::Float64)\nrm_jacobi01(N::Int,a::Float64,b::Float64)\nrm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)\nstieltjes\nlanczos\nmcdiscretization"
 },
 
 {
