@@ -1,6 +1,6 @@
 module PolyChaos
 
-using SpecialFunctions, FastGaussQuadrature, SparseArrays, Distributions
+using SpecialFunctions, SparseArrays, Distributions
 import LinearAlgebra: I, dot, SymTridiagonal, eigen, issymmetric
 import FFTW: ifft
 import Combinatorics: with_replacement_combinations

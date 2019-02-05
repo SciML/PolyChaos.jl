@@ -180,54 +180,6 @@ struct Quad
   end
 end
 
-function Quad(name::String,N::Int64,d::Dict=Dict())
-  name = lowercase(name)
-
-  if name == "hermite"
-    d = Dict()
-    n,w = gausshermite(N)
-  elseif name == "legendre"
-    d = Dict()
-    n,w = gausslegendre(N)
-  elseif name == "jacobi"
-    a,b = Float64(d[:shape_a]), Float64(d[:shape_b])
-    n,w = gaussjacobi(N,a,b)
-  elseif name == "laguerre"
-    d = Dict()
-    n,w = gausslaguerre(N)
-  elseif name == "genlaguerre"
-    shape = Float64(d[:shape])
-    rate = Float64(d[:rate])
-    @assert rate==1 "rates different from 1 not yet supported"
-    n,w = gausslaguerre(N,shape,"default",rate)
-  ########################################################
-  ########################################################
-  ########################################################
-  # measures corresponding to probability density functions:
-  elseif name == "gaussian"
-    d = Dict()
-    n,w = quadpts_gaussian(N)
-  elseif name == "uniform01"
-    d = Dict()
-    n,w = quadpts_uniform01(N)
-  elseif name == "beta01"  # parameters of beta distribution
-    a,b = Float64(d[:shape_a]), Float64(d[:shape_b])
-    n,w = quadpts_beta01(N,a,b)
-  elseif name == "gamma"
-    m = Measure(name,d)
-    shape, rate = Float64(d[:shape]), Float64(d[:rate])
-    @assert rate==1. "rates different from one not yet supported."
-    n,w = quadpts_gamma(N,shape)
-  elseif name == "logistic"
-    d = Dict()
-    n,w = quadpts_logistic(N)
-  else
-    error("Quadrature `$name` is not yet implemented.")
-  end
-  m = Measure(name,d)
-  Quad(name,N,n,w,m)
-end
-
 function Quad(N::Int64,m::Measure;quadrature::Function=clenshaw_curtis)
   n,w = quadgp(m.w,m.dom[1],m.dom[2],N;quadrature=quadrature)
   Quad("quadgp",N,n,w,m)
@@ -250,6 +202,7 @@ function Quad(N::Int64,weight::Function,α::Vector{Float64},β::Vector{Float64},
     Quad("golubwelsch",N,n,w,m)
 end
 
+# all-purpose constructor (last resort!)
 function Quad(N::Int64,weight::Function,supp::Tuple{Real,Real},symm::Bool,d::Dict=Dict();quadrature::Function=clenshaw_curtis)
     @assert N>=1 "Number of qudrature points has to be positive"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
@@ -260,30 +213,27 @@ end
 
 # Struct that contains pre-computed nodes and weights
 struct OrthoPolyQ
-op::OrthoPoly
-quad::Quad
-# the constructor should call the function quadpts()
-# two parameters are important:
-# @assert Nquad>=op.deg
+    op::OrthoPoly
+    quad::Quad
 end
 
 function OrthoPolyQ(op::OrthoPoly,N::Int64)
-  name=op.name
-  s = [ "gaussian",
-        "hermite",
-        "uniform01",
-        "legendre",
-        "beta01",
-        "jacobi",
-        "gamma",
-        "laguerre", "genlaguerre",
-        "logistic"]
-  if name in s
-    q = Quad(op.name,N,op.meas.pars)
-  else
+    # name=op.name
+    # s = [ "gaussian",
+    #       "hermite",
+    #       "uniform01",
+    #       "legendre",
+    #       "beta01",
+    #       "jacobi",
+    #       "gamma",
+    #       "laguerre", "genlaguerre",
+    #       "logistic"]
+    # if name in s
+    #   q = Quad(op.name,N,op.meas.pars)
+    # else
     q = Quad(N,op.α,op.β,op.meas)
-  end
-  return OrthoPolyQ(op,q)
+    # end
+    return OrthoPolyQ(op,q)
 end
 OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α))
 
@@ -292,7 +242,7 @@ function OrthoPolyQ(name::String,N::Int64,d::Dict=Dict();Nrec::Int64=N+1)
   OrthoPolyQ(op)
 end
 
-#
+
 struct MultiOrthoPoly
 name::Vector{String}
 deg::Int64

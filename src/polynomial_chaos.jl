@@ -111,7 +111,7 @@ function assign2multi(x::Vector{Float64},i::Int64,ind::Matrix{Int64})
     nx, deg = length(x), ind[end,end]
     @assert nx<=deg+1 "inconsistent number of coefficients ($nx vs $(deg+1))"
     @assert i<=p "basis is $p-variate, you requested $i-variate"
-    @show myind::Vector{Int64} = findUnivariateIndices(i,ind)[1:nx]
+    myind::Vector{Int64} = findUnivariateIndices(i,ind)[1:nx]
     y = spzeros(Float64,l)
     y[myind] = x
     return y
