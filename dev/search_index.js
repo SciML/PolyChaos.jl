@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "OrthoPoly",
     "category": "section",
-    "text": "Given an absolutely continuous measure we are wondering what are the monic polynomials phi_i Omega rightarrow mathbbR that are orthogonal relative to this very measure? Mathematically this readslangle phi_i phi_j rangle = int_Omega phi_i(t) phi_j(t) w(t) mathrmdt =\nbegincases\n 0  i=j \n= 0  ineq j\nendcasesThey can be constructed using the type OrthoPoly, which has the fieldsName Meaning\nname::String Name\ndeg::Int64 Maximum degree\nα::Vector{Float64} Vector of recurrence coefficients α\nβ::Vector{Float64} Vector of recurrence coefficients β\nmeas::Measure Underlying measureThe purpose of name is obvious. The integer deg stands for the maxium degree of the polynomials. Rather than storing the polynomials phi_i themselves we store the recurrence coefficients α, β that characterize the system of orthogonal polynomials. These recurrence coefficients are the single most important piece of information for the orthogonal polynomials. For several common measures, there exist analytic formulae. These are built-in to PolyChaos and should be used whenever possible.This tutorial shows the above in action"
+    "text": "Given an absolutely continuous measure we are wondering what are the monic polynomials phi_i Omega rightarrow mathbbR that are orthogonal relative to this very measure? Mathematically this readslangle phi_i phi_j rangle = int_Omega phi_i(t) phi_j(t) w(t) mathrmdt =\nbegincases\n 0  i=j \n= 0  ineq j\nendcasesThey can be constructed using the type OrthoPoly, which has the fieldsName Meaning\nname::String Name\ndeg::Int64 Maximum degree\nα::Vector{Float64} Vector of recurrence coefficients α\nβ::Vector{Float64} Vector of recurrence coefficients β\nmeas::Measure Underlying measureThe purpose of name is obvious. The integer deg stands for the maxium degree of the polynomials. Rather than storing the polynomials phi_i themselves we store the recurrence coefficients α, β that characterize the system of orthogonal polynomials. These recurrence coefficients are the single most important piece of information for the orthogonal polynomials. For several common measures, there exist analytic formulae. These are built-in to PolyChaos and should be used whenever possible.This tutorial shows the above in action."
 },
 
 {
@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "Quad",
     "category": "section",
-    "text": "Quadrature rules are intricately related to orthogonal polynomials. An n-point quadrature rule is a pair of so-called nodes t_k and weights w_k for k=1dotsn that allow to solve integrals relative to the measureint_Omega f(t) w(t) mathrmd t approx sum_k=1^n w_k f(t_k)If the integrand f is polynomial, then the specific Gauss quadrature rules possess the remarkable property that an n-point quadrature rule can integrate polynomial integrands f of degree at most 2n-1 exactly; no approximation error is made.note: Note\nFor common measures, PolyChaos resorts to the package FastGaussQuadrature The compilation time of FastGaussQuadrature is currently extremely slow, see here.The fields of Quad areName Meaning\nname::String Name\nNquad::Int64 Number n of quadrature points\nnodes::Vector{Float64} Nodes\nweights::Vector{Float64} Weights\nmeas::Measure Underlying measurewith obvious meanings.This tutorial shows the above in action"
+    "text": "Quadrature rules are intricately related to orthogonal polynomials. An n-point quadrature rule is a pair of so-called nodes t_k and weights w_k for k=1dotsn that allow to solve integrals relative to the measureint_Omega f(t) w(t) mathrmd t approx sum_k=1^n w_k f(t_k)If the integrand f is polynomial, then the specific Gauss quadrature rules possess the remarkable property that an n-point quadrature rule can integrate polynomial integrands f of degree at most 2n-1 exactly; no approximation error is made.The fields of Quad areName Meaning\nname::String Name\nNquad::Int64 Number n of quadrature points\nnodes::Vector{Float64} Nodes\nweights::Vector{Float64} Weights\nmeas::Measure Underlying measurewith obvious meanings.This tutorial shows the above in action."
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "MultiMeasure",
     "category": "section",
-    "text": "So far, everything was univariate, the weight of the measure was mapping real numbers to real numbers. PolyChaos can handle product measures too. Let\'s assume the weight function is a product of two independent Gaussian densitiesw mathbbR times mathbbR rightarrow mathbbR quad w(x) = frac1sqrt2pi mathrme^x_1^22 frac1sqrt2pi mathrme^x_2^22The type MultiMeasure serves this purpose, with its fieldsName Meaning\nname::Vector{String} Name\nw::Function Weight function of product measure\nw_uni::Vector{Function} Weight functions of underlying univariate measures\ndom::Vector{Tuple{Float64,Float64}} Domain\nsymmetric::Vector{Bool} Symmetry properties\npars::Vector{Dict} Additioanl parametersAll fields from Measure appear in vectorized versions (except for the weight w, which is the weight of the product measure) The only new field is w_uni, which stacks the univariate weight functions.This tutorial shows the above in action"
+    "text": "So far, everything was univariate, the weight of the measure was mapping real numbers to real numbers. PolyChaos can handle product measures too. Let\'s assume the weight function is a product of two independent Gaussian densitiesw mathbbR times mathbbR rightarrow mathbbR quad w(x) = frac1sqrt2pi mathrme^x_1^22 frac1sqrt2pi mathrme^x_2^22The type MultiMeasure serves this purpose, with its fieldsName Meaning\nname::Vector{String} Name\nw::Function Weight function of product measure\nw_uni::Vector{Function} Weight functions of underlying univariate measures\ndom::Vector{Tuple{Float64,Float64}} Domain\nsymmetric::Vector{Bool} Symmetry properties\npars::Vector{Dict} Additioanl parametersAll fields from Measure appear in vectorized versions (except for the weight w, which is the weight of the product measure) The only new field is w_uni, which stacks the univariate weight functions.This tutorial shows the above in action."
 },
 
 {
@@ -93,7 +93,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "MultiOrthoPoly",
     "category": "section",
-    "text": "Just as we did in the univariate case, we use MultiMeasure as a building block for multivariate orthogonal polynomials. The type MultiOrthoPoly combines product measures with the respective orthogonal polynomials and their quadrature rules. Its fields areName Meaning\nname::Vector{String} Names\ndeg::Int64 Maximum degree\ndim::Int64 Dimension of basis\nind::Matrix{Int64} Multi-index\nmeas::MultiMeasure Underlying product measure\nuni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}} Underlying univariate orthogonal polynomialsThe names of the univariate bases are stored in names; the maximum degree of the basis is deg; the overall dimension of the multivariate basis is dim; the multi-index ind maps the j-th multivariate basis to the elements of the univariate bases; the product measure is stored in meas; finally, all univariate bases are collected in uni.This tutorial shows the above in action"
+    "text": "Just as we did in the univariate case, we use MultiMeasure as a building block for multivariate orthogonal polynomials. The type MultiOrthoPoly combines product measures with the respective orthogonal polynomials and their quadrature rules. Its fields areName Meaning\nname::Vector{String} Names\ndeg::Int64 Maximum degree\ndim::Int64 Dimension of basis\nind::Matrix{Int64} Multi-index\nmeas::MultiMeasure Underlying product measure\nuni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}} Underlying univariate orthogonal polynomialsThe names of the univariate bases are stored in names; the maximum degree of the basis is deg; the overall dimension of the multivariate basis is dim; the multi-index ind maps the j-th multivariate basis to the elements of the univariate bases; the product measure is stored in meas; finally, all univariate bases are collected in uni.This tutorial shows the above in action."
 },
 
 {
@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "Tensor",
     "category": "section",
-    "text": "The last type we need to address is Tensor. It is used to store the results of scalar products. Its fields areName Meaning\ndim::Int64 Dimension m of tensor langle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\nT::SparseVector{Float64,Int64} Entries of tensor\nget::Function Function to get entries from T\nop::Union{OrthoPolyQ,MultiOrthoPoly} Underlying univariate orthogonal polynomialsThe dimension m of the tensor is the number of terms that appear in the scalar product. Let\'s assume we set m = 3, hence have langle phi_i phi_j phi_k rangle, then the concrete entry is obtained as Tensor.get([i,j,k]).This tutorial shows the above in action"
+    "text": "The last type we need to address is Tensor. It is used to store the results of scalar products. Its fields areName Meaning\ndim::Int64 Dimension m of tensor langle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\nT::SparseVector{Float64,Int64} Entries of tensor\nget::Function Function to get entries from T\nop::Union{OrthoPolyQ,MultiOrthoPoly} Underlying univariate orthogonal polynomialsThe dimension m of the tensor is the number of terms that appear in the scalar product. Let\'s assume we set m = 3, hence have langle phi_i phi_j phi_k rangle, then the concrete entry is obtained as Tensor.get([i,j,k]).This tutorial shows the above in action."
 },
 
 {
@@ -733,7 +733,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.stieltjes",
     "category": "function",
-    "text": "stieltjes(N::Int64,nodes::Vector{Float64},weights::Vector{Float64})\n\nDescription based on W. Gautschi OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES Given the discrete inner product (with nodes and weights) the function generates the firstN recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\n\n\n\n\n"
+    "text": "stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)\n\nStieltjes procedure–-Given the nodes and weights the function generates the firstN recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nSet the Boolean removezeroweights to true if zero weights should be removed.\n\n\n\n\n\n"
 },
 
 {
@@ -741,7 +741,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.lanczos",
     "category": "function",
-    "text": "lanczos(N::Int64,nodes::Vector{Float64},weights::Vector{Float64}) Description based on W. Gautschi OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES\n\nGiven the discrete inner product (with nodes and weights) the function generates the first N recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nThe script is adapted from the routine RKPW in W.B. Gragg and W.J. Harrod, ``The numerically stable reconstruction of Jacobi matrices from spectral data\'\', Numer. Math. 44 (1984), 317-335.\n\n\n\n\n\n"
+    "text": "lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)\n\nLanczos procedure–-given the nodes and weights the function generates the first N recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nSet the Boolean removezeroweights to true if zero weights should be removed.\n\nThe script is adapted from the routine RKPW in W.B. Gragg and W.J. Harrod, The numerically stable reconstruction of Jacobi matrices from spectral data, Numer. Math. 44 (1984), 317-335.\n\n\n\n\n\n"
 },
 
 {
@@ -825,46 +825,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "functions/#PolyChaos.quadpts_beta01",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_beta01",
-    "category": "function",
-    "text": "quadpts_beta01(α::Float64,β::Float64,Nquad::Int64)\n\nget quadrature points for beta distribution on (01)` using Gauss-Jacobi quadrature\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_gamma",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_gamma",
-    "category": "function",
-    "text": "quadpts_gamma(α::Float64,Nquad::Int)\n\nget quadrature points for gamma distribution on (0infty) using Gauss-Laguerre quadrature\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_gaussian",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_gaussian",
-    "category": "function",
-    "text": "quadpts_gaussian(Nquad::Int)\n\nget quadrature points for normal distribution on (-inftyinfty) using Gauss-Hermite quadrature\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_logistic",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_logistic",
-    "category": "function",
-    "text": "quadpts_logistic(N::Int,c1::Real,c2::Real,c3::Real=1.)\nquadpts_logistic(N::Int64)\n\nN-point quadrature rule for weight function\n\n    w(t) = c_3 c_2fracexp(-c_2(t-c_1))(1+exp(-c_2(t-c_1)))^2\n\nThe default value for c3 is one. In that case w(t) is the probability density function of\n\n    Y = frac1c_2 X + c_1 quad c_20\n\nwhere X has the standard logistic density\n\n    ρ(t) = fracexp(-t)(1+exp(-t))^2\n\nThe N-point quadrature rule for ρ(t) is computed by calling quadpts_logistic(N::Int64).\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_uniform01",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_uniform01",
-    "category": "function",
-    "text": "quadpts_uniform01(Nquad::Int)\n\nget quadrature points for uniform distribution on 01 using Gauss-Legendre quadrature\n\n\n\n\n\n"
-},
-
-{
     "location": "functions/#PolyChaos.quadgp",
     "page": "Functions",
     "title": "PolyChaos.quadgp",
@@ -925,7 +885,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "Quadrature Rules",
     "category": "section",
-    "text": "fejer\nfejer2\nclenshaw_curtis\nquadpts_beta01\nquadpts_gamma\nquadpts_gaussian\nquadpts_logistic\nquadpts_uniform01\nquadgp\ngauss\nradau\nradau_jacobi\nradau_laguerre\nlobatto\nlobatto_jacobi"
+    "text": "fejer\nfejer2\nclenshaw_curtis\nquadgp\ngauss\nradau\nradau_jacobi\nradau_laguerre\nlobatto\nlobatto_jacobi"
 },
 
 {
