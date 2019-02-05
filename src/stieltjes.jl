@@ -17,12 +17,15 @@ Given the discrete inner product (with nodes and weights) the function
 generates the first`N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
 """
-function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
+function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)
     tiny = 10*floatmin()
     huge = 0.1*floatmax()
     α, β = zeros(Float64,N), zeros(Float64,N)
-    # nodes, weights = removeZeroWeights(nodes_,weights_)
-    nodes, weights = nodes_, weights_
+    if removezeroweights
+        nodes, weights = removeZeroWeights(nodes_,weights_)
+    else
+        nodes, weights = nodes_, weights_
+    end
     Ncap = length(nodes)
     @assert N>0 && N<=Ncap "N is out of range."
     s0::Float64 = sum(weights)
@@ -39,7 +42,7 @@ function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
         s2 = dot(nodes, weights.*p2.^2)
         # s1 = sum( weights[ν]*p2[ν]^2 for ν=1:Ncap )
         # s2 = sum( weights[ν]*nodes[ν]*p2[ν]^2 for ν=1:Ncap )
-        @assert abs(s1)>=tiny "Underflow in stieltjes() for k=$k"
+        @assert abs(s1)>=tiny "Underflow in stieltjes() for k=$k; try using `removeZeroWeights`"
         @assert maximum(abs.(p2))<=huge && abs(s2)<=huge "Overflow in stieltjes for k=$k"
         α[k+1] = s2/s1
         β[k+1] = s1/s0
@@ -63,10 +66,13 @@ W.B. Gragg and W.J. Harrod, ``The numerically stable
 reconstruction of Jacobi matrices from spectral data'',
 Numer. Math. 44 (1984), 317-335.
 """
-function lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
+function lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)
     @assert length(nodes_)==length(weights_)>0 "inconsistent number of nodes and weights"
-    # nodes, weights = removeZeroWeights(nodes_,weights_)
-    nodes, weights = nodes_, weights_
+    if removezeroweights
+        nodes, weights = removeZeroWeights(nodes_,weights_)
+    else
+        nodes, weights = nodes_, weights_
+    end
     Ncap = length(nodes)
     N<=0 || N>Ncap ? error("$N out of range") : ()
     p0 = copy(nodes)
@@ -155,7 +161,7 @@ are available *for all* ``m`` weights ``w_i(t)`` with ``i = 1, \\dots, m``.
 For further information, please see W. Gautschi "Orthogonal Polynomials: Approximation
 and Computation", Section 2.2.4.
 """
-function mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)
+function mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false,removezeroweights::Bool=false)
     @assert Nmax>0 && Nmax>N "invalid choice of Nmax=$Nmax."
     @assert ε>0 "invalid choice of ε=$ε"
     @assert discretization in [stieltjes, lanczos] "unknown discretization $discretization"
@@ -183,7 +189,7 @@ function mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float
         if mp>0
             xx[Ntot+1:Ntot+mp], ww[Ntot+1:Ntot+mp] = discretemeasure[:,1], discretemeasure[:,2]
         end
-        α,β = discretization(N,xx,ww)
+        α,β = discretization(N,xx,ww;removezeroweights=removezeroweights)
         end
     # printstyled("\nSuccess: ",color=:green)
     # print("converged after $kount iteration(s).\n\n")
