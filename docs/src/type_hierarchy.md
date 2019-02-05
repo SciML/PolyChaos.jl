@@ -73,7 +73,7 @@ These recurrence coefficients are the single most important piece of information
 For several common measures, there exist analytic formulae.
 These are built-in to `PolyChaos` and should be used whenever possible.
 
-[This tutorial shows the above in action](@ref UnivariateMonicOrthogonalPolynomials)
+[This tutorial shows the above in action.](@ref UnivariateMonicOrthogonalPolynomials)
 
 ## Quad
 Quadrature rules are intricately related to orthogonal polynomials.
@@ -82,10 +82,6 @@ An $n$-point quadrature rule is a pair of so-called nodes $t_k$ and weights $w_k
 \int_\Omega f(t) w(t) \mathrm{d} t \approx \sum_{k=1}^n w_k f(t_k).
 ```
 If the integrand $f$ is polynomial, then the specific Gauss quadrature rules possess the remarkable property that an $n$-point quadrature rule can integrate polynomial integrands $f$ of degree at most $2n-1$ *exactly*; no approximation error is made.
-
-!!! note
-    For [common measures](@ref CommonRandomVariables), `PolyChaos` resorts to the package [`FastGaussQuadrature`](https://github.com/ajt60gaibb/FastGaussQuadrature.jl/)
-    The compilation time of `FastGaussQuadrature` is currently extremely slow, [see here](https://github.com/ajt60gaibb/FastGaussQuadrature.jl/issues/47).
 
 The fields of `Quad` are
 
@@ -99,7 +95,7 @@ The fields of `Quad` are
 
 with obvious meanings.
 
-[This tutorial shows the above in action](@ref NumericalIntegration)
+[This tutorial shows the above in action.](@ref NumericalIntegration)
 
  ## OrthoPolyQ
 As you would expect from the figure at the top, the type `OrthoPolyQ` is an amalgamation of `OrthoPoly` and `Quad`.
@@ -137,7 +133,7 @@ The type `MultiMeasure` serves this purpose, with its fields
 All fields from `Measure` appear in vectorized versions (except for the weight $w$, which is the weight of the product measure)
 The only *new* field is `w_uni`, which stacks the univariate weight functions.
 
-[This tutorial shows the above in action](@ref MultivariateMonicOrthogonalPolynomials)
+[This tutorial shows the above in action.](@ref MultivariateMonicOrthogonalPolynomials)
 
 ## MultiOrthoPoly
 Just as we did in the univariate case, we use `MultiMeasure` as a building block for multivariate orthogonal polynomials.
@@ -155,7 +151,7 @@ Its fields are
 
 The names of the univariate bases are stored in `names`; the maximum degree of the basis is `deg`; the overall dimension of the multivariate basis is `dim`; the multi-index `ind` maps the $j$-th multivariate basis to the elements of the univariate bases; the product measure is stored in `meas`; finally, all univariate bases are collected in `uni`.
 
-[This tutorial shows the above in action](@ref MultivariateMonicOrthogonalPolynomials)
+[This tutorial shows the above in action.](@ref MultivariateMonicOrthogonalPolynomials)
 
 ## Tensor
 The last type we need to address is `Tensor`.
@@ -172,4 +168,4 @@ Its fields are
 The *dimension* $m$ of the tensor is the number of terms that appear in the scalar product.
 Let's assume we set $m = 3$, hence have $\langle \phi_{i} \phi_{j}, \phi_{k} \rangle$, then the concrete entry is obtained as `Tensor.get([i,j,k])`.
 
-[This tutorial shows the above in action](@ref ComputationOfScalarProducts)
+[This tutorial shows the above in action.](@ref ComputationOfScalarProducts)

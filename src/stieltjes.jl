@@ -10,12 +10,12 @@ function removeZeroWeights(n::Vector{Float64},w::Vector{Float64})
 end
 
 """
-    stieltjes(N::Int64,nodes::Vector{Float64},weights::Vector{Float64})
-Description based on W. Gautschi *OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS
-AND RELATED QUADRATURE RULES*
-Given the discrete inner product (with nodes and weights) the function
+    stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)
+Stieltjes procedure---Given the nodes and weights the function
 generates the first`N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
+
+Set the Boolean `removezeroweights` to `true` if zero weights should be removed.
 """
 function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)
     tiny = 10*floatmin()
@@ -53,17 +53,16 @@ end
 
 
 """
-  lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64})
-Description based on W. Gautschi *OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS
-AND RELATED QUADRATURE RULES*
-
-Given the discrete inner product (with nodes and weights) the function
+    lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)
+Lanczos procedure---given the nodes and weights the function
 generates the first `N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
 
+Set the Boolean `removezeroweights` to `true` if zero weights should be removed.
+
 The script is adapted from the routine RKPW in
-W.B. Gragg and W.J. Harrod, ``The numerically stable
-reconstruction of Jacobi matrices from spectral data'',
+W.B. Gragg and W.J. Harrod, *The numerically stable
+reconstruction of Jacobi matrices from spectral data*,
 Numer. Math. 44 (1984), 317-335.
 """
 function lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)

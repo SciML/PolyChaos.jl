@@ -45,11 +45,6 @@ evaluate
 fejer
 fejer2
 clenshaw_curtis
-quadpts_beta01
-quadpts_gamma
-quadpts_gaussian
-quadpts_logistic
-quadpts_uniform01
 quadgp
 gauss
 radau
