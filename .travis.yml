@@ -1,6 +1,5 @@
 language: julia
 
-
 jobs:
   include:
     - stage: "Documentation"
