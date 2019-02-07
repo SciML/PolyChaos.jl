@@ -43,14 +43,14 @@ b_leg = rm_legendre(N)[2];
 b_cheb = rm_chebyshev1(N)[2]
 bb[:,1]-b_cheb
 bb[:,end]-b_leg
-using Plots, LaTeXStrings
+using Plots
 gr()
 plot(Γ,bb',yaxis=:log10, w=3, legend=false)
 zs, os = zeros(N), ones(N)
 scatter!(zs,b_cheb,marker=:x)
 scatter!(os,b_leg,marker=:circle)
-xlabel!(L"\gamma")
-ylabel!(L"\beta")
+xlabel!("gamma")
+ylabel!("beta")
 title!("N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre")
 ```
 
