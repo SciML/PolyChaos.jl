@@ -43,16 +43,15 @@ b_leg = rm_legendre(N)[2];
 b_cheb = rm_chebyshev1(N)[2]
 bb[:,1]-b_cheb
 bb[:,end]-b_leg
-using PyPlot
-figure(1);
-grid(true);
-semilogy(Γ,bb');
-[ plot(0.,b_cheb[i],"x") for i=1:N ];
-[ plot(1.,b_leg[i],"o") for i=1:N ];
-ttl = latexstring("N=$N  Recurrence Coefficients Interpolating from Chebyshev to Legendre");
-xlabel(L"\gamma");
-ylabel(L"\beta");
-title("N=$N β-Recurrence Coefficients Interpolating from Chebyshev to Legendre");
+using Plots, LaTeXStrings
+gr()
+plot(Γ,bb',yaxis=:log10, w=3, legend=false)
+zs, os = zeros(N), ones(N)
+scatter!(zs,b_cheb,marker=:x)
+scatter!(os,b_leg,marker=:circle)
+xlabel!(L"\gamma")
+ylabel!(L"\beta")
+title!("N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre")
 ```
 
 # Multiple Discretization
@@ -186,18 +185,17 @@ Let's plot these values to get a better feeling.
 
 
 ```@example mysetup
-using PyPlot
-figure(1);
-grid(true);
-semilogy(Γ,bb');
-[ plot(0.,b_cheb[i],"x") for i=1:N ];
-[ plot(1.,b_leg[i],"o") for i=1:N ];
-ttl = latexstring("N=$N  Recurrence Coefficients Interpolating from Chebyshev to Legendre");
-xlabel(L"\gamma");
-ylabel(L"\beta");
-title("N=$N β-Recurrence Coefficients Interpolating from Chebyshev to Legendre");
+using Plots, LaTeXStrings
+gr()
+plot(Γ,bb',yaxis=:log10, w=3, legend=false)
+zs, os = zeros(N), ones(N)
+scatter!(zs,b_cheb,marker=:x)
+scatter!(os,b_leg,marker=:circle)
+
+xlabel!(L"\gamma")
+ylabel!(L"\beta")
+title!("N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre")
 ```
-![type hierarchy](multiple_discretization_files/multiple_discretization_10_0.png)
 
 The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials.
 The interpolating line in between stands for the β recursion coefficients of $w(t;\gamma)$.

@@ -1,3 +1,38 @@
+```@setup mysetup
+k = 1
+using PolyChaos
+deg, Nrec = 2, 20
+op = OrthoPoly("gaussian",deg;Nrec=Nrec);
+opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
+L = dim(opq)
+mu, sig = 0., 1.
+x = [ convert2affinePCE("gaussian",mu,sig); zeros(Float64,L-2) ]
+t2 = Tensor(2,opq);
+t3 = Tensor(3,opq)
+y = [ sum( x[i]*x[j]*t3.get([i-1,j-1,m-1])/t2.get([m-1,m-1])  for i=1:L, j=1:L ) for m=1:L ]
+moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]
+function myskew(y)
+   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )
+   μ = y[1]
+   σ = std(y,opq)
+   (e3-3*μ*σ^2-μ^3)/(σ^3)
+end
+print("Expected value:\t\t$(moms_analytic(k)[1]) = $(mean(y,opq))\n")
+print("\t\t\terror = $(abs(mean(y,opq)-moms_analytic(k)[1]))\n")
+print("Standard deviation:\t$(moms_analytic(k)[2]) = $(std(y,opq))\n")
+print("\t\t\terror = $(moms_analytic(k)[2]-std(y,opq))\n")
+print("Skewness:\t\t$(moms_analytic(k)[3]) = $(myskew(y))\n")
+print("\t\t\terror = $(moms_analytic(k)[3]-myskew(y))\n")
+using Plots, LaTeXStrings
+gr()
+Nsmpl = 10000
+ysmpl = samplePCE(Nsmpl,y,opq)
+histogram(ysmpl;normalize=true,xlabel=L"t",ylabel=L"\rho(t)")
+import SpecialFunctions: gamma
+ρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)
+t = range(0.1; stop=maximum(ysmpl), length=100)
+plot!(t,ρ.(t),w=4)
+```
 
 # Chi-squared Distribution ($k=1$)
 
@@ -36,19 +71,18 @@ First, we create a orthogonal basis relative to $f_X(x)$ of degree at most $d=2$
 Notice that we consider a total of `Nrec` recursion coefficients, and that we also add a quadrature rule by calling `OrthoPolyQ()`.
 
 
-```julia
+```@example mysetup
 k = 1
 using PolyChaos
 deg, Nrec = 2, 20
 op = OrthoPoly("gaussian",deg;Nrec=Nrec);
-opq = OrthoPolyQ(op)
-# opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
+opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
 ```
 
 Next, we define the PCE for $X$.
 
 
-```julia
+```@example mysetup
 L = dim(opq)
 mu, sig = 0., 1.
 x = [ convert2affinePCE("gaussian",mu,sig); zeros(Float64,L-2) ]
@@ -57,7 +91,7 @@ x = [ convert2affinePCE("gaussian",mu,sig); zeros(Float64,L-2) ]
 With the orthogonal basis and the quadrature at hand, we can compute the tensors `t2` and `t3` that store the entries $\langle \phi_m, \phi_m \rangle$, and $\langle \phi_i \phi_j, \phi_m \rangle$, respectively.
 
 
-```julia
+```@example mysetup
 t2 = Tensor(2,opq);
 t3 = Tensor(3,opq)
 ```
@@ -65,19 +99,19 @@ t3 = Tensor(3,opq)
 With the tensors at hand, we can compute the Galerkin projection.
 
 
-```julia
+```@example mysetup
 y = [ sum( x[i]*x[j]*t3.get([i-1,j-1,m-1])/t2.get([m-1,m-1])  for i=1:L, j=1:L ) for m=1:L ]
 ```
 
 Let's compare the moments via PCE to the closed-form expressions.
 
 
-```julia
+```@example mysetup
 moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]
 function myskew(y)
    e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )
    μ = y[1]
-   σ = mystd(y)
+   σ = std(y,opq)
    (e3-3*μ*σ^2-μ^3)/(σ^3)
 end
 
@@ -96,18 +130,18 @@ The latter stop is done using `evaluatePCE()`.
 Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{\mathrm{e}^{-0.5t}}{\sqrt{2 t} \, \Gamma(0.5)}$ of the chi-squared distribution with one degree of freedom.
 
 
-```julia
-using PyPlot
+```@example mysetup
+using Plots, LaTeXStrings
+gr()
 Nsmpl = 10000
 #ξ = sampleMeasure(Nsmpl,opq)
 #ysmpl = evaluatePCE(y,ξ,opq)
 ysmpl = samplePCE(Nsmpl,y,opq)
-figure(1)
-plt[:hist](ysmpl; density=true,bins=75)
-grid(true); xlabel(L"$t$"); ylabel(L"$\rho(t)$");
+histogram(ysmpl;normalize=true,xlabel=L"t",ylabel=L"\rho(t)")
+
 
 import SpecialFunctions: gamma
 ρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
-plot(t,ρ.(t))
+plot!(t,ρ.(t),w=4)
 ```
