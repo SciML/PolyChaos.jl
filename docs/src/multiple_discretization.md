@@ -185,15 +185,15 @@ Let's plot these values to get a better feeling.
 
 
 ```@example mysetup
-using Plots, LaTeXStrings
+using Plots
 gr()
 plot(Γ,bb',yaxis=:log10, w=3, legend=false)
 zs, os = zeros(N), ones(N)
 scatter!(zs,b_cheb,marker=:x)
 scatter!(os,b_leg,marker=:circle)
 
-xlabel!(L"\gamma")
-ylabel!(L"\beta")
+xlabel!("gamma")
+ylabel!("beta")
 title!("N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre")
 ```
 

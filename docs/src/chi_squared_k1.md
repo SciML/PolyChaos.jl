@@ -131,13 +131,13 @@ Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{\mathr
 
 
 ```@example mysetup
-using Plots, LaTeXStrings
+using Plots
 gr()
 Nsmpl = 10000
 #ξ = sampleMeasure(Nsmpl,opq)
 #ysmpl = evaluatePCE(y,ξ,opq)
 ysmpl = samplePCE(Nsmpl,y,opq)
-histogram(ysmpl;normalize=true,xlabel=L"t",ylabel=L"\rho(t)")
+histogram(ysmpl;normalize=true,xlabel="t",ylabel="rho(t)")
 
 
 import SpecialFunctions: gamma
