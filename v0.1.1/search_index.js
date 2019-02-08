@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "OrthoPoly",
     "category": "section",
-    "text": "Given an absolutely continuous measure we are wondering what are the monic polynomials phi_i Omega rightarrow mathbbR that are orthogonal relative to this very measure? Mathematically this readslangle phi_i phi_j rangle = int_Omega phi_i(t) phi_j(t) w(t) mathrmdt =\nbegincases\n 0  i=j \n= 0  ineq j\nendcasesThey can be constructed using the type OrthoPoly, which has the fieldsName Meaning\nname::String Name\ndeg::Int64 Maximum degree\nα::Vector{Float64} Vector of recurrence coefficients α\nβ::Vector{Float64} Vector of recurrence coefficients β\nmeas::Measure Underlying measureThe purpose of name is obvious. The integer deg stands for the maxium degree of the polynomials. Rather than storing the polynomials phi_i themselves we store the recurrence coefficients α, β that characterize the system of orthogonal polynomials. These recurrence coefficients are the single most important piece of information for the orthogonal polynomials. For several common measures, there exist analytic formulae. These are built-in to PolyChaos and should be used whenever possible.This tutorial shows the above in action"
+    "text": "Given an absolutely continuous measure we are wondering what are the monic polynomials phi_i Omega rightarrow mathbbR that are orthogonal relative to this very measure? Mathematically this readslangle phi_i phi_j rangle = int_Omega phi_i(t) phi_j(t) w(t) mathrmdt =\nbegincases\n 0  i=j \n= 0  ineq j\nendcasesThey can be constructed using the type OrthoPoly, which has the fieldsName Meaning\nname::String Name\ndeg::Int64 Maximum degree\nα::Vector{Float64} Vector of recurrence coefficients α\nβ::Vector{Float64} Vector of recurrence coefficients β\nmeas::Measure Underlying measureThe purpose of name is obvious. The integer deg stands for the maxium degree of the polynomials. Rather than storing the polynomials phi_i themselves we store the recurrence coefficients α, β that characterize the system of orthogonal polynomials. These recurrence coefficients are the single most important piece of information for the orthogonal polynomials. For several common measures, there exist analytic formulae. These are built-in to PolyChaos and should be used whenever possible.This tutorial shows the above in action."
 },
 
 {
@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "Quad",
     "category": "section",
-    "text": "Quadrature rules are intricately related to orthogonal polynomials. An n-point quadrature rule is a pair of so-called nodes t_k and weights w_k for k=1dotsn that allow to solve integrals relative to the measureint_Omega f(t) w(t) mathrmd t approx sum_k=1^n w_k f(t_k)If the integrand f is polynomial, then the specific Gauss quadrature rules possess the remarkable property that an n-point quadrature rule can integrate polynomial integrands f of degree at most 2n-1 exactly; no approximation error is made.note: Note\nFor common measures, PolyChaos resorts to the package FastGaussQuadrature The compilation time of FastGaussQuadrature is currently extremely slow, see here.The fields of Quad areName Meaning\nname::String Name\nNquad::Int64 Number n of quadrature points\nnodes::Vector{Float64} Nodes\nweights::Vector{Float64} Weights\nmeas::Measure Underlying measurewith obvious meanings.This tutorial shows the above in action"
+    "text": "Quadrature rules are intricately related to orthogonal polynomials. An n-point quadrature rule is a pair of so-called nodes t_k and weights w_k for k=1dotsn that allow to solve integrals relative to the measureint_Omega f(t) w(t) mathrmd t approx sum_k=1^n w_k f(t_k)If the integrand f is polynomial, then the specific Gauss quadrature rules possess the remarkable property that an n-point quadrature rule can integrate polynomial integrands f of degree at most 2n-1 exactly; no approximation error is made.The fields of Quad areName Meaning\nname::String Name\nNquad::Int64 Number n of quadrature points\nnodes::Vector{Float64} Nodes\nweights::Vector{Float64} Weights\nmeas::Measure Underlying measurewith obvious meanings.This tutorial shows the above in action."
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "MultiMeasure",
     "category": "section",
-    "text": "So far, everything was univariate, the weight of the measure was mapping real numbers to real numbers. PolyChaos can handle product measures too. Let\'s assume the weight function is a product of two independent Gaussian densitiesw mathbbR times mathbbR rightarrow mathbbR quad w(x) = frac1sqrt2pi mathrme^x_1^22 frac1sqrt2pi mathrme^x_2^22The type MultiMeasure serves this purpose, with its fieldsName Meaning\nname::Vector{String} Name\nw::Function Weight function of product measure\nw_uni::Vector{Function} Weight functions of underlying univariate measures\ndom::Vector{Tuple{Float64,Float64}} Domain\nsymmetric::Vector{Bool} Symmetry properties\npars::Vector{Dict} Additioanl parametersAll fields from Measure appear in vectorized versions (except for the weight w, which is the weight of the product measure) The only new field is w_uni, which stacks the univariate weight functions.This tutorial shows the above in action"
+    "text": "So far, everything was univariate, the weight of the measure was mapping real numbers to real numbers. PolyChaos can handle product measures too. Let\'s assume the weight function is a product of two independent Gaussian densitiesw mathbbR times mathbbR rightarrow mathbbR quad w(x) = frac1sqrt2pi mathrme^x_1^22 frac1sqrt2pi mathrme^x_2^22The type MultiMeasure serves this purpose, with its fieldsName Meaning\nname::Vector{String} Name\nw::Function Weight function of product measure\nw_uni::Vector{Function} Weight functions of underlying univariate measures\ndom::Vector{Tuple{Float64,Float64}} Domain\nsymmetric::Vector{Bool} Symmetry properties\npars::Vector{Dict} Additioanl parametersAll fields from Measure appear in vectorized versions (except for the weight w, which is the weight of the product measure) The only new field is w_uni, which stacks the univariate weight functions.This tutorial shows the above in action."
 },
 
 {
@@ -93,7 +93,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "MultiOrthoPoly",
     "category": "section",
-    "text": "Just as we did in the univariate case, we use MultiMeasure as a building block for multivariate orthogonal polynomials. The type MultiOrthoPoly combines product measures with the respective orthogonal polynomials and their quadrature rules. Its fields areName Meaning\nname::Vector{String} Names\ndeg::Int64 Maximum degree\ndim::Int64 Dimension of basis\nind::Matrix{Int64} Multi-index\nmeas::MultiMeasure Underlying product measure\nuni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}} Underlying univariate orthogonal polynomialsThe names of the univariate bases are stored in names; the maximum degree of the basis is deg; the overall dimension of the multivariate basis is dim; the multi-index ind maps the j-th multivariate basis to the elements of the univariate bases; the product measure is stored in meas; finally, all univariate bases are collected in uni.This tutorial shows the above in action"
+    "text": "Just as we did in the univariate case, we use MultiMeasure as a building block for multivariate orthogonal polynomials. The type MultiOrthoPoly combines product measures with the respective orthogonal polynomials and their quadrature rules. Its fields areName Meaning\nname::Vector{String} Names\ndeg::Int64 Maximum degree\ndim::Int64 Dimension of basis\nind::Matrix{Int64} Multi-index\nmeas::MultiMeasure Underlying product measure\nuni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}} Underlying univariate orthogonal polynomialsThe names of the univariate bases are stored in names; the maximum degree of the basis is deg; the overall dimension of the multivariate basis is dim; the multi-index ind maps the j-th multivariate basis to the elements of the univariate bases; the product measure is stored in meas; finally, all univariate bases are collected in uni.This tutorial shows the above in action."
 },
 
 {
@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Type Hierarchy",
     "title": "Tensor",
     "category": "section",
-    "text": "The last type we need to address is Tensor. It is used to store the results of scalar products. Its fields areName Meaning\ndim::Int64 Dimension m of tensor langle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\nT::SparseVector{Float64,Int64} Entries of tensor\nget::Function Function to get entries from T\nop::Union{OrthoPolyQ,MultiOrthoPoly} Underlying univariate orthogonal polynomialsThe dimension m of the tensor is the number of terms that appear in the scalar product. Let\'s assume we set m = 3, hence have langle phi_i phi_j phi_k rangle, then the concrete entry is obtained as Tensor.get([i,j,k]).This tutorial shows the above in action"
+    "text": "The last type we need to address is Tensor. It is used to store the results of scalar products. Its fields areName Meaning\ndim::Int64 Dimension m of tensor langle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\nT::SparseVector{Float64,Int64} Entries of tensor\nget::Function Function to get entries from T\nop::Union{OrthoPolyQ,MultiOrthoPoly} Underlying univariate orthogonal polynomialsThe dimension m of the tensor is the number of terms that appear in the scalar product. Let\'s assume we set m = 3, hence have langle phi_i phi_j phi_k rangle, then the concrete entry is obtained as Tensor.get([i,j,k]).This tutorial shows the above in action."
 },
 
 {
@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Numerical Integration",
     "title": "Numerical Integration",
     "category": "section",
-    "text": "using PolyChaos\nn = 5; f(t) = sin(t)\nopq = OrthoPolyQ(\"uniform01\",n-1);\nI0 = integrate(f,opq);\nm = Measure(\"uniform01\");\nq = Quad(n-1,m);\nI1 = integrate(f,q)\nop = OrthoPoly(\"uniform01\",n-1)\nq = Quad(n,op)\nI2 = integrate(f,q)The goal of this tutorial is to solve an integral using Gauss quadrature,I = int_0^1 f(t) mathrmd t approx sum_k=1^n w_k f(t_k)where we choose f(t) = sin(t), and n = 5."
+    "text": "using PolyChaos\nn = 5; f(t) = sin(t)\nopq = OrthoPolyQ(\"uniform01\",n-1);\nI0 = integrate(f,opq);\nm = Measure(\"uniform01\");\nq = Quad(n-1,m);\nI1 = integrate(f,q)\nop = OrthoPoly(\"uniform01\",n-1)\nq = Quad(n,op)\nI2 = integrate(f,q)The goal of this tutorial is to solve an integral using Gauss quadrature,I = int_0^1 f(t) mathrmd t approx sum_k=1^n w_k f(t_k)where we choose f(t) = sin(t), and n = 5.Make sure to check out this tutorial too."
 },
 
 {
@@ -149,20 +149,84 @@ var documenterSearchIndex = {"docs": [
     "page": "Numerical Integration",
     "title": "Comparison",
     "category": "section",
-    "text": "We see that the different variants provide slightly different results:1-cos(1) .- [I0 I1 I2]with I0 and I2 being the same and more accurate than I1. The increased accuracy is based on the fact that for I0 and I2 the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials. The quadrature for I1 is based on an general-purpose method that can be significantly less accurate."
+    "text": "We see that the different variants provide slightly different results:1-cos(1) .- [I0 I1 I2]with I0 and I2 being the same and more accurate than I1. The increased accuracy is based on the fact that for I0 and I2 the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials. The quadrature for I1 is based on an general-purpose method that can be significantly less accurate, see also the next tutorial."
+},
+
+{
+    "location": "quadrature_rules/#",
+    "page": "Quadrature Rules",
+    "title": "Quadrature Rules",
+    "category": "page",
+    "text": "using PolyChaos, LinearAlgebra\nmy_f(t) = t^2\na, b = 1.23, 3.45 # shape parameters of Jacobi weight\nint_exact = 0.353897; # reference value \nN = 4\nα, β = rm_jacobi(N,a,b)\nn_gauss, w_gauss = gauss(N,α,β)\nint_gauss = dot(w_gauss,my_f.(n_gauss))\nprint(\"first point:\\t $(n_gauss[1])\\n\")\nprint(\"end point:\\t $(n_gauss[end])\\n\")\nprint(\"error Gauss:\\t $(int_gauss-int_exact)\\n\")\nn_radau, w_radau = radau(N-1,α,β,1.)\nint_radau = dot(w_radau,my_f.(n_radau))\nprint(\"first point:\\t $(n_radau[1])\\n\")\nprint(\"end point:\\t $(n_radau[end])\\n\")\nprint(\"error Radau:\\t $(int_radau-int_exact)\")\nn_lob, w_lob = lobatto(N-2,α,β,-1.,1.)\nint_lob = dot(w_lob,my_f.(n_lob))\nprint(\"first point:\\t $(n_lob[1])\\n\")\nprint(\"end point:\\t $(n_lob[end])\\n\")\nprint(\"error Lobatto:\\t $(int_lob-int_exact)\")\nn_fej, w_fej = fejer(N)\nint_fej = dot(w_fej,my_f.(n_fej).*(1 .- n_fej).^a.*(1 .+ n_fej).^b)\nprint(\"first point:\\t $(n_fej[1])\\n\")\nprint(\"end point:\\t $(n_fej[end])\\n\")\nprint(\"error Fejer:\\t $(int_fej-int_exact)\")\nn_fej2, w_fej2 = fejer2(N)\nint_fej2 = dot(w_fej2,my_f.(n_fej2).*(1 .- n_fej2).^a.*(1 .+ n_fej2).^b)\nprint(\"first point:\\t $(n_fej2[1])\\n\")\nprint(\"end point:\\t $(n_fej2[end])\\n\")\nprint(\"error Fejer2:\\t $(int_fej2-int_exact)\")\nn_cc, w_cc = clenshaw_curtis(N)\nint_cc = dot(w_cc,my_f.(n_cc).*(1 .- n_cc).^a.*(1 .+ n_cc).^b)\nprint(\"first point:\\t\\t $(n_cc[1])\\n\")\nprint(\"end point:\\t\\t $(n_cc[end])\\n\")\nprint(\"error Clenshaw-Curtis:\\t $(int_cc-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#QuadratureRules-1",
+    "page": "Quadrature Rules",
+    "title": "Quadrature Rules",
+    "category": "section",
+    "text": "In this tutorial we investigate how recurrence coefficients of orthogonal polynomials lead to quadrature rules.We want to solve the integralI = int_-1^1 f(t) w(t) mathrmd twith the weight functionw(t) = (1-t)^a (1+t)^bfor all t in -11 and ab-1. For the function f we choosef(t) = t^2To solve the integral we do the following:Choose number of nodes N;\nGenerate recurrence coefficients;\nGenerate quadrature rule from those recurrence coefficients.We will compare Gauss quadrature to Gauss-Radau quadrature and Gauss-Lobatto quadrature.Make sure to check out this tutorial too.Let\'s begin:using PolyChaos, LinearAlgebra\nmy_f(t) = t^2\na, b = 1.23, 3.45 # shape parameters of Jacobi weight\nint_exact = 0.353897; # reference value Now we compute N recurrence coefficients.N = 4\nα, β = rm_jacobi(N,a,b)"
+},
+
+{
+    "location": "quadrature_rules/#Gauss-1",
+    "page": "Quadrature Rules",
+    "title": "Gauss",
+    "category": "section",
+    "text": "The first quadrature rule is Gauss quadrature. This method goes back to Golub and Welsch.n_gauss, w_gauss = gauss(N,α,β)\nint_gauss = dot(w_gauss,my_f.(n_gauss))\nprint(\"first point:\\t $(n_gauss[1])\\n\")\nprint(\"end point:\\t $(n_gauss[end])\\n\")\nprint(\"error Gauss:\\t $(int_gauss-int_exact)\\n\")Since Gauss quadrature has a degree of exactness of 2N-1, the value of the integral is exact."
+},
+
+{
+    "location": "quadrature_rules/#Gauss-Radau-1",
+    "page": "Quadrature Rules",
+    "title": "Gauss-Radau",
+    "category": "section",
+    "text": "Gauss-Radau quadrature is a variant of Gauss quadrature that allows to specify a value of a node that has to be included. We choose to include the right end point t = 10.n_radau, w_radau = radau(N-1,α,β,1.)\nint_radau = dot(w_radau,my_f.(n_radau))\nprint(\"first point:\\t $(n_radau[1])\\n\")\nprint(\"end point:\\t $(n_radau[end])\\n\")\nprint(\"error Radau:\\t $(int_radau-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#Gauss-Lobatto-1",
+    "page": "Quadrature Rules",
+    "title": "Gauss-Lobatto",
+    "category": "section",
+    "text": "Next, we look at Gauss-Lobatto quadrature, which allows to include two points. We choose to include the left and end point of the interval, which are t in -10 10.n_lob, w_lob = lobatto(N-2,α,β,-1.,1.)\nint_lob = dot(w_lob,my_f.(n_lob))\nprint(\"first point:\\t $(n_lob[1])\\n\")\nprint(\"end point:\\t $(n_lob[end])\\n\")\nprint(\"error Lobatto:\\t $(int_lob-int_exact)\")There are other quadratures that we subsume as all-purpose quadrature rules. These include Fejér\'s first and second rule, and Clenshaw-Curtis quadrature."
+},
+
+{
+    "location": "quadrature_rules/#Fejér\'s-First-Rule-1",
+    "page": "Quadrature Rules",
+    "title": "Fejér\'s First Rule",
+    "category": "section",
+    "text": "Fejér\'s first rule does not include the end points of the interval.n_fej, w_fej = fejer(N)\nint_fej = dot(w_fej,my_f.(n_fej).*(1 .- n_fej).^a.*(1 .+ n_fej).^b)\nprint(\"first point:\\t $(n_fej[1])\\n\")\nprint(\"end point:\\t $(n_fej[end])\\n\")\nprint(\"error Fejer:\\t $(int_fej-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#Fejér\'s-Second-Rule-1",
+    "page": "Quadrature Rules",
+    "title": "Fejér\'s Second Rule",
+    "category": "section",
+    "text": "Fejér\'s second rule does include the end points of the interval.n_fej2, w_fej2 = fejer2(N)\nint_fej2 = dot(w_fej2,my_f.(n_fej2).*(1 .- n_fej2).^a.*(1 .+ n_fej2).^b)\nprint(\"first point:\\t $(n_fej2[1])\\n\")\nprint(\"end point:\\t $(n_fej2[end])\\n\")\nprint(\"error Fejer2:\\t $(int_fej2-int_exact)\")"
+},
+
+{
+    "location": "quadrature_rules/#Clenshaw-Curtis-1",
+    "page": "Quadrature Rules",
+    "title": "Clenshaw-Curtis",
+    "category": "section",
+    "text": "Clenshaw-Curtis quadrature is similar to Féjer\'s second rule, as in it includes the end points of the integration interval. For the same number of nodes it is also more accurate than Féjer\'s rules, generally speaking.n_cc, w_cc = clenshaw_curtis(N)\nint_cc = dot(w_cc,my_f.(n_cc).*(1 .- n_cc).^a.*(1 .+ n_cc).^b)\nprint(\"first point:\\t\\t $(n_cc[1])\\n\")\nprint(\"end point:\\t\\t $(n_cc[end])\\n\")\nprint(\"error Clenshaw-Curtis:\\t $(int_cc-int_exact)\")As we can see, for the same number of nodes N, the quadrature rules based on the recurrence coefficients can greatly outperform the all-purpose quadratures. So, whenever possible, use quadrature rules based on recurrence coefficients of the orthogonal polynomials relative to the underlying measure. Make sure to check out this tutorial too."
 },
 
 {
     "location": "orthogonal_polynomials_canonical/#",
-    "page": "Monic Orthogonal Polynomials",
-    "title": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
+    "title": "Univariate Monic Orthogonal Polynomials",
     "category": "page",
     "text": ""
 },
 
 {
     "location": "orthogonal_polynomials_canonical/#UnivariateMonicOrthogonalPolynomials-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Univariate Monic Orthogonal Polynomials",
     "category": "section",
     "text": "Univariate monic orthogonal polynomials make up the core building block of the package. These are real polynomials  pi_k _k geq 0, which are univariate pi_k mathbbR rightarrow mathbbR and orthogonal relative to a nonnegative weight function w mathbbR rightarrow mathbbR_geq 0, and which have a leading coefficient equal to one:beginaligned\npi_k(t) = t^k + a_k-1 t^k-1 + dots + a_1 t + a_0 quad forall k = 0 1 dots \nlangle pi_k pi_l rangle = int_mathbbR pi_k(t) pi_l(t) w(t) mathrmdt =\nbegincases\n0  k neq l text and kl geq 0 \n pi_k ^2  0  k = l geq 0\nendcases\nendalignedThese univariate monic orthogonal polynomials satisfy the paramount three-term recurrence relationbeginaligned\npi_k+1(t) = (t - alpha_k) pi_k(t) - beta_k pi_k-1(t) quad k= 0 1 dots \npi_o(t) = 1 \npi_-1(t) = 0\nendalignedHence, every system of n univariate monic orthogonal polynomials  pi_k _k=0^n is isomorphic to its recurrence coefficients  alpha_k beta_k _k=0^n."
@@ -170,7 +234,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "orthogonal_polynomials_canonical/#Classical-Orthogonal-Polynomials-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Classical Orthogonal Polynomials",
     "category": "section",
     "text": "The so-called classical orthogonal polynomials are polynomials named after famous mathematicians who each discovered a special family of orthogonal polynomials, for example Hermite polynomials or Jacobi polynomials. For classical orthogonal polynomials there exist closed-form expressions of–-among others–-the recurrence coefficients. Also quadrature rules for classical orthogonal polynomials are well-studied (with dedicated packages such as FastGaussQuadrature.jl. However, more often than not these classical orthogonal polynomials are neither monic nor orthogonal, hence not normalized in any sense. For example, there is a distinction between the probabilists\' Hermite polynomials and the physicists\' Hermite polynomials. The difference is in the weight function w(t) relative to which the polynomials are orthogonal:beginaligned\ntextProbabilists w(t) = frac1sqrt2 pi  exp left( - fract^22 right) \ntextPhysicists w(t) =  exp left( - t^2 right)\nendalignedTo streamline the computations, all classical orthogonal polynomials are converted to monic orthogonal polynomials (for which, of course, the closed-form expressions persist). Currently, the following weight functions (hence classical orthogonal polynomials) are supported:Name Weight w(t) Parameters Support Classical polynomial\nhermite $ \\exp \\left( - t^2 \\right)$ - (-infty infty) Hermite\ngenhermite $ \\lvert t \\rvert^{2 \\mu}\\exp \\left( - t^2 \\right)$ mu  -frac12 (-infty infty) Generalized Hermite\nlegendre 1 - (-11) Legendre\njacobi (1-t)^alpha (1+t)^beta alpha beta  -1 (-11) Jacobi\nlaguerre exp(-t) - (0infty) Laguerre\ngenlaguerre t^alphaexp(-t) alpha-1 (0infty) Generalized Laguerre\nmeixnerpollaczek frac12 pi exp((2phi-pi)t) lvertGamma(lambda + mathrmit)rvert^2 lambda  0 0phipi (-inftyinfty) Meixner-PollaczekAdditionally, the following weight functions that are equivalent to probability density functions are supported:Name Weight w(t) Parameters Support Classical polynomial\ngaussian frac1sqrt2 pi  exp left( - fract^22 right) - (-infty infty) Probabilists\' Hermite\nuniform01 1 - (01) Legendre\nbeta01 frac1B(alphabeta)  t^alpha-1 (1-t)^beta-1 alpha beta  0 (01) Jacobi\ngamma fracbeta^alphaGamma(alpha) t^alpha-1 exp(-beta t) alpha beta  0 (0infty) Laguerre\nlogistic fracexp(-t)(1+exp(-t))^2 - (-inftyinfty) -To generate the orthogonal polynomials up to maximum degree deg, simply callusing PolyChaos\ndeg = 4\nop = OrthoPoly(\"gaussian\",deg)This generates opas an OrthoPoly type with the underlying Gaussian measure op.meas. The recurrence coefficients are accessible via coeffs().coeffs(op)By default, the constructor for OrthoPoly generates deg+1 recurrence coefficients. Sometimes, some other number Nrec may be required. This is why Nrec is a keyword for the constructor OrthoPoly.N = 100\nop_ = OrthoPoly(\"logistic\",deg;Nrec=N)Let\'s check whether we truly have more coefficients:size(coeffs(op_),1)==N"
@@ -178,7 +242,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "orthogonal_polynomials_canonical/#Arbitrary-Weights-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Arbitrary Weights",
     "category": "section",
     "text": "If you are given a weight function w that does not belong to the Table above, it is still possible to generate the respective univariate monic orthogonal polynomials. First, we define the measure by specifying a name, the weight, the support, symmetry, and parameterssupp = (-1,1)\nfunction w(t)\n    supp[1]<=t<=supp[2] ? (1. + t) : error(\"$t not in support\")\nend\nmy_meas = Measure(\"my_meas\",w,supp,false,Dict())Notice: it is advisable to define the weight such that an error is thrown for arguments outside of the support.Now, we want to construct the univariate monic orthogonal polynomials up to degree deg relative to m. The constructor ismy_op = OrthoPoly(\"my_op\",deg,my_meas;Nquad=200)By default, the recurrence coefficients are computed using the Stieltjes procuedure with Clenshaw-Curtis quadrature (with Nquad nodes and weights). Hence, the choice of Nquad influences accuracy."
@@ -186,7 +250,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "orthogonal_polynomials_canonical/#MultivariateMonicOrthogonalPolynomials-1",
-    "page": "Monic Orthogonal Polynomials",
+    "page": "Univariate Monic Orthogonal Polynomials",
     "title": "Multivariate Monic Orthogonal Polynomials",
     "category": "section",
     "text": "Suppose we have p systems of univariate monic orthogonal polynomials, pi_k^(1) _kgeq 0   pi_k^(2) _kgeq 0 dots  pi_k^(p) _kgeq 0each system being orthogonal relative to the weights w^(1) w^(2) dots w^(p) with supports mathcalW^(1) mathcalW^(2) dots mathcalW^(p). Also, let d^(i) be the maximum degree of the i-th system of univariate orthogonal polynomials. We would like to construct a p-variate monic basis  psi_k _k geq 0 with psi mathbbR^p rightarrow mathbbR of degree at most 0 leq d leq min_i=1dotsk d^(i). Further, this basis shall be orthogonal relative to the product measure w mathcalW = mathcalW^(1) otimes mathcalW^(2) mathcalW^(1) cdots otimes mathcalW^(p) rightarrow mathbbR_geq 0 given byw(t) = prod_i=1^p w^(i)(t_i)hence satisfieslangle psi_k psi_l rangle = int_mathcalW psi_k(t) psi_l(t) w(t) mathrmd t =\nbegincases\n0  k neq l text and kl geq 0 \n psi_k ^2  0  k = l geq 0\nendcasesFor this, there exists the composite struct MultiOrthoPoly. Let\'s consider an example where we mix classical orthogonal polynomials with an arbitrary weight.deg = [3,5,6,4]\nd = minimum(deg)\n\nop1 = OrthoPoly(\"gaussian\",deg[1])\nop2 = OrthoPoly(\"uniform01\",deg[2])\nop3 = OrthoPoly(\"beta01\",deg[3],Dict(:shape_a=>2,:shape_b=>1.2))\nops = [op1,op2,op3,my_op]\nmop = MultiOrthoPoly(ops,d)The total number of  basis polynomials is stored in the field dim. The univariate basis polynomials making up the multivariate basis are stored in the field uni.mop.uniThe field ind contains the multi-index, i.e. row i stores what combination of univariate polynomials makes up the i-th multivariate polynomial. For example,i = 11\nmop.ind[i+1,:]translates mathematically topsi_11(t) = pi_0^(1)(t_1) pi_1^(2)(t_2) pi_0^(3)(t_3) pi_1^(4)(t_4)Notice that there is an offset by one, because the basis counting starts at 0, but Julia is 1-indexed. The underlying measure of mop is now of type MultiMeasure, and stored in the field measmop.measThe weight w can be evaluated as expectedmop.meas.w(0.5*ones(length(ops)))"
@@ -197,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multiple Discretization",
     "title": "Multiple Discretization",
     "category": "page",
-    "text": "using PolyChaos, LinearAlgebra\nγ = 0.5;\nint_exact = 1+pi/2; # exact value of the integral\nfunction my_w(t::Float64,γ::Float64)\n    γ + (1-γ)*1/sqrt(1-t^2)\nend\nN = 1000;\nn,w = fejer(N);\nint_fejer = dot(w,my_w.(n,γ))\nprint(\"Fejer error:\\t$(abs(int_exact-int_fejer))\\twith $N nodes\")\nfunction quad_gaussleg(N::Int,γ::Float64)\n    a,b=rm_legendre(N)\n    n,w=golubwelsch(a,b)\nend\nn,w = quad_gaussleg(N,γ)\nint_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))\nprint(\"Gauss-Legendre error:\\t$(abs(int_exact-int_gaussleg))\\twith $N nodes\")\nfunction quad_gausscheb(N::Int64,γ::Float64)\n    a,b = rm_chebyshev1(N)\n    n,w = golubwelsch(a,b)\nend\nn,w = quad_gausscheb(N,γ)\nint_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))\nprint(\"Gauss-Chebyshev error:\\t$(abs(int_exact-int_gausscheb))\\twith $N nodes\")\nfunction quad_gaussleg_mod(N::Int,γ::Float64)\n    n,w = quad_gaussleg(N,γ)\n    return n,γ*w\nend\nfunction quad_gausscheb_mod(N::Int,γ::Float64)\n            n,w = quad_gausscheb(N,γ)\n    return n,(1-γ)*w\nend\nN = 8\na,b = mcdiscretization(N,[n->quad_gaussleg_mod(n,γ); n->quad_gausscheb_mod(n,γ)])\nn,w = golubwelsch(a,b)\nint_mc = sum(w)\nprint(\"Discretization error:\\t$(abs(int_exact-int_mc))\\twith $N nodes\")\nΓ = 0:0.1:1;\nab = [ mcdiscretization(N,[n->quad_gaussleg_mod(n,gam); n->quad_gausscheb_mod(n,gam)]) for gam in Γ ];\nbb = hcat([ ab[i][2] for i=1:length(Γ)]...);\nb_leg = rm_legendre(N)[2];\nb_cheb = rm_chebyshev1(N)[2]\nbb[:,1]-b_cheb\nbb[:,end]-b_leg\nusing PyPlot\nfigure(1);\ngrid(true);\nsemilogy(Γ,bb\');\n[ plot(0.,b_cheb[i],\"x\") for i=1:N ];\n[ plot(1.,b_leg[i],\"o\") for i=1:N ];\nttl = latexstring(\"N=$N  Recurrence Coefficients Interpolating from Chebyshev to Legendre\");\nxlabel(L\"\\gamma\");\nylabel(L\"\\beta\");\ntitle(\"N=$N β-Recurrence Coefficients Interpolating from Chebyshev to Legendre\");"
+    "text": "using PolyChaos, LinearAlgebra\nγ = 0.5;\nint_exact = 1+pi/2; # exact value of the integral\nfunction my_w(t::Float64,γ::Float64)\n    γ + (1-γ)*1/sqrt(1-t^2)\nend\nN = 1000;\nn,w = fejer(N);\nint_fejer = dot(w,my_w.(n,γ))\nprint(\"Fejer error:\\t$(abs(int_exact-int_fejer))\\twith $N nodes\")\nfunction quad_gaussleg(N::Int,γ::Float64)\n    a,b=rm_legendre(N)\n    n,w=golubwelsch(a,b)\nend\nn,w = quad_gaussleg(N,γ)\nint_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))\nprint(\"Gauss-Legendre error:\\t$(abs(int_exact-int_gaussleg))\\twith $N nodes\")\nfunction quad_gausscheb(N::Int64,γ::Float64)\n    a,b = rm_chebyshev1(N)\n    n,w = golubwelsch(a,b)\nend\nn,w = quad_gausscheb(N,γ)\nint_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))\nprint(\"Gauss-Chebyshev error:\\t$(abs(int_exact-int_gausscheb))\\twith $N nodes\")\nfunction quad_gaussleg_mod(N::Int,γ::Float64)\n    n,w = quad_gaussleg(N,γ)\n    return n,γ*w\nend\nfunction quad_gausscheb_mod(N::Int,γ::Float64)\n            n,w = quad_gausscheb(N,γ)\n    return n,(1-γ)*w\nend\nN = 8\na,b = mcdiscretization(N,[n->quad_gaussleg_mod(n,γ); n->quad_gausscheb_mod(n,γ)])\nn,w = golubwelsch(a,b)\nint_mc = sum(w)\nprint(\"Discretization error:\\t$(abs(int_exact-int_mc))\\twith $N nodes\")\nΓ = 0:0.1:1;\nab = [ mcdiscretization(N,[n->quad_gaussleg_mod(n,gam); n->quad_gausscheb_mod(n,gam)]) for gam in Γ ];\nbb = hcat([ ab[i][2] for i=1:length(Γ)]...);\nb_leg = rm_legendre(N)[2];\nb_cheb = rm_chebyshev1(N)[2]\nbb[:,1]-b_cheb\nbb[:,end]-b_leg\nusing Plots\ngr()\nplot(Γ,bb\',yaxis=:log10, w=3, legend=false)\nzs, os = zeros(N), ones(N)\nscatter!(zs,b_cheb,marker=:x)\nscatter!(os,b_leg,marker=:circle)\nxlabel!(\"gamma\")\nylabel!(\"beta\")\ntitle!(\"N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre\")"
 },
 
 {
@@ -205,20 +269,20 @@ var documenterSearchIndex = {"docs": [
     "page": "Multiple Discretization",
     "title": "Multiple Discretization",
     "category": "section",
-    "text": "This tutorial shows how to compute recurrence coefficients for non-trivial weight functions, and how they are being used for quadrature. The method we use is called multiple discretization, and follows W. Gautschi\'s book \"Orthogonal Polynomials: Computation and Approximation\", specifically Section 2.2.4, and Example 2.38.Suppose we have the weight functionforall t in -11 gamma in 01 quad w(tgamma) = gamma + (1-gamma) frac1sqrt1-t^2and we would like to solveint_-1^1 f(t) w(tc) mathrmdt = sum_nu=1^N f(tau_nu) w_nuby some quadrature rule. We will see that ad-hoc quadrature rules will fail to solve the integral even for the simplest choice f equiv 1. However, finding the recurrence coefficients of the underlying orthogonal polynomials, and then finding the quadrature rule will be the way to go.Let us first try to solve the integral for f equiv 1 by Fejer\'s rule.using PolyChaos, LinearAlgebra\nγ = 0.5;\nint_exact = 1+pi/2; # exact value of the integral\nfunction my_w(t::Float64,γ::Float64)\n    γ + (1-γ)*1/sqrt(1-t^2)\nend\n\nN = 1000;\nn,w = fejer(N);\nint_fejer = dot(w,my_w.(n,γ))\nprint(\"Fejer error:\\t$(abs(int_exact-int_fejer))\\twith $N nodes\")Clearly, that is not satisfying. Well, the term gamma of the weight w makes us think of Gauss-Legendre integration, so let\'s try it instead.function quad_gaussleg(N::Int,γ::Float64)\n    a,b=rm_legendre(N)\n    n,w=golubwelsch(a,b)\nend\nn,w = quad_gaussleg(N,γ)\nint_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))\nprint(\"Gauss-Legendre error:\\t$(abs(int_exact-int_gaussleg))\\twith $N nodes\")Even worse! Well, we can factor out frac1sqrt1-t^2, making the integral amenable to a Gauss-Chebyshev rule. So, let\'s give it anothery try.function quad_gausscheb(N::Int64,γ::Float64)\n    a,b = rm_chebyshev1(N)\n    n,w = golubwelsch(a,b)\nend\nn,w = quad_gausscheb(N,γ)\nint_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))\n# int=sum(xw(:,2).*(1+sqrt(1-xw(:,1).^2)))\nprint(\"Gauss-Chebyshev error:\\t$(abs(int_exact-int_gausscheb))\\twith $N nodes\")Okay, that\'s better, but it took us a lot of nodes to get this result. Is there a different way? Indeed, there is. As we have noticed, the weight w has a lot in common with Gauss-Legendre and Gauss-Chebyshev. We can decompose the integral as followsint_-1^1 f(t) w(t) mathrmdt = sum_i=1^m int_-1^1 f(t) w_i(t) mathrmd twithbeginalign*\nw_1(t) = gamma \nw_2(t) = (1-gamma) frac1sqrt1-t^2\nendalign*To the weight w_1 we can apply Gauss-Legendre quadrature, to the weight w_2 we can apply Gauss-Chebyshev quadrature (with tiny modifications). This discretization of the measure can be used in our favor. The function mcdiscretization() takes the m discretization rules as an inputfunction quad_gaussleg_mod(N::Int,γ::Float64)\n    n,w = quad_gaussleg(N,γ)\n    return n,γ*w\nend\nfunction quad_gausscheb_mod(N::Int,γ::Float64)\n            n,w = quad_gausscheb(N,γ)\n    return n,(1-γ)*w\nend\n\nN = 8\na,b = mcdiscretization(N,[n->quad_gaussleg_mod(n,γ); n->quad_gausscheb_mod(n,γ)])\nn,w = golubwelsch(a,b)\nint_mc = sum(w)\nprint(\"Discretization error:\\t$(abs(int_exact-int_mc))\\twith $N nodes\")Et voilà, no error with fewer nodes. (For this example, we\'d need in fact just a single node.)The function mcdiscretization() is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight w. Let\'s inspect the values of the recurrence coefficients a little more. For gamma = 0, we are in the world of Chebyshev polynomials, for gamma = 1, we enter the realm of Legendre polynomials. And in between? That\'s exactly where the weight w comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let\'s verify this by plotting the recurrence coefficients for several values of gamma.Γ = 0:0.1:1;\nab = [ mcdiscretization(N,[n->quad_gaussleg_mod(n,gam); n->quad_gausscheb_mod(n,gam)]) for gam in Γ ];\nbb = hcat([ ab[i][2] for i=1:length(Γ)]...);\nb_leg = rm_legendre(N)[2];\nb_cheb = rm_chebyshev1(N)[2]\nbb[:,1]-b_chebbb[:,end]-b_legLet\'s plot these values to get a better feeling.using PyPlot\nfigure(1);\ngrid(true);\nsemilogy(Γ,bb\');\n[ plot(0.,b_cheb[i],\"x\") for i=1:N ];\n[ plot(1.,b_leg[i],\"o\") for i=1:N ];\nttl = latexstring(\"N=$N  Recurrence Coefficients Interpolating from Chebyshev to Legendre\");\nxlabel(L\"\\gamma\");\nylabel(L\"\\beta\");\ntitle(\"N=$N β-Recurrence Coefficients Interpolating from Chebyshev to Legendre\");(Image: type hierarchy)The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials. The interpolating line in between stands for the β recursion coefficients of w(tgamma)."
+    "text": "This tutorial shows how to compute recurrence coefficients for non-trivial weight functions, and how they are being used for quadrature. The method we use is called multiple discretization, and follows W. Gautschi\'s book \"Orthogonal Polynomials: Computation and Approximation\", specifically Section 2.2.4, and Example 2.38.Suppose we have the weight functionforall t in -11 gamma in 01 quad w(tgamma) = gamma + (1-gamma) frac1sqrt1-t^2and we would like to solveint_-1^1 f(t) w(tc) mathrmdt = sum_nu=1^N f(tau_nu) w_nuby some quadrature rule. We will see that ad-hoc quadrature rules will fail to solve the integral even for the simplest choice f equiv 1. However, finding the recurrence coefficients of the underlying orthogonal polynomials, and then finding the quadrature rule will be the way to go.Let us first try to solve the integral for f equiv 1 by Fejer\'s rule.using PolyChaos, LinearAlgebra\nγ = 0.5;\nint_exact = 1+pi/2; # exact value of the integral\nfunction my_w(t::Float64,γ::Float64)\n    γ + (1-γ)*1/sqrt(1-t^2)\nend\n\nN = 1000;\nn,w = fejer(N);\nint_fejer = dot(w,my_w.(n,γ))\nprint(\"Fejer error:\\t$(abs(int_exact-int_fejer))\\twith $N nodes\")Clearly, that is not satisfying. Well, the term gamma of the weight w makes us think of Gauss-Legendre integration, so let\'s try it instead.function quad_gaussleg(N::Int,γ::Float64)\n    a,b=rm_legendre(N)\n    n,w=golubwelsch(a,b)\nend\nn,w = quad_gaussleg(N,γ)\nint_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))\nprint(\"Gauss-Legendre error:\\t$(abs(int_exact-int_gaussleg))\\twith $N nodes\")Even worse! Well, we can factor out frac1sqrt1-t^2, making the integral amenable to a Gauss-Chebyshev rule. So, let\'s give it anothery try.function quad_gausscheb(N::Int64,γ::Float64)\n    a,b = rm_chebyshev1(N)\n    n,w = golubwelsch(a,b)\nend\nn,w = quad_gausscheb(N,γ)\nint_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))\n# int=sum(xw(:,2).*(1+sqrt(1-xw(:,1).^2)))\nprint(\"Gauss-Chebyshev error:\\t$(abs(int_exact-int_gausscheb))\\twith $N nodes\")Okay, that\'s better, but it took us a lot of nodes to get this result. Is there a different way? Indeed, there is. As we have noticed, the weight w has a lot in common with Gauss-Legendre and Gauss-Chebyshev. We can decompose the integral as followsint_-1^1 f(t) w(t) mathrmdt = sum_i=1^m int_-1^1 f(t) w_i(t) mathrmd twithbeginalign*\nw_1(t) = gamma \nw_2(t) = (1-gamma) frac1sqrt1-t^2\nendalign*To the weight w_1 we can apply Gauss-Legendre quadrature, to the weight w_2 we can apply Gauss-Chebyshev quadrature (with tiny modifications). This discretization of the measure can be used in our favor. The function mcdiscretization() takes the m discretization rules as an inputfunction quad_gaussleg_mod(N::Int,γ::Float64)\n    n,w = quad_gaussleg(N,γ)\n    return n,γ*w\nend\nfunction quad_gausscheb_mod(N::Int,γ::Float64)\n            n,w = quad_gausscheb(N,γ)\n    return n,(1-γ)*w\nend\n\nN = 8\na,b = mcdiscretization(N,[n->quad_gaussleg_mod(n,γ); n->quad_gausscheb_mod(n,γ)])\nn,w = golubwelsch(a,b)\nint_mc = sum(w)\nprint(\"Discretization error:\\t$(abs(int_exact-int_mc))\\twith $N nodes\")Et voilà, no error with fewer nodes. (For this example, we\'d need in fact just a single node.)The function mcdiscretization() is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight w. Let\'s inspect the values of the recurrence coefficients a little more. For gamma = 0, we are in the world of Chebyshev polynomials, for gamma = 1, we enter the realm of Legendre polynomials. And in between? That\'s exactly where the weight w comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let\'s verify this by plotting the recurrence coefficients for several values of gamma.Γ = 0:0.1:1;\nab = [ mcdiscretization(N,[n->quad_gaussleg_mod(n,gam); n->quad_gausscheb_mod(n,gam)]) for gam in Γ ];\nbb = hcat([ ab[i][2] for i=1:length(Γ)]...);\nb_leg = rm_legendre(N)[2];\nb_cheb = rm_chebyshev1(N)[2]\nbb[:,1]-b_chebbb[:,end]-b_legLet\'s plot these values to get a better feeling.using Plots\ngr()\nplot(Γ,bb\',yaxis=:log10, w=3, legend=false)\nzs, os = zeros(N), ones(N)\nscatter!(zs,b_cheb,marker=:x)\nscatter!(os,b_leg,marker=:circle)\n\nxlabel!(\"gamma\")\nylabel!(\"beta\")\ntitle!(\"N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre\")The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials. The interpolating line in between stands for the β recursion coefficients of w(tgamma)."
 },
 
 {
     "location": "scalar_products/#",
-    "page": "Scalar Products",
-    "title": "Scalar Products",
+    "page": "Computation of Scalar Products",
+    "title": "Computation of Scalar Products",
     "category": "page",
     "text": ""
 },
 
 {
     "location": "scalar_products/#ComputationOfScalarProducts-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Computation of Scalar Products",
     "category": "section",
     "text": "By now, we are able to construct orthogonal polynomials, and to construct quadrature rules for a given nonnegative weight function, respectively. Now we combine both ideas to solve integrals involving the orthogonal polynomialslangle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\n= int phi_i_1(t) phi_i_2(t) cdots phi_i_m-1(t) phi_i_m(t) w(t) mathrmd tboth for the univariate and multivariate case. The integrand is a polynomial (possibly multivariate) that can be solved exactly with the appropriate Gauss quadrature rules.note: Note\nTo simplify notation we drop the integration interval. It is clear from the context."
@@ -226,7 +290,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Univariate-Polynomials-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Univariate Polynomials",
     "category": "section",
     "text": ""
@@ -234,7 +298,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Classical-Polynomials-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Classical Polynomials",
     "category": "section",
     "text": "Let\'s begin with a univariate basis for some classical orthogonal polynomialusing PolyChaos\ndeg, n = 4, 20\ns_α, s_β = 2.1, 3.2\nop = OrthoPoly(\"beta01\",deg,Dict(:shape_a=>s_α,:shape_b=>s_β);Nrec=n)To add the corresponding quadrature rule there is the composite struct OrthoPolyQ whose simplest constructor readsopq = OrthoPolyQ(op,n)By default, an n-point Gauss quadrature rule is create relative to the underlying measure op.meas, where n is the number of recurrence coefficients stored in op.α and op.β. The type OrthoPolyQ has just two fields: an OrthoPoly, and a Quad.To compute the squared norms phi_k ^2 = langle phi_k phi_k  rangle\n= int phi_k(t) phi_k(t) w(t) mathrmd tof the basis we call computeSP2()normsq = computeSP2(opq)For the general caselangle phi_i_1 phi_i_2 cdots phi_i_m-1 phi_i_m rangle\n= int phi_i_1(t) phi_i_2(t) cdots phi_i_m-1(t) phi_i_m(t) w(t) mathrmd tthere exists a type Tensor that requires only two arguments: the dimension m geq 1, and an OrthoPolyQm = 3\nt = Tensor(3,opq)To get the desired entries, Tensorcomes with a get() function that is called for some index a in mathbbN_0^m that has the entries a = i_1 i_2 dots i_m. For examplet.get([1,2,3])Or using comprehensionT = [ t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]Notice that we can cross-check the results.using LinearAlgebra\n@show normsq == LinearAlgebra.diag(T[:,:,1])\n@show normsq == LinearAlgebra.diag(T[:,1,:])\n@show normsq == LinearAlgebra.diag(T[1,:,:])Also, normsq can be computed analogously in Tensor formatt2 = Tensor(2,opq)\n@show normsq == [ t2.get([i,i]) for i=0:dim(opq)-1]"
@@ -242,7 +306,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Arbitrary-Weights-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Arbitrary Weights",
     "category": "section",
     "text": "Of course, the type OrthoPolyQ can be constructed for arbitrary weights w(t). In this case we have to compute the orthogonal basis and the respective quadrature rule. Let\'s re-work the above example by hand.using SpecialFunctions\nsupp = (0,1)\nfunction w(t)\n    supp[1]<=t<=supp[2] ? (t^(s_α-1)*(1-t)^(s_β-1)/SpecialFunctions.beta(s_α,s_β)) : error(\"$t not in support\")\nend\nmy_meas = Measure(\"my_meas\",w,supp,false,Dict())\nmy_op = OrthoPoly(\"my_op\",deg,my_meas;Nrec=n)\nmy_quad = Quad(n,my_op)\nmy_opq = OrthoPolyQ(my_op,my_quad)Now we can compute the squared norms  phi_k ^2my_normsq = computeSP2(my_opq)And the tensormy_t = Tensor(m,my_opq)\nmy_T = [ my_t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]Let\'s compare the results:@show abs.(normsq-my_normsq)\n@show norm(T-my_T)note: Note\nThe possibility to create quadrature rules for arbitrary weights should be reserved to cases different from classical ones."
@@ -250,7 +314,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "scalar_products/#Multivariate-Polynomials-1",
-    "page": "Scalar Products",
+    "page": "Computation of Scalar Products",
     "title": "Multivariate Polynomials",
     "category": "section",
     "text": "For multivariate polynomials the syntax for Tensor is very much alike, except that we are dealing with the type MultiOrthoPoly now.mop = MultiOrthoPoly([opq,my_opq],deg)mt2 = Tensor(2,mop)\nmt3 = Tensor(3,mop)\nmT2 = [ mt2.get([i,i]) for i=0:dim(mop)-1 ]Notice that mT2 carries the elements of the 2-dimensional tensors for the univariate bases opq and my_opq. The encoding is given by the multi-index mop.indmop.indTo cross-check the results we can distribute the multi-index back to its univariate indices with the help of findUnivariateIndices.ind_opq = findUnivariateIndices(1,mop.ind)\nind_my_opq = findUnivariateIndices(2,mop.ind)@show mT2[ind_opq] - normsq\n@show mT2[ind_my_opq] - my_normsq;"
@@ -405,7 +469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Chi Squared, One DOF",
     "title": "Chi Squared, One DOF",
     "category": "page",
-    "text": ""
+    "text": "k = 1\nusing PolyChaos\ndeg, Nrec = 2, 20\nop = OrthoPoly(\"gaussian\",deg;Nrec=Nrec);\nopq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ(\"gaussian\",deg;Nrec=Nrec)\nL = dim(opq)\nmu, sig = 0., 1.\nx = [ convert2affinePCE(\"gaussian\",mu,sig); zeros(Float64,L-2) ]\nt2 = Tensor(2,opq);\nt3 = Tensor(3,opq)\ny = [ sum( x[i]*x[j]*t3.get([i-1,j-1,m-1])/t2.get([m-1,m-1])  for i=1:L, j=1:L ) for m=1:L ]\nmoms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]\nfunction myskew(y)\n   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )\n   μ = y[1]\n   σ = std(y,opq)\n   (e3-3*μ*σ^2-μ^3)/(σ^3)\nend\nprint(\"Expected value:\\t\\t$(moms_analytic(k)[1]) = $(mean(y,opq))\\n\")\nprint(\"\\t\\t\\terror = $(abs(mean(y,opq)-moms_analytic(k)[1]))\\n\")\nprint(\"Standard deviation:\\t$(moms_analytic(k)[2]) = $(std(y,opq))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[2]-std(y,opq))\\n\")\nprint(\"Skewness:\\t\\t$(moms_analytic(k)[3]) = $(myskew(y))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[3]-myskew(y))\\n\")\nusing Plots\ngr()\nNsmpl = 10000\nysmpl = samplePCE(Nsmpl,y,opq)\nhistogram(ysmpl;normalize=true,xlabel=\"t\",ylabel=\"rho(t)\")\nimport SpecialFunctions: gamma\nρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)\nt = range(0.1; stop=maximum(ysmpl), length=100)\nplot!(t,ρ.(t),w=4)"
 },
 
 {
@@ -429,7 +493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Chi Squared, One DOF",
     "title": "Practice",
     "category": "section",
-    "text": "First, we create a orthogonal basis relative to f_X(x) of degree at most d=2 (deg below).Notice that we consider a total of Nrec recursion coefficients, and that we also add a quadrature rule by calling OrthoPolyQ().k = 1\nusing PolyChaos\ndeg, Nrec = 2, 20\nop = OrthoPoly(\"gaussian\",deg;Nrec=Nrec);\nopq = OrthoPolyQ(op)\n# opq = OrthoPolyQ(\"gaussian\",deg;Nrec=Nrec)Next, we define the PCE for X.L = dim(opq)\nmu, sig = 0., 1.\nx = [ convert2affinePCE(\"gaussian\",mu,sig); zeros(Float64,L-2) ]With the orthogonal basis and the quadrature at hand, we can compute the tensors t2 and t3 that store the entries langle phi_m phi_m rangle, and langle phi_i phi_j phi_m rangle, respectively.t2 = Tensor(2,opq);\nt3 = Tensor(3,opq)With the tensors at hand, we can compute the Galerkin projection.y = [ sum( x[i]*x[j]*t3.get([i-1,j-1,m-1])/t2.get([m-1,m-1])  for i=1:L, j=1:L ) for m=1:L ]Let\'s compare the moments via PCE to the closed-form expressions.moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]\nfunction myskew(y)\n   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )\n   μ = y[1]\n   σ = mystd(y)\n   (e3-3*μ*σ^2-μ^3)/(σ^3)\nend\n\nprint(\"Expected value:\\t\\t$(moms_analytic(k)[1]) = $(mean(y,opq))\\n\")\nprint(\"\\t\\t\\terror = $(abs(mean(y,opq)-moms_analytic(k)[1]))\\n\")\nprint(\"Standard deviation:\\t$(moms_analytic(k)[2]) = $(std(y,opq))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[2]-std(y,opq))\\n\")\nprint(\"Skewness:\\t\\t$(moms_analytic(k)[3]) = $(myskew(y))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[3]-myskew(y))\\n\")\nLet\'s plot the probability density function to compare results. We first draw samples from the measure with the help of sampleMeasure(), and then evaluate the basis at these samples and multiply times the PCE coefficients. The latter stop is done using evaluatePCE(). Finally, we compare the result agains the analytical PDF rho(t) = fracmathrme^-05tsqrt2 t  Gamma(05) of the chi-squared distribution with one degree of freedom.using PyPlot\nNsmpl = 10000\n#ξ = sampleMeasure(Nsmpl,opq)\n#ysmpl = evaluatePCE(y,ξ,opq)\nysmpl = samplePCE(Nsmpl,y,opq)\nfigure(1)\nplt[:hist](ysmpl; density=true,bins=75)\ngrid(true); xlabel(L\"$t$\"); ylabel(L\"$\\rho(t)$\");\n\nimport SpecialFunctions: gamma\nρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)\nt = range(0.1; stop=maximum(ysmpl), length=100)\nplot(t,ρ.(t))"
+    "text": "First, we create a orthogonal basis relative to f_X(x) of degree at most d=2 (deg below).Notice that we consider a total of Nrec recursion coefficients, and that we also add a quadrature rule by calling OrthoPolyQ().k = 1\nusing PolyChaos\ndeg, Nrec = 2, 20\nop = OrthoPoly(\"gaussian\",deg;Nrec=Nrec);\nopq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ(\"gaussian\",deg;Nrec=Nrec)Next, we define the PCE for X.L = dim(opq)\nmu, sig = 0., 1.\nx = [ convert2affinePCE(\"gaussian\",mu,sig); zeros(Float64,L-2) ]With the orthogonal basis and the quadrature at hand, we can compute the tensors t2 and t3 that store the entries langle phi_m phi_m rangle, and langle phi_i phi_j phi_m rangle, respectively.t2 = Tensor(2,opq);\nt3 = Tensor(3,opq)With the tensors at hand, we can compute the Galerkin projection.y = [ sum( x[i]*x[j]*t3.get([i-1,j-1,m-1])/t2.get([m-1,m-1])  for i=1:L, j=1:L ) for m=1:L ]Let\'s compare the moments via PCE to the closed-form expressions.moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]\nfunction myskew(y)\n   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )\n   μ = y[1]\n   σ = std(y,opq)\n   (e3-3*μ*σ^2-μ^3)/(σ^3)\nend\n\nprint(\"Expected value:\\t\\t$(moms_analytic(k)[1]) = $(mean(y,opq))\\n\")\nprint(\"\\t\\t\\terror = $(abs(mean(y,opq)-moms_analytic(k)[1]))\\n\")\nprint(\"Standard deviation:\\t$(moms_analytic(k)[2]) = $(std(y,opq))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[2]-std(y,opq))\\n\")\nprint(\"Skewness:\\t\\t$(moms_analytic(k)[3]) = $(myskew(y))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[3]-myskew(y))\\n\")\nLet\'s plot the probability density function to compare results. We first draw samples from the measure with the help of sampleMeasure(), and then evaluate the basis at these samples and multiply times the PCE coefficients. The latter stop is done using evaluatePCE(). Finally, we compare the result agains the analytical PDF rho(t) = fracmathrme^-05tsqrt2 t  Gamma(05) of the chi-squared distribution with one degree of freedom.using Plots\ngr()\nNsmpl = 10000\n#ξ = sampleMeasure(Nsmpl,opq)\n#ysmpl = evaluatePCE(y,ξ,opq)\nysmpl = samplePCE(Nsmpl,y,opq)\nhistogram(ysmpl;normalize=true,xlabel=\"t\",ylabel=\"rho(t)\")\n\n\nimport SpecialFunctions: gamma\nρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)\nt = range(0.1; stop=maximum(ysmpl), length=100)\nplot!(t,ρ.(t),w=4)"
 },
 
 {
@@ -437,7 +501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Chi Squared, Several DOFs",
     "title": "Chi Squared, Several DOFs",
     "category": "page",
-    "text": ""
+    "text": "k = 12\nusing PolyChaos\ndegree, Nrec = 2, 20\nop = OrthoPoly(\"gaussian\",degree;Nrec=Nrec);\nopq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ(\"gaussian\",deg;Nrec=Nrec)\nmop = MultiOrthoPoly([opq for i=1:k],degree)\nL = dim(mop)\nmu, sig = 0., 1.\nx = [ assign2multi(convert2affinePCE(\"gaussian\",mu,sig),i,mop.ind) for i=1:k ]\nt2 = Tensor(2,mop)\nt3 = Tensor(3,mop)\ny = [ sum( x[i][j1]*x[i][j2]*t3.get([j1-1,j2-1,m-1])/t2.get([m-1,m-1])  for i=1:k, j1=1:L, j2=1:L ) for m=1:L ]\nmoms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]\nfunction myskew(y)\n   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )\n   μ = y[1]\n   σ = std(y,mop)\n   (e3-3*μ*σ^2-μ^3)/(σ^3)\nend\nprint(\"Expected value:\\t\\t$(moms_analytic(k)[1]) = $(mean(y,mop))\\n\")\nprint(\"\\t\\t\\terror = $(abs(mean(y,mop)-moms_analytic(k)[1]))\\n\")\nprint(\"Standard deviation:\\t$(moms_analytic(k)[2]) = $(std(y,mop))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[2]-std(y,mop))\\n\")\nprint(\"Skewness:\\t\\t$(moms_analytic(k)[3]) = $(myskew(y))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[3]-myskew(y))\\n\")\nusing Plots\ngr()\nNsmpl = 10000\nysmpl = samplePCE(Nsmpl,y,mop)\nhistogram(ysmpl;normalize=true,xlabel=\"t\",ylabel=\"rho(t)\")\nimport SpecialFunctions: gamma\nρ(t) = 1/(2^(0.5*k)*gamma(0.5*k))*t^(0.5*k-1)*exp(-0.5*t)\nt = range(0.1; stop=maximum(ysmpl), length=100)\nplot!(t,ρ.(t),w=4)"
 },
 
 {
@@ -461,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Chi Squared, Several DOFs",
     "title": "Practice",
     "category": "section",
-    "text": "First, we create a orthogonal basis relative to f_X(x) of degree at most d=2 (degree below).Notice that we consider a total of Nrec recursion coefficients, and that we also add a quadrature rule by calling OrthoPolyQ().k = 12\nusing PolyChaos\ndegree, Nrec = 2, 20\nop = OrthoPoly(\"gaussian\",degree;Nrec=Nrec);\nopq = OrthoPolyQ(op)Now let\'s define a multivariate basismop = MultiOrthoPoly([opq for i=1:k],degree)Next, we define the PCE for all X_i with i = 1 dots k.L = dim(mop)\nmu, sig = 0., 1.\nx = [ assign2multi(convert2affinePCE(\"gaussian\",mu,sig),i,mop.ind) for i=1:k ]With the orthogonal basis and the quadrature at hand, we can compute the tensors t2 and t3 that store the entries langle phi_m phi_m rangle, and langle phi_j_1 phi_j_2 phi_m rangle, respectively.t2 = Tensor(2,mop);\nt3 = Tensor(3,mop)With the tensors at hand, we can compute the Galerkin projection.Notice: there are more efficient ways to do this, but let\'s keep it simple.y = [ sum( x[i][j1]*x[i][j2]*t3.get([j1-1,j2-1,m-1])/t2.get([m-1,m-1])  for i=1:k, j1=1:L, j2=1:L ) for m=1:L ]Let\'s compare the moments via PCE to the closed-form expressions.moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]\nfunction myskew(y)\n   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )\n   μ = y[1]\n   σ = mystd(y)\n   (e3-3*μ*σ^2-μ^3)/(σ^3)\nend\n\nprint(\"Expected value:\\t\\t$(moms_analytic(k)[1]) = $(mean(y,mop))\\n\")\nprint(\"\\t\\t\\terror = $(abs(mean(y,mop)-moms_analytic(k)[1]))\\n\")\nprint(\"Standard deviation:\\t$(moms_analytic(k)[2]) = $(std(y,mop))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[2]-std(y,mop))\\n\")\nprint(\"Skewness:\\t\\t$(moms_analytic(k)[3]) = $(myskew(y))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[3]-myskew(y))\\n\")\nLet\'s plot the probability density function to compare results. We first draw samples from the measure with the help of sampleMeasure(), and then evaluate the basis at these samples and multiply times the PCE coefficients. The latter stop is done using evaluatePCE(). Both steps are combined in the function samplePCE(). Finally, we compare the result agains the analytical PDF rho(t) = fract^t2-1mathrme^-t22^k2  Gamma(k2) of the chi-squared distribution with one degree of freedom.using PyPlot\nNsmpl = 10000\n# ξ = sampleMeasure(Nsmpl,mop)\n# ysmpl = evaluatePCE(y,ξ,mop)\nysmpl = samplePCE(Nsmpl,y,mop)\nfigure(1)\nplt[:hist](ysmpl; density=true,bins=70)\ngrid(true); xlabel(L\"$t$\"); ylabel(L\"$\\rho(t)$\");\n\nimport SpecialFunctions: gamma\nρ(t) = 1/(2^(0.5*k)*gamma(0.5*k))*t^(0.5*k-1)*exp(-0.5*t)\nt = range(0.1; stop=maximum(ysmpl), length=100)\nplot(t,ρ.(t))"
+    "text": "First, we create a orthogonal basis relative to f_X(x) of degree at most d=2 (degree below).Notice that we consider a total of Nrec recursion coefficients, and that we also add a quadrature rule by calling OrthoPolyQ().k = 12\nusing PolyChaos\ndegree, Nrec = 2, 20\nop = OrthoPoly(\"gaussian\",degree;Nrec=Nrec);\nopq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ(\"gaussian\",deg;Nrec=Nrec)Now let\'s define a multivariate basismop = MultiOrthoPoly([opq for i=1:k],degree)Next, we define the PCE for all X_i with i = 1 dots k.L = dim(mop)\nmu, sig = 0., 1.\nx = [ assign2multi(convert2affinePCE(\"gaussian\",mu,sig),i,mop.ind) for i=1:k ]With the orthogonal basis and the quadrature at hand, we can compute the tensors t2 and t3 that store the entries langle phi_m phi_m rangle, and langle phi_j_1 phi_j_2 phi_m rangle, respectively.t2 = Tensor(2,mop)\nt3 = Tensor(3,mop)With the tensors at hand, we can compute the Galerkin projection.Notice: there are more efficient ways to do this, but let\'s keep it simple.y = [ sum( x[i][j1]*x[i][j2]*t3.get([j1-1,j2-1,m-1])/t2.get([m-1,m-1])  for i=1:k, j1=1:L, j2=1:L ) for m=1:L ]Let\'s compare the moments via PCE to the closed-form expressions.moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]\nfunction myskew(y)\n   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )\n   μ = y[1]\n   σ = std(y,mop)\n   (e3-3*μ*σ^2-μ^3)/(σ^3)\nend\n\nprint(\"Expected value:\\t\\t$(moms_analytic(k)[1]) = $(mean(y,mop))\\n\")\nprint(\"\\t\\t\\terror = $(abs(mean(y,mop)-moms_analytic(k)[1]))\\n\")\nprint(\"Standard deviation:\\t$(moms_analytic(k)[2]) = $(std(y,mop))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[2]-std(y,mop))\\n\")\nprint(\"Skewness:\\t\\t$(moms_analytic(k)[3]) = $(myskew(y))\\n\")\nprint(\"\\t\\t\\terror = $(moms_analytic(k)[3]-myskew(y))\\n\")\nLet\'s plot the probability density function to compare results. We first draw samples from the measure with the help of sampleMeasure(), and then evaluate the basis at these samples and multiply times the PCE coefficients. The latter stop is done using evaluatePCE(). Both steps are combined in the function samplePCE(). Finally, we compare the result agains the analytical PDF rho(t) = fract^t2-1mathrme^-t22^k2  Gamma(k2) of the chi-squared distribution with one degree of freedom.using Plots\ngr()\nNsmpl = 10000\n# ξ = sampleMeasure(Nsmpl,mop)\n# ysmpl = evaluatePCE(y,ξ,mop)\nysmpl = samplePCE(Nsmpl,y,mop)\nhistogram(ysmpl;normalize=true,xlabel=\"t\",ylabel=\"rho(t)\")\n\nimport SpecialFunctions: gamma\nρ(t) = 1/(2^(0.5*k)*gamma(0.5*k))*t^(0.5*k-1)*exp(-0.5*t)\nt = range(0.1; stop=maximum(ysmpl), length=100)\nplot!(t,ρ.(t),w=4)"
 },
 
 {
@@ -669,7 +733,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.stieltjes",
     "category": "function",
-    "text": "stieltjes(N::Int64,nodes::Vector{Float64},weights::Vector{Float64})\n\nDescription based on W. Gautschi OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES Given the discrete inner product (with nodes and weights) the function generates the firstN recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\n\n\n\n\n"
+    "text": "stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)\n\nStieltjes procedure–-Given the nodes and weights the function generates the firstN recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nSet the Boolean removezeroweights to true if zero weights should be removed.\n\n\n\n\n\n"
 },
 
 {
@@ -677,7 +741,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.lanczos",
     "category": "function",
-    "text": "lanczos(N::Int64,nodes::Vector{Float64},weights::Vector{Float64}) Description based on W. Gautschi OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES\n\nGiven the discrete inner product (with nodes and weights) the function generates the first N recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nThe script is adapted from the routine RKPW in W.B. Gragg and W.J. Harrod, ``The numerically stable reconstruction of Jacobi matrices from spectral data\'\', Numer. Math. 44 (1984), 317-335.\n\n\n\n\n\n"
+    "text": "lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)\n\nLanczos procedure–-given the nodes and weights the function generates the first N recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nSet the Boolean removezeroweights to true if zero weights should be removed.\n\nThe script is adapted from the routine RKPW in W.B. Gragg and W.J. Harrod, The numerically stable reconstruction of Jacobi matrices from spectral data, Numer. Math. 44 (1984), 317-335.\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#PolyChaos.mcdiscretization",
+    "page": "Functions",
+    "title": "PolyChaos.mcdiscretization",
+    "category": "function",
+    "text": "mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)\n\nThis routine returns N recurrence coefficients of the polynomials that are orthogonal relative to a weight function w that is decomposed as a sum of m weights w_i with domains a_ib_i for i=1dotsm,\n\nw(t) = sum_i^m w_i(t) quad textwith  operatornamedom(w_i) = a_i b_i\n\nFor each weight w_i and its domain a_i b_i the function mcdiscretization() expects a quadrature rule of the form     nodes::Vector{Float64}, weights::Vector{Float64} = myquadi(N::Int64) all of which are stacked in the parameter quad     quad = [ myquad1, ..., myquadm ] If the weight function has a discrete part (specified by discretemeasure) it is added on to the discretized continuous weight function.\n\nThe function mcdiscretization() performs a sequence of discretizations of the given weight w(t), each discretization being followed by an application of the Stieltjes or Lanczos procedure (keyword discretization in [stieltjes, lanczos]) to produce approximations to the desired recurrence coefficients. The function applies to each subinterval i an N-point quadrature rule (the ith entry of quad) to discretize the weight function w_i on that subinterval. If the procedure converges to within a prescribed accuracy ε before N reaches its maximum allowed value Nmax. If the function does not converge, the function prompts an error message.\n\nThe keyword gaussquad should be set to true if Gauss quadrature rules are available for all m weights w_i(t) with i = 1 dots m.\n\nFor further information, please see W. Gautschi \"Orthogonal Polynomials: Approximation and Computation\", Section 2.2.4.\n\n\n\n\n\n"
 },
 
 {
@@ -685,7 +757,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "Recurrence Coefficients for Monic Orthogonal Polynomials",
     "category": "section",
-    "text": "The functions below provide analytic expressions for the recurrence coefficients of common orthogonal polynomials. All of these provide monic orthogonal polynomials relative to the weights.note: Note\nThe number N of recurrence coefficients has to be positive for all functions below.r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})\nrm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)\nrm_logistic(N::Int)\nrm_hermite(N::Int,mu::Float64)\nrm_hermite_prob(N::Int)\nrm_laguerre(N::Int,a::Float64)\nrm_legendre(N::Int)\nrm_legendre01(N::Int)\nrm_jacobi(N::Int,a::Float64,b::Float64)\nrm_jacobi01(N::Int,a::Float64,b::Float64)\nrm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)\nstieltjes\nlanczos"
+    "text": "The functions below provide analytic expressions for the recurrence coefficients of common orthogonal polynomials. All of these provide monic orthogonal polynomials relative to the weights.note: Note\nThe number N of recurrence coefficients has to be positive for all functions below.r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})\nrm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)\nrm_logistic(N::Int)\nrm_hermite(N::Int,mu::Float64)\nrm_hermite_prob(N::Int)\nrm_laguerre(N::Int,a::Float64)\nrm_legendre(N::Int)\nrm_legendre01(N::Int)\nrm_jacobi(N::Int,a::Float64,b::Float64)\nrm_jacobi01(N::Int,a::Float64,b::Float64)\nrm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)\nstieltjes\nlanczos\nmcdiscretization"
 },
 
 {
@@ -753,46 +825,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "functions/#PolyChaos.quadpts_beta01",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_beta01",
-    "category": "function",
-    "text": "quadpts_beta01(α::Float64,β::Float64,Nquad::Int64)\n\nget quadrature points for beta distribution on (01)` using Gauss-Jacobi quadrature\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_gamma",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_gamma",
-    "category": "function",
-    "text": "quadpts_gamma(α::Float64,Nquad::Int)\n\nget quadrature points for gamma distribution on (0infty) using Gauss-Laguerre quadrature\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_gaussian",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_gaussian",
-    "category": "function",
-    "text": "quadpts_gaussian(Nquad::Int)\n\nget quadrature points for normal distribution on (-inftyinfty) using Gauss-Hermite quadrature\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_logistic",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_logistic",
-    "category": "function",
-    "text": "quadpts_logistic(N::Int,c1::Real,c2::Real,c3::Real=1.)\nquadpts_logistic(N::Int64)\n\nN-point quadrature rule for weight function\n\n    w(t) = c_3 c_2fracexp(-c_2(t-c_1))(1+exp(-c_2(t-c_1)))^2\n\nThe default value for c3 is one. In that case w(t) is the probability density function of\n\n    Y = frac1c_2 X + c_1 quad c_20\n\nwhere X has the standard logistic density\n\n    ρ(t) = fracexp(-t)(1+exp(-t))^2\n\nThe N-point quadrature rule for ρ(t) is computed by calling quadpts_logistic(N::Int64).\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadpts_uniform01",
-    "page": "Functions",
-    "title": "PolyChaos.quadpts_uniform01",
-    "category": "function",
-    "text": "quadpts_uniform01(Nquad::Int)\n\nget quadrature points for uniform distribution on 01 using Gauss-Legendre quadrature\n\n\n\n\n\n"
-},
-
-{
     "location": "functions/#PolyChaos.quadgp",
     "page": "Functions",
     "title": "PolyChaos.quadgp",
@@ -853,7 +885,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "Quadrature Rules",
     "category": "section",
-    "text": "fejer\nfejer2\nclenshaw_curtis\nquadpts_beta01\nquadpts_gamma\nquadpts_gaussian\nquadpts_logistic\nquadpts_uniform01\nquadgp\ngauss\nradau\nradau_jacobi\nradau_laguerre\nlobatto\nlobatto_jacobi"
+    "text": "fejer\nfejer2\nclenshaw_curtis\nquadgp\ngauss\nradau\nradau_jacobi\nradau_laguerre\nlobatto\nlobatto_jacobi"
 },
 
 {
