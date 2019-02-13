@@ -7,9 +7,28 @@ evaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})
 evaluate(n::Int64,x::Float64,a::Vector{Float64},b::Vector{Float64})
 evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)
 evaluate(n::Int64,x::Float64,op::OrthoPoly)
+evaluate(n::Int64,x::Vector{Float64},opq::OrthoPolyQ) = evaluate(n,x,opq.op)
+evaluate(n::Int64,x::Float64,opq::OrthoPolyQ) = evaluate(n,[x],opq.op)
 ```
 Evaluate the `n`-th univariate basis polynomial at point(s) `x`
 The function is multiply dispatched to facilitate its use with the composite type `OrthoPoly`
+
+If several basis polynomials (stored in `ns`) are to be evaluated at points `x`, then call
+```
+evaluate(ns::Vector{Int64},x::Vector{Float64},op::OrthoPoly) = evaluate(ns,x,op.α,op.β)
+evaluate(ns::Vector{Int64},x::Float64,op::OrthoPoly) = evaluate(ns,[x],op)
+evaluate(ns::Vector{Int64},x::Vector{Float64},opq::OrthoPolyQ) = evaluate(ns,x,opq.op)
+evaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)
+```
+
+If *all* basis polynomials are to be evaluated at points `x`, then call
+```
+evaluate(x::Vector{Float64},op::OrthoPoly) = evaluate(collect(0:op.deg),x,op)
+evaluate(x::Float64,op::OrthoPoly) = evaluate([x],op)
+evaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)
+evaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)
+```
+which returns an Array of dimensions `(length(x),op.deg+1)`.
 
 !!! note
     - `n` is the degree of the univariate basis polynomial
@@ -25,6 +44,19 @@ evaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly)
 ```
 Evaluate the n-th p-variate basis polynomial at point(s) x
 The function is multiply dispatched to facilitate its use with the composite type `MultiOrthoPoly`
+
+If several basis polynomials are to be evaluated at points `x`, then call
+```
+evaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
+evaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly)
+```
+where `ind` is a matrix of multi-indices.
+
+If *all* basis polynomials are to be evaluated at points `x`, then call
+```
+evaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)
+```
+which returns an array of dimensions `(mop.dim,size(x,1))`.
 
 !!! note
     - `n is a multi-index
@@ -58,7 +90,24 @@ end
 evaluate(n::Int64,x::Float64,a::Vector{Float64},b::Vector{Float64}) = evaluate(n,[x],a,b)
 evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly) = evaluate(n,x,op.α,op.β)
 evaluate(n::Int64,x::Float64,op::OrthoPoly) = evaluate(n,[x],op)
+evaluate(n::Int64,x::Vector{Float64},opq::OrthoPolyQ) = evaluate(n,x,opq.op)
+evaluate(n::Int64,x::Float64,opq::OrthoPolyQ) = evaluate(n,[x],opq.op)
 
+# univariate + several bases
+function evaluate(ns::Vector{Int64},x::Array{Float64},a::Vector{Float64},b::Vector{Float64})
+    hcat(map(i->evaluate(i,x,a,b),ns)...)
+end
+evaluate(ns::Vector{Int64},x::Vector{Float64},op::OrthoPoly) = evaluate(ns,x,op.α,op.β)
+evaluate(ns::Vector{Int64},x::Float64,op::OrthoPoly) = evaluate(ns,[x],op)
+evaluate(x::Vector{Float64},op::OrthoPoly) = evaluate(collect(0:op.deg),x,op)
+evaluate(x::Float64,op::OrthoPoly) = evaluate([x],op)
+evaluate(ns::Vector{Int64},x::Vector{Float64},opq::OrthoPolyQ) = evaluate(ns,x,opq.op)
+evaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)
+evaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)
+evaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)
+
+
+# multivariate
 function evaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
     @assert length(a)==length(b)
     @assert length(n)==size(x,2)
@@ -72,15 +121,19 @@ function evaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}}
 end
 
 function evaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
-    x_ = zeros(1,length(x))
-    x_[:] = x[:]
-    evaluate(n,x_,a,b)
+    evaluate(n,reshape(x,length(x),1),a,b)
 end
 
 function evaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly)
     p = length(n)
     @assert p==length(op.uni)
-    a,b = [ op.uni[i].α for i=1:p], [ op.uni[i].β for i=1:p]
+    if typeof(op.uni) == Vector{OrthoPoly}
+        a,b = [ op.uni[i].α for i=1:p], [ op.uni[i].β for i=1:p]
+    elseif typeof(op.uni) == Vector{OrthoPolyQ}
+        a,b = [ op.uni[i].op.α for i=1:p], [ op.uni[i].op.β for i=1:p]
+    else
+        error("The type of $(typeof(op.uni)) is not supported")
+    end
     evaluate(n,x,a,b)
 end
 
@@ -89,3 +142,25 @@ function evaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly)
     x_[:] = x[:]
     evaluate(n,x_,op)
 end
+
+# using multi-index + multivariate
+function evaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
+    myind = [ ind[row,:] for row in 1:size(ind,1) ]
+    vals = map(i->evaluate(i,x,a,b),myind)
+    Matrix(hcat(vals...)')
+end
+
+function evaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly)
+    p = size(ind,2)
+    @assert p==length(op.uni)
+    if typeof(op.uni) == Vector{OrthoPoly}
+        a,b = [ op.uni[i].α for i=1:p], [ op.uni[i].β for i=1:p]
+    elseif typeof(op.uni) == Vector{OrthoPolyQ}
+        a,b = [ op.uni[i].op.α for i=1:p], [ op.uni[i].op.β for i=1:p]
+    else
+        error("The type of $(typeof(op.uni)) is not supported")
+    end
+    evaluate(ind,x,a,b)
+end
+
+evaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)
