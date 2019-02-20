@@ -65,27 +65,27 @@ which returns an array of dimensions `(mop.dim,size(x,1))`.
     - `size(a)==size(b)=p`.
 """
 function evaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})
-    @assert n>=0 "Degree n has to be non-negative (currently n=$n)."
+    @assert n >= 0 "Degree n has to be non-negative (currently n=$n)."
     # if length(a)==0 warn("Length of a is 0.") end
-    @assert length(a)==length(b) "Inconsistent number of recurrence coefficients."
-    @assert n<=length(a) "Specified degree is $n, but you only provided $(length(a)) coefficients."
+    @assert length(a) == length(b) "Inconsistent number of recurrence coefficients."
+    @assert n <= length(a) "Specified degree is $n, but you only provided $(length(a)) coefficients."
     # recurrence relation for orthogonal polynomials
     nx = length(x)
     pminus, p = zeros(nx), ones(nx)
     if n==0
         if nx==1
-            return p[1]
+            return first(p)
         else
             return p
         end
     end
-    pplus = (x .- a[1]).*p .- b[1]*pminus
-    for k=2:n
+    pplus = (x .- first(a)).*p .- first(b)*pminus
+    for k in 2:n
         pminus = p
         p = pplus
-        pplus = (x .- a[k]).*p .- b[k]*pminus
+        @inbounds pplus = (x .- a[k]).*p .- b[k]*pminus
     end
-    nx==1 ? pplus[1] : pplus
+    nx == 1 ? first(pplus) : pplus
 end
 evaluate(n::Int64,x::Float64,a::Vector{Float64},b::Vector{Float64}) = evaluate(n,[x],a,b)
 evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly) = evaluate(n,x,op.α,op.β)
@@ -106,61 +106,19 @@ evaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)
 evaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)
 evaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)
 
-
 # multivariate
 function evaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
-    @assert length(a)==length(b)
-    @assert length(n)==size(x,2)
-    Nmulti = length(n)
-    Npoints = size(x,1)
-    val = ones(Float64,Npoints)
-    for i=1:length(n)
-        val = val.*evaluate(n[i],x[:,i],a[i],b[i])
-    end
-    return val
+    @assert length(n) == size(x,2) "number of univariate bases (= $(length(n))) inconsistent with columns points x (= $(size(x,2)))"
+    reduce(*,(map(i->evaluate(n[i],x[:,i],a[i],b[i]),1:length(n))))
 end
-
-function evaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
-    evaluate(n,reshape(x,length(x),1),a,b)
-end
-
-function evaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly)
-    p = length(n)
-    @assert p==length(op.uni)
-    if typeof(op.uni) == Vector{OrthoPoly}
-        a,b = [ op.uni[i].α for i=1:p], [ op.uni[i].β for i=1:p]
-    elseif typeof(op.uni) == Vector{OrthoPolyQ}
-        a,b = [ op.uni[i].op.α for i=1:p], [ op.uni[i].op.β for i=1:p]
-    else
-        error("The type of $(typeof(op.uni)) is not supported")
-    end
-    evaluate(n,x,a,b)
-end
-
-function evaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly)
-    x_ = zeros(1,length(x))
-    x_[:] = x[:]
-    evaluate(n,x_,op)
-end
+evaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}}) = evaluate(n,reshape(x,length(x),1),a,b)
+evaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly) = evaluate(n,x,coeffs(op)...)
+evaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly) = evaluate(n,reshape(x,1,length(x)),op)
 
 # using multi-index + multivariate
 function evaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
-    myind = [ ind[row,:] for row in 1:size(ind,1) ]
-    vals = map(i->evaluate(i,x,a,b),myind)
-    Matrix(hcat(vals...)')
+    vals = map(i->evaluate(ind[i,:],x,a,b),Base.OneTo(size(ind,1)))
+    hcat(vals...) |> transpose |> Matrix
 end
-
-function evaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly)
-    p = size(ind,2)
-    @assert p==length(op.uni)
-    if typeof(op.uni) == Vector{OrthoPoly}
-        a,b = [ op.uni[i].α for i=1:p], [ op.uni[i].β for i=1:p]
-    elseif typeof(op.uni) == Vector{OrthoPolyQ}
-        a,b = [ op.uni[i].op.α for i=1:p], [ op.uni[i].op.β for i=1:p]
-    else
-        error("The type of $(typeof(op.uni)) is not supported")
-    end
-    evaluate(ind,x,a,b)
-end
-
+evaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly) = evaluate(ind,x,coeffs(op)...)
 evaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)

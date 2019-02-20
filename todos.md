@@ -10,6 +10,7 @@
     - gamma distribution needs to be double checked → construction of basis for feasible rates other than 1
     - check code for efficiency following [guidelines](https://docs.julialang.org/en/v1/manual/performance-tips/): use `@inbounds` and `StaticArrays.jl`, see [here](https://docs.julialang.org/en/v1/manual/performance-tips/#man-performance-annotations-1)
     - add [macros](https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros-1) to generate `OrthoPoly` and the rest
+    - rewrite `evaluate.jl` without for loops, for example recursively or using `reduce`?
     - code generation for random linear ODEs
     - extend code testing
       - ade `codedev`
