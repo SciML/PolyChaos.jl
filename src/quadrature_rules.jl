@@ -15,6 +15,7 @@ Fejer's first quadrature rule.
 """
 function fejer(N::Int64)
     @assert N >= 1 "N has to be positive"
+    N == 1 && return zeros(1), [2.]
     θ = map(x->(2x-1)*pi/(2N),1:N)
     M = N ÷ 2
     return cos.(θ), map(x->2/N*(1-2*sum(cos(2*n*x)/(4*n^2-1) for n=1:M)),θ)
@@ -25,9 +26,10 @@ end
 Fejer's second quadrature rule according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 """
 function fejer2(n::Int64)
+    @assert n >= 2
     N = 1:2:n-1
     m = n - length(N)
-    v0 = push!(push!(map(x->2/x/(x-2.),N),1/(n-1)), zeros(m)...)
+    v0 = push!(push!(map(x->2/x/(x-2.),N),1/last(N)), zeros(m)...)
     @inbounds v2 = -v0[1:n] - v0[n+1:-1:2];
     wf2 = real(ifft(v2))
     return map(x->cos(x*pi/n),0:n), push!(wf2, first(wf2))
@@ -38,20 +40,18 @@ end
 Clenshaw-Curtis quadrature according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 """
 function clenshaw_curtis(n::Int64)::Tuple{Vector{Float64},Vector{Float64}}
-    @assert n>=1 "n must be > 1"
-    x::Vector{Float64} = cos.(collect(0:n)/n*pi)
-    N::Vector{Int64}=collect(1:2:n-1);
-    l=length(N);
-    m=n-l;
-    K::Vector{Int64}=collect(0:m-1);
-    v0::Vector{Float64}=[2 ./N./(N .- 2);  1/N[end]; zeros(m)];
-    v2::Vector{Float64}=-v0[1:end-1]-v0[end:-1:2];
-    g0::Vector{Float64}=-ones(n);
-    g0[1+l]=g0[1+l]+n;
-    g0[1+m]=g0[1+m]+n;
-    g::Vector{Float64}=g0/(n^2-1+mod(n,2));
-    wcc=real(ifft(v2+g));
-    return x, [wcc; wcc[1]]
+    @assert n >= 2
+    N = 1:2:n-1
+    l = length(N)
+    m = n - l
+    v0 = push!(push!(map(x->2/x/(x-2.),N),1/last(N)), zeros(m)...)
+    @inbounds v2 = -v0[1:n] - v0[n+1:-1:2]
+    g0= -ones(Float64,n)
+    g0[1+l] += n
+    g0[1+m] += n
+    g = 1 / (n^2 - 1 + mod(n,2) ) * g0
+    wcc = real(ifft(v2 + g));
+    return map(i->cos(i/n*pi),0:n), push!(wcc,first(wcc))
 end
 
 """
@@ -77,7 +77,6 @@ function quadgp(weight::Function,lb::Float64,ub::Float64,N::Int64=10;quadrature:
         d = (1 .+ t_fej.^2)./( 1 .- t_fej.^2).^2
     end
     w = w_fej.*weight.(t).*d
-    size(w)
     return t, w
 end
 
@@ -87,10 +86,10 @@ end
 # Quadrature rules based on recurrence coefficients
 
 function golubwelsch(α::Vector{Float64},β::Vector{Float64})
-    J = SymTridiagonal( α, sqrt.(β[2:end]) )
+    n = length(α)
+    @inbounds J = SymTridiagonal( α, sqrt.(β[2:n]) )
     nodes, V = eigen(J)
-    # nodes, V = e.values, e.vectors
-    weights = V[1,:].^2*β[1]
+    @inbounds weights = V[1,1:n].^2*first(β)
     return nodes, weights
 end
 golubwelsch(op::OrthoPoly) = golubwelsch(op.α,op.β)
@@ -114,7 +113,7 @@ function gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})
     @assert length(α) == length(β) "inconsistent number of recurrence coefficients"
     N0 = length(α)
     @assert N0 >= N "not enough recurrence coefficients"
-    golubwelsch(α[1:N],β[1:N])
+    @inbounds golubwelsch(α[1:N],β[1:N])
 end
 gauss(α::Vector{Float64},β::Vector{Float64}) = gauss(length(α),α,β)
 gauss(N::Int64,op::OrthoPoly) = gauss(N::Int64,op.α,op.β)
@@ -148,9 +147,9 @@ function radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)
     for n in Base.OneTo(N)
       pm1 = p0
       p0 = p1;
-      p1 = (end0 - α[n])*p0 - β[n]*pm1;
+      @inbounds p1 = (end0 - α[n])*p0 - β[n]*pm1;
     end
-    α[N+1] = end0 - β[N+1]*p0/p1
+    @inbounds α[N+1] = end0 - β[N+1]*p0/p1
     gauss(N+1,α,β)
 end
 radau(α::Vector{Float64},β::Vector{Float64},end0::Float64) = radau(length(α)-1,α,β,end0)
@@ -173,11 +172,11 @@ rule for the Jacobi weight function on `[-1,1]` with parameters
     (2000), 403-412.
 """
 function radau_jacobi(N::Int64,a::Float64,b::Float64;endpoint::String="left")
-    @assert N>0 "only positive N allowed"
+    @assert N > 0 "only positive N allowed"
     endpoint = lowercase(endpoint)
     @assert endpoint in ["left", "right"] "$endpoint is no valid specification"
     α, β = rm_jacobi(N+1,a,b);
-    α[N+1] = endpoint == "left" ? -1+2*N*(N+a)/((2*N+a+b)*(2*N+a+b+1)) : 1-2*N*(N+b)/((2*N+a+b)*(2*N+a+b+1))
+    @inbounds α[N+1] = endpoint == "left" ? -1+2*N*(N+a)/((2*N+a+b)*(2*N+a+b+1)) : 1-2*N*(N+b)/((2*N+a+b)*(2*N+a+b+1))
     gauss(α,β)
 end
 radau_jacobi(N::Int64,a::Float64;endpoint::String="left") = radau_jacobi(N,a,a;endpoint=endpoint)
@@ -198,7 +197,7 @@ rule for the Laguerre weight function on ``[0,\\infty]`` with parameter `a`.
 function radau_laguerre(N::Int64,a::Float64)
     @assert N>=0 "only positive N allowed"
     α, β = rm_laguerre(N+1,a);
-    α[N+1] = N
+    @inbounds α[N+1] = N
     gauss(α,β)
 end
 radau_laguerre(N::Int64) = radau_laguerre(N,0.)
@@ -234,12 +233,12 @@ function lobatto(N::Int64,α::Vector{Float64},β::Vector{Float64},endl::Float64,
         p0l=p1l
         pm1r=p0r
         p0r=p1r
-        p1l=(endl-α[n])*p0l-β[n]*pm1l
-        p1r=(endr-α[n])*p0r-β[n]*pm1r
+        @inbounds p1l=(endl-α[n])*p0l-β[n]*pm1l
+        @inbounds p1r=(endr-α[n])*p0r-β[n]*pm1r
     end
     det = p1l * p0r - p1r * p0l
-    α[N+2] = (endl * p1l * p0r - endr * p1r * p0l) / det
-    β[N+2] = (endr - endl) * p1l * p1r / det;
+    @inbounds α[N+2] = (endl * p1l * p0r - endr * p1r * p0l) / det
+    @inbounds β[N+2] = (endr - endl) * p1l * p1r / det;
     gauss(N+2,α,β)
 end
 lobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64) = lobatto(length(α)-2,α,β,endl,endr)
@@ -262,8 +261,8 @@ parameters `a` and `b`.
 function lobatto_jacobi(N::Int64,a::Float64,b::Float64)
     @assert N > 0 "only positive N allowed"
     α,β = rm_jacobi(N+2,a,b);
-    α[N+2] = (a-b) / (2*N+a+b+2)
-    β[N+2] = 4 * (N + a + 1) * (N + b + 1) * (N + a + b + 1) / ((2 * N + a + b + 1) * (2*N + a + b + 2)^2)
+    @inbounds α[N+2] = (a-b) / (2*N+a+b+2)
+    @inbounds β[N+2] = 4 * (N + a + 1) * (N + b + 1) * (N + a + b + 1) / ((2 * N + a + b + 1) * (2*N + a + b + 2)^2)
     gauss(α,β)
 end
 lobatto_jacobi(N::Int64,a::Float64) = lobatto_jacobi(N,a,a)
