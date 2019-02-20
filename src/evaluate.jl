@@ -59,7 +59,7 @@ evaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)
 which returns an array of dimensions `(mop.dim,size(x,1))`.
 
 !!! note
-    - `n is a multi-index
+    - `n` is a multi-index
     - `length(n) == p`, i.e. a p-variate basis polynomial
     - `size(x) = (N,p)`, where `N` is the number of points
     - `size(a)==size(b)=p`.

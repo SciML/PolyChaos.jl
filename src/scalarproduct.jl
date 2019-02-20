@@ -90,24 +90,27 @@ suitable combination of `OrthoPoly` and its quadrature rule `Quad`.
     - It is checked whether enough quadrature points are supplied to solve the integral exactly.
 """
 function computeSP(a_::Vector{Int64},α::Vector{Float64},β::Vector{Float64},nodes::Vector{Float64},weights::Vector{Float64};issymmetric::Bool=false)
-    @assert minimum(a_)>=0 "no negative degrees allowed"
+    @assert minimum(a_) >= 0 "no negative degrees allowed"
     # remove zero entries
     # this works because ``<Φ_i,Φ_j,Φ_0,...,Φ_0> = <Φ_i,Φ_j>``
     # hence, avoiding unnecessary operations that introduced numerical gibberish
-    zero_inds = findall(x->x==0,a_)
-    a = a_[setdiff(1:length(a_),zero_inds)]
+    a = Vector{Int64}()
+    for aa in a_
+        !iszero(aa) && push!(a,aa)
+    end
+    # a = filter(!iszero,a_)
     # simplification in case the measure is symmetric w.r.t t=0
     # exploit symmetry of the density, see Theorem 1.17 in W. Gautschi's book
     # and exploit the fact that
-    issymmetric && isodd(sum(a)) ? (return 0.) : ()
+    (issymmetric && isodd(sum(a))) && return 0.
     # Gauss quadrature rules have exactness 2N-1
     @assert Int(ceil(0.5*(sum(a)+1)))<=length(nodes) "not enough nodes to integrate exactly ($(length(nodes)) provided, where $(Int(ceil(0.5*(sum(a)+1)))) are needed)."
-    if length(a)==0
+    if iszero(length(a))
         return β[1]
-    elseif length(a)==1
+    elseif isone(length(a))
         return 0.
     elseif length(a)==2
-        a[1]==a[2] ? (return computeSP2(a[1],β)[end]) : return 0.
+        a[1] == a[2] ? (return computeSP2(a[1],β)[end]) : (return 0.)
     else
         f = ones(Float64,length(nodes))
         for i=1:length(a)
@@ -141,8 +144,8 @@ The function is multiply dispatched to facilitate its use with the composite typ
 """
 function computeSP2(n::Int64,β::Vector{Float64})
     @assert n>=0 "can only compute scalar products for non-negative degrees"
-    @assert length(β)>=n+1
-    n==0 ? (return β[1]) : ()
+    @assert length(β) >= n + 1
+    n == 0 && return β[1]
     s = ones(Float64,n+1)
     s[1] = β[1]  # order 0computeSP2
     for i=2:n+1
