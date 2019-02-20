@@ -13,7 +13,7 @@ struct Measure
     symmetric::Bool
     pars::Dict
     function Measure(name::String,w::Function,dom::Tuple{Real,Real},symm::Bool,d::Dict=Dict())
-      @assert dom[1]<dom[2] "Invalid support."
+      @assert dom[1] < dom[2] "Invalid support."
       new(lowercase(name),w,Float64.(dom),symm,d)
     end
 end
@@ -67,8 +67,8 @@ function Measure(name::String,d::Dict=Dict())
   elseif name == "beta01"  # parameters of beta distribution
       s = (0,1)
       par1, par2 = d[:shape_a], d[:shape_b]
-      @assert par1>0 && par2>0 "Invalid shape parameters."
-      par1==par2 ? symm=true : symm=false
+      @assert par1 > 0 && par2 > 0 "Invalid shape parameters."
+      symm = (par1 == par2)
       return Measure(name,build_w_beta(par1,par2),s,symm,d)
   elseif name == "gamma"
       shape, rate = d[:shape], d[:rate]
@@ -91,7 +91,7 @@ struct OrthoPoly
   meas::Measure
   # inner constructor
   function OrthoPoly(name::String,deg::Int64,α::Vector{Float64},β::Vector{Float64},m::Measure)
-    @assert deg>=0 "Degree has to be non-negative."
+    @assert deg >= 0 "Degree has to be non-negative."
     @assert length(α)==length(β) "Different number of recursion coefficients α and β supplied."
     new(lowercase(name),deg,α,β,m)
   end
@@ -99,7 +99,7 @@ end
 
 # constructor for classic distributions
 function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-  @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
+  @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
 
   if name == "legendre"
@@ -107,7 +107,7 @@ function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
     a,b = rm_legendre(Nrec)
   elseif name == "jacobi"
     par1, par2 = d[:shape_a], d[:shape_b]
-    par1==par2 ? symm=true : symm=false
+    symm = (par1 == par2)
     a,b = rm_jacobi(Nrec,Float64(par1),Float64(par2))
   elseif name == "laguerre"
     d = Dict()
@@ -153,7 +153,7 @@ end
 
 # general constructor
 function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
-  @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
+  @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
   a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
   return OrthoPoly(name,deg,a,b,m)
@@ -174,8 +174,8 @@ struct Quad
   weights::Vector{Float64}
   meas::Measure
   function Quad(name::String,N::Int64,nodes::Vector{Float64},weights::Vector{Float64},m::Measure)
-    @assert N>=1 "Number of qudrature points has to be positive"
-    @assert length(nodes)==length(weights) "Inconsistent number of nodes and weights inconsistent."
+    @assert N >= 1 "Number of qudrature points has to be positive"
+    @assert length(nodes) == length(weights) "Inconsistent number of nodes and weights inconsistent."
     new(lowercase(name),N,nodes,weights,m)
   end
 end
@@ -187,16 +187,16 @@ end
 
 # general constructor
 function Quad(N::Int,α::Vector{Float64},β::Vector{Float64},m::Measure)
-  @assert length(α)==length(β) "Inconsistent length of recurrence coefficients."
-  @assert N<=length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
+  @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
+  @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
   n,w = golubwelsch(α[1:N],β[1:N])
   Quad("golubwelsch",N,n,w,m)
 end
 Quad(N::Int,op::OrthoPoly) = Quad(N,op.α,op.β,op.meas)
 
 function Quad(N::Int64,weight::Function,α::Vector{Float64},β::Vector{Float64},supp::Tuple{Float64,Float64},symm::Bool,d::Dict=Dict())
-    @assert length(α)==length(β) "Inconsistent length of recurrence coefficients."
-    @assert N<=length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
+    @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
+    @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
     n,w = golubwelsch(α[1:N],β[1:N])
     Quad("golubwelsch",N,n,w,m)
@@ -204,7 +204,7 @@ end
 
 # all-purpose constructor (last resort!)
 function Quad(N::Int64,weight::Function,supp::Tuple{Real,Real},symm::Bool,d::Dict=Dict();quadrature::Function=clenshaw_curtis)
-    @assert N>=1 "Number of qudrature points has to be positive"
+    @assert N >= 1 "Number of qudrature points has to be positive"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
     n,w = quadgp(weight,Float64(supp[1]),Float64(supp[2]),N;quadrature=quadrature)
     Quad("quadgp",N,n,w,m)
@@ -271,7 +271,7 @@ uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
       new(name,deg,dim,ind,m,uni)
     end
     function MultiOrthoPoly(uni::Union{Vector{OrthoPolyQ}},deg::Int64)
-      @assert deg>=0 "degree has to be non-negative"
+      @assert deg >= 0 "degree has to be non-negative"
       degs = [ s.op.deg for s in uni ]
       @assert deg<=minimum(degs) "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."
       Nuni::Int64 = length(uni)

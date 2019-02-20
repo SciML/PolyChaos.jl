@@ -78,11 +78,9 @@ Creates `N` recurrence coefficients for monic polynomials that are orthogonal
 on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\mathrm{e}^{-t})^2}``
 """
 function rm_logistic(N::Int)
-    @assert N>=0 "parameter(s) out of range."
-    N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
-    a = zeros(N)
-    b = [ k^4*pi^2/(4*k^2-1) for k=1:N-1 ]
-    return a, [1; b]
+    @assert N >= 0 "parameter(s) out of range."
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    zeros(N), pushfirst!(map(k->k^4*pi^2/(4*k^2-1),Base.OneTo(N-1)),1.)
 end
 
 """
@@ -94,19 +92,13 @@ that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = |t|^{2 \\mu} 
 The call `rm_hermite(N)` is the same as `rm_hermite(N,0)`.
 """
 function rm_hermite(N::Int,mu::Float64)
-    @assert N>=0 && mu>-1/2 "parameter(s) out of range."
-    N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
-    m0=gamma(mu+1/2)
-    N==1 ? (return [0.], [m0]) : ()
-    N=N-1
-    n=collect(1:N)
-    nh=0.5*n;
-    [ nh[i] += mu for i=1:2:N ]
-    # nh[1:2:N]=nh[1:2:N]+mu;
-    return zeros(N+1), [m0; nh]
+    @assert N >= 0 && mu > -0.5 "parameter(s) out of range."
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    m0 = mu != 0. ? gamma(mu + 0.5) : sqrt(π)
+    N == 1 && return [0.], [m0]
+    return zeros(N), pushfirst!(map(x->isodd(x) ? 0.5*x+mu : 0.5*x,1:N-1), m0)
 end
 rm_hermite(N::Int) = rm_hermite(N,0.)
-
 
 """
     rm_hermite_prob(N::Int)
@@ -114,9 +106,10 @@ Creates `N` recurrence coefficients for monic probabilists' Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{-0.5t^2}``
 """
 function rm_hermite_prob(N::Int)
-    @assert N>=0 "parameter(s) out of range."
-    N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
-    return zeros(N), [sqrt(2*pi); collect(1.:N-1) ]
+    @assert N >= 0 "parameter(s) out of range."
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    # return zeros(N), [sqrt(2*pi); collect(1.:N-1) ]
+    return zeros(N), pushfirst!( collect(1.:N-1), sqrt(2*pi))
 end
 
 """
@@ -128,16 +121,11 @@ that are orthogonal on ``(0,\\infty)`` relative to ``w(t) = t^a \\mathrm{e}^{-t}
 The call `rm_laguerre(N)` is the same as `rm_laguerre(N,0)`.
 """
 function rm_laguerre(N::Int,a::Float64)
-    @assert N>=0 && a>-1. "parameter(s) out of range"
-    N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
-    nu=a+1;
-    mu=gamma(a+1);
-    N==1 ? (return [nu], [mu]) : ()
-    N=N-1;
-    n= collect(1:N);
-    na=2*n .+ (a+1.);
-    nb=n.*(n .+ a);
-    return [nu; na], [mu; nb]
+    @assert N >= 0 && a > -1. "parameter(s) out of range"
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N==1 && return [a+1.], [gamma(a+1)]
+    n = 1.:N-1
+    return pushfirst!(map(x->2x+a+1.,n)::Vector{Float64},a+1.), pushfirst!(map(x->x^2+a*x,n)::Vector{Float64},gamma(a+1))
 end
 function rm_laguerre(N::Int)
     rm_laguerre(N,0.)
@@ -154,24 +142,18 @@ The call `rm_jacobi(N,a)` is the same as `rm_jacobi(N,a,a)` and `rm_jacobi(N)` t
 `rm_jacobi(N,0,0)`.
 """
 function rm_jacobi(N::Int,a::Float64,b::Float64)
-    @assert N>=0 && a>-1. && b>-1. "parameter(s) out of range"
-    N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
-    nu=(b-a)/(a+b+2.);
-    if a+b+2. > 128.
-      mu=exp((a+b+1)*log(2)+((gammaln(a+1)+gammaln(b+1))-gammaln(a+b+2)));
-    else
-      mu=2^(a+b+1)*((gamma(a+1)*gamma(b+1))/gamma(a+b+2));
-    end
-    N==1 ? (return [nu], [mu]) : ()
-    N=N-1;
-    n= collect(1:N);
-    nab=2*n .+ (a+b);
-    A=[nu; (b^2-a^2)*ones(N)./(nab.*(nab .+ 2))];
-    n=collect(2:N);
-    nab=nab[n];
-    B1=4*(a+1)*(b+1)/((a+b+2)^2*(a+b+3));
-    B=4*(n .+ a).*(n .+ b).*n.*(n .+ (a+b))./((nab.^2).*(nab .+ 1).*(nab .- 1));
-    return A, [mu; B1; B]
+    @assert N >= 0 && a >- 1. && b >- 1. "parameter(s) out of range"
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    nu = (b - a) / ( a+ b + 2.);
+    mu::Float64 = a + b + 2. <= 128. ? 2^(a+b+1)*((gamma(a+1)*gamma(b+1))/gamma(a+b+2)) : exp((a+b+1)*log(2)+((log(gamma(a+1))+log(gamma(b+1)))-log(gamma(a+b+2))))
+    N == 1 && return [nu], [mu]
+    n = 1:N-1
+    nab = map(x->2x+a+b,n)
+    A = pushfirst!(map(x->(b^2-a^2)/(x*(x+2)),nab),nu)
+    B1 = map(x->4*(x+a)*(x+b)*x*(x+a+b),n[2:N-1])
+    B2 = map(x->(x^2.)*(x+1.)*(x-1.),nab[2:N-1])
+    B3 = 4. * (a + 1) * (b + 1) / ((a + b + 2)^2 * (a + b + 3));
+    A, pushfirst!(pushfirst!(B1./B2,B3),mu)::Vector{Float64}
 end
 
 rm_jacobi(N::Int,a::Float64) = rm_jacobi(N,a,a)
@@ -189,16 +171,9 @@ The call `rm_jacobi01(N,a)` is the same as `rm_jacobi01(N,a,a)` and `rm_jacobi01
 """
 function rm_jacobi01(N::Int,a::Float64,b::Float64)
     @assert N>=0 && a>-1. && b>-1. "parameter(s) out of range"
-    N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
-    c,d=rm_jacobi(N,a,b);
-    cd=[c d]
-    ab=copy(cd)
-    n=1:N;
-    ab[n,1]=(1 .+ cd[n,1])./2;
-    ab[1,2]=cd[1,2]/2^(a+b+1.);
-    n=2:N;
-    ab[n,2]=cd[n,2]./4;
-    return ab[:,1], ab[:,2]
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    c, d = rm_jacobi(N,a,b)
+    map(x->(1+x)/2,c), pushfirst!(0.25*d[2:N], d[1]/2^(a+b+1.))
 end
 rm_jacobi01(N::Int,a::Float64) = rm_jacobi01(N,a,a)
 rm_jacobi01(N::Int) = rm_jacobi01(N,0.,0.)
@@ -222,16 +197,14 @@ rm_legendre01(N::Int) = rm_jacobi01(N)
 
 function rm_chebyshev1(N::Int64)
     @assert N>=0 "N has to be non-negative"
-    α::Vector{Float64}, β::Vector{Float64} = zeros(Float64,N), zeros(Float64,N)
-    if N==1
-        β[1] = pi
-    elseif N==2
-        β[1:2] = [pi; 0.5]
-    elseif N>2
-        β[1:2] = [pi; 0.5]
-        β[3:end] = 0.25*ones(N-2)
+    α = zeros(Float64,N)
+    if N == 1
+        return α, [pi]
+    elseif N == 2
+        return α, [pi; 0.5]
+    else
+        return α, pushfirst!(pushfirst!(0.25*ones(N-2),0.5),pi)
     end
-    return α, β
 end
 #     rm_hahn(N::Int,a::Float64,b::Float64)
 #     rm_hahn(N::Int,a::Float64)
@@ -289,7 +262,7 @@ end
 """
 function rm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)
     @assert N>=0 && lambda>0. && phi>0. "parameter(s) out of range"
-    N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     n=1:N;
     sinphi=sin(phi); lam2=2*lambda;
     ab=zeros(Float64,N,2)
