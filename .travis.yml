@@ -3,6 +3,9 @@ julia:
   - 1.0
   - 1.1
 
+after_success:
+  - julia -e 'cd(Pkg.dir("PolyChaos")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+
 jobs:
   include:
     - stage: "Documentation"

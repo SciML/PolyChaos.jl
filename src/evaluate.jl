@@ -109,7 +109,11 @@ evaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)
 # multivariate
 function evaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})
     @assert length(n) == size(x,2) "number of univariate bases (= $(length(n))) inconsistent with columns points x (= $(size(x,2)))"
-    reduce(*,(map(i->evaluate(n[i],x[:,i],a[i],b[i]),1:length(n))))
+    val = ones(Float64,size(x,1))
+    for i=1:length(n)
+        @inbounds val = val.*evaluate(n[i],x[:,i],a[i],b[i])
+    end
+    return val
 end
 evaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}}) = evaluate(n,reshape(x,length(x),1),a,b)
 evaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly) = evaluate(n,x,coeffs(op)...)
