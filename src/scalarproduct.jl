@@ -1,33 +1,37 @@
 export  computeSP,
         computeSP2
 
-function computeSP(a::Vector{Int64},
+function computeSP(a_::Vector{Int64},
                    α::Vector{Vector{Float64}},β::Vector{Vector{Float64}},
                    nodes::Vector{Vector{Float64}},weights::Vector{Vector{Float64}},
                    ind::Matrix{Int64};
-                   issymmetric::BitArray=falses(length(α)))::Float64
-    @assert minimum(a)>=0 "no negative degrees allowed"
-    l,p = size(ind); # p-variate basis
-    p==1 ? computeSP(a,α[1],β[1],nodes[1],weights[1];issymmetric=issymmetric[1]) : ()
-    l-=1
-    m = length(a) # m-dimensional scalar product
-    @assert maximum(a)<=l "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"
+                   issymmetric::BitArray=falses(length(α)),
+                   zerotol::Float64=1e-10)
+                  # display("war hier")
+    @assert minimum(a_)>=0 "no negative degrees allowed"
+    l, p = size(ind); # p-variate basis
+    p == 1 && computeSP(a_,α[1],β[1],nodes[1],weights[1];issymmetric=issymmetric[1])
+    l -= 1
+    # m = length(a_) # m-dimensional scalar product
+    @assert maximum(a_)<=l "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"
     @assert length(α)==length(β)==length(nodes)==length(weights)==length(issymmetric)==p "inconsistent number of rec. coefficients and/or nodes/weights"
-    # remove zero entries from index
-    zero_inds = findall(x->x==0,a)
-    a = a[setdiff(1:length(a),zero_inds)]
-    if  length(a)==0
+
+    a = Vector{Int64}()
+    for aa in a_
+        !iszero(aa) && push!(a,aa)
+    end
+
+    if  iszero(length(a))
         return prod(β[i][1] for i=1:p)
-    elseif length(a)==1
+    elseif isone(length(a))
         return 0.
     else
         inds_uni = multi2uni(a,ind)
-        # display(inds_uni)
         val = 1.
         for i=1:p
             # compute univariate scalar product
-            v = computeSP(inds_uni[i,:],α[i],β[i],nodes[i],weights[i];issymmetric=issymmetric[i])
-            v==0. ? (return 0.) : (val*=v)
+            @inbounds v = computeSP(inds_uni[i,:],α[i],β[i],nodes[i],weights[i];issymmetric=issymmetric[i])
+            isapprox(v,0,atol=zerotol) ? (return 0.) : (val*=v)
         end
     end
     return val
@@ -106,16 +110,19 @@ function computeSP(a_::Vector{Int64},α::Vector{Float64},β::Vector{Float64},nod
     # Gauss quadrature rules have exactness 2N-1
     @assert Int(ceil(0.5*(sum(a)+1)))<=length(nodes) "not enough nodes to integrate exactly ($(length(nodes)) provided, where $(Int(ceil(0.5*(sum(a)+1)))) are needed)."
     if iszero(length(a))
-        return β[1]
+        return first(β)
     elseif isone(length(a))
         return 0.
-    elseif length(a)==2
-        a[1] == a[2] ? (return computeSP2(a[1],β)[end]) : (return 0.)
+    elseif length(a) == 2
+        @inbounds a[1] == a[2] ? (return computeSP2(first(a),β)[end]) : (return 0.)
     else
+        # display("war hier")
         f = ones(Float64,length(nodes))
-        for i=1:length(a)
-            f = f.*evaluate(a[i],nodes,α,β)
+        @simd for i = 1:length(a)
+            @inbounds f = f.*evaluate(a[i],nodes,α,β)
         end
+        # f = reduce(*,hcat(map(i->evaluate(a[i],nodes,α,β),1:length(a))...),dims=2)
+        # display(f-f_)
         return dot(weights,f)
     end
 end
@@ -147,9 +154,9 @@ function computeSP2(n::Int64,β::Vector{Float64})
     @assert length(β) >= n + 1
     n == 0 && return β[1]
     s = ones(Float64,n+1)
-    s[1] = β[1]  # order 0computeSP2
+    @inbounds s[1] = β[1]  # order 0computeSP2
     for i=2:n+1
-        s[i] = s[i-1]*β[i]
+        @inbounds s[i] = s[i-1]*β[i]
     end
     return s
 end
