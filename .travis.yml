@@ -4,7 +4,7 @@ julia:
   - 1.1
 
 after_success:
-  - julia -e 'cd(Pkg.dir("PolyChaos")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); cd(Pkg.dir("PolyChaos")); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
 
 jobs:
   include:

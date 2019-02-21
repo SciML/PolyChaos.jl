@@ -55,13 +55,17 @@ function clenshaw_curtis(n::Int64)::Tuple{Vector{Float64},Vector{Float64}}
 end
 
 """
-    quadgp(weight::Function,a::Float64,b::Float64,N::Int64=10;quadrature::Function=clenshaw_curti
+    quadgp(weight::Function,lb::Float64,ub::Float64,N::Int64=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
 general purpose quadrature based on Gautschi, "Orthogonal Polynomials: Computation and Approximation", Section 2.2.2, pp. 93-95
+
+Compute the `N`-point quadrature rule for `weight` with support (`lb`, `ub`).
+The quadrature rule can be specified by the keyword `quadrature`.
+The keyword `bnd` sets the numerical value for infinity.
 """
 function quadgp(weight::Function,lb::Float64,ub::Float64,N::Int64=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
     @assert lb < ub "inconsistent interval bounds"
-    t_fej::Vector{Float64},w_fej::Vector{Float64} = quadrature(N)
-    t::Vector{Float64},w::Vector{Float64},d::Vector{Float64} = zeros(Float64,N),zeros(Float64,N),zeros(Float64,N)
+    t_fej,w_fej = quadrature(N)
+    t, w, d = zeros(Float64,N),zeros(Float64,N),zeros(Float64,N)
     # transformation
     if (-bnd<lb<bnd) && (-bnd<ub<bnd)
         t = 0.5*((ub-lb)*t_fej .+ (ub+lb))

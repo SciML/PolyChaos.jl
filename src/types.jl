@@ -34,53 +34,53 @@ function Measure(name::String,d::Dict=Dict())
       s = (-1,1); symm = true
       return Measure(name,w_legendre,s,symm,d)
     elseif name == "jacobi"
-      s = (-1,1)
-      par1, par2 = d[:shape_a], d[:shape_b]
-      par1==par2 ? symm=true : symm=false
-      return Measure(name,build_w_jacobi(par1,par2),s,symm,d)
-  elseif name == "laguerre"
-      s = (0,Inf); symm = false
-      return Measure(name,w_laguerre,s,symm,d)
-  elseif name == "genlaguerre"
-      s = (0,Inf); symm = false
-      return Measure(name,build_w_genlaguerre(d[:shape]),s,symm,d)
-  elseif name == "hermite"
-      s = (-Inf,Inf); symm = true
-      return Measure(name,w_hermite,s,symm,d)
-  elseif name == "genhermite"
-      s = (-Inf,Inf); symm = true
-      return Measure(name,build_w_genhermite(Float64(d[:mu])),s,symm,d)
-  elseif name == "meixnerpollaczek"
-      s = (-Inf,Inf); symm = false
-      par1, par2 = d[:lambda], d[:phi]
-      return Measure(name,build_w_meixner_pollaczek(par1,par2),s,symm,d)
+        s = (-1,1)
+        par1, par2 = d[:shape_a], d[:shape_b]
+        par1==par2 ? symm=true : symm=false
+        return Measure(name,build_w_jacobi(par1,par2),s,symm,d)
+    elseif name == "laguerre"
+        s = (0,Inf); symm = false
+        return Measure(name,w_laguerre,s,symm,d)
+    elseif name == "genlaguerre"
+        s = (0,Inf); symm = false
+        return Measure(name,build_w_genlaguerre(d[:shape]),s,symm,d)
+    elseif name == "hermite"
+        s = (-Inf,Inf); symm = true
+        return Measure(name,w_hermite,s,symm,d)
+    elseif name == "genhermite"
+        s = (-Inf,Inf); symm = true
+        return Measure(name,build_w_genhermite(Float64(d[:mu])),s,symm,d)
+    elseif name == "meixnerpollaczek"
+        s = (-Inf,Inf); symm = false
+        par1, par2 = d[:lambda], d[:phi]
+        return Measure(name,build_w_meixner_pollaczek(par1,par2),s,symm,d)
   ########################################################
   ########################################################
   ########################################################
   # measures corresponding to probability density functions:
-  elseif name == "gaussian"
-      s = (-Inf, Inf)
-      return Measure(name,w_gaussian,s,true,d)
-  elseif name == "uniform01"
-      s = (0,1)
-      return Measure(name,w_uniform01,s,true,d)
-  elseif name == "beta01"  # parameters of beta distribution
-      s = (0,1)
-      par1, par2 = d[:shape_a], d[:shape_b]
-      @assert par1 > 0 && par2 > 0 "Invalid shape parameters."
-      symm = (par1 == par2)
-      return Measure(name,build_w_beta(par1,par2),s,symm,d)
-  elseif name == "gamma"
-      shape, rate = d[:shape], d[:rate]
-      @assert rate==1. "rates different from one not yet supported."
-      s = (0,Inf)
-      return Measure(name,build_w_gamma(shape),s,false,d)
-  elseif name == "logistic"
-      s = (-Inf,Inf)
-      return Measure(name,w_logistic,s,true,d)
-  else
-      error("Measure named `$name` is not yet implemented.")
-  end
+    elseif name == "gaussian"
+        s = (-Inf, Inf)
+        return Measure(name,w_gaussian,s,true,d)
+    elseif name == "uniform01"
+        s = (0,1)
+        return Measure(name,w_uniform01,s,true,d)
+    elseif name == "beta01"  # parameters of beta distribution
+        s = (0,1)
+        par1, par2 = d[:shape_a], d[:shape_b]
+        @assert par1 > 0 && par2 > 0 "Invalid shape parameters."
+        symm = (par1 == par2)
+    return Measure(name,build_w_beta(par1,par2),s,symm,d)
+        elseif name == "gamma"
+        shape, rate = d[:shape], d[:rate]
+        @assert rate==1. "rates different from one not yet supported."
+        s = (0,Inf)
+        return Measure(name,build_w_gamma(shape),s,false,d)
+    elseif name == "logistic"
+        s = (-Inf,Inf)
+        return Measure(name,w_logistic,s,true,d)
+    else
+        error("Measure named `$name` is not yet implemented.")
+    end
 end
 
 struct OrthoPoly
@@ -101,7 +101,6 @@ end
 function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
   @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
-
   if name == "legendre"
     d = Dict()
     a,b = rm_legendre(Nrec)
@@ -155,7 +154,7 @@ end
 function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
   @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
-  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
+  a,b = rm_compute(m,Nrec,Nquad,quadrature=quadrature,discretization=discretization)
   return OrthoPoly(name,deg,a,b,m)
 end
 
@@ -163,7 +162,7 @@ function OrthoPoly(name::String,deg::Int64,w::Function,s::Tuple{Real,Real},symm:
   @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
   m = Measure(name,w,s,symm,d)
-  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
+  a,b = rm_compute(m,Nrec,Nquad,quadrature=quadrature,discretization=discretization)
   return OrthoPoly(name,deg,a,b,m)
 end
 
@@ -187,10 +186,10 @@ end
 
 # general constructor
 function Quad(N::Int,α::Vector{Float64},β::Vector{Float64},m::Measure)
-  @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
-  @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
-  n,w = golubwelsch(α[1:N],β[1:N])
-  Quad("golubwelsch",N,n,w,m)
+    @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
+    @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
+    n,w = golubwelsch(α[1:N],β[1:N])
+    Quad("golubwelsch",N,n,w,m)
 end
 Quad(N::Int,op::OrthoPoly) = Quad(N,op.α,op.β,op.meas)
 
@@ -238,8 +237,8 @@ end
 OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α))
 
 function OrthoPolyQ(name::String,N::Int64,d::Dict=Dict();Nrec::Int64=N+1)
-  op = OrthoPoly(name,N,d;Nrec=Nrec)
-  OrthoPolyQ(op)
+    op = OrthoPoly(name,N,d;Nrec=Nrec)
+    OrthoPolyQ(op)
 end
 
 

@@ -24,17 +24,16 @@ function r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})
 end
 
 """
-    rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)
+    rm_compute(weight::Function,lb::Float64,ub::Float64,Npoly::Int64=4,Nquad::Int64=10;quadrature::Function=clenshaw_curtis)
 Given a positive `weight` function with domain `(lb,ub)`, i.e. a function ``w: [lb, ub ] \\rightarrow \\mathbb{R}_{\\geq 0}``,
 this function creates `Npoly` recursion coefficients `(α,β)`.
 
 The keyword `quadrature` specifies what quadrature rule is being used.
 """
-function rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
-    # @assert discretization in [ stieltjes, lanczos ]
-    @assert Npoly<=Nquad
-    Npoly==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
-    n,w=quadgp(weight,lb,ub,Nquad;quadrature=quadrature)
+function rm_compute(weight::Function,lb::Float64,ub::Float64,Npoly::Int64=4,Nquad::Int64=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
+    @assert Npoly <= Nquad
+    Npoly == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    n,w= quadgp(weight,lb,ub,Nquad;quadrature=quadrature)
     a,b = discretization(Npoly,n,w)
     # display((b,maximum(b)))
     # the following assertions are taken from Theorem 1.28 from
@@ -46,7 +45,7 @@ function rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nqua
     return a,b
 end
 
-rm_compute(m::Measure;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2];Npoly=Npoly,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
+rm_compute(m::Measure,Npoly::Int64=4,Nquad::Int64=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2],Npoly,Nquad,quadrature=quadrature,discretization=discretization)
 
 ##
 function rm_logisticsum(n::Int,p1::Vector{Float64},p2::Vector{Float64};Mmax::Int=100,eps0::Real=1e-9)
