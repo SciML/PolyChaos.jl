@@ -9,7 +9,7 @@ fprintf(fileID,'%i\n',[low;step;high]);
 %% hermite coefficients
 
 for n =low:step:high
-    for mu = 0.0:0.1:1AME may also start wit
+    for mu = 0.0:0.1:1
         path = ['/home/ws/uxsng/JuliaDev/PolyChaos.jl/test/dataRecCoeffs/hermite',num2str(n),'mu',num2str(mu,'%1.1f'),'.txt'];
         fileID = fopen(path,'w');
         ab=r_hermite(n,mu);

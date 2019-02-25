@@ -4,7 +4,7 @@ import LinearAlgebra: norm
 # load config
 myfile = open("dataRecCoeffs/config.txt")
 ns = parse.(Int,readlines(myfile))
-print(ns)
+
 nodes = ns[1]:ns[2]:ns[3]
 mus = 0.:0.1:1
 albe = 0.:0.2:2
