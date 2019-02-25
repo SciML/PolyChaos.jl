@@ -1,5 +1,27 @@
 # Functions
 
+!!! note
+    The core interface of (so we hope) all essential functions are *not* dependent on specialized types such as `OrthoPoly`/`OrthoPolyQ`.
+    Having said that, for exactly those essential functions there exist overloaded functions that accept specialized types such as `OrthoPoly`/`OrthoPolyQ` as arguments.
+
+    Too abstract?
+    For example, the function `evaluate()` that evaluates a polynomial of degree `n` at points `x` has the core interface
+    ```
+        evaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})
+    ```
+    where `a` and `b` are the vectors of recurrence coefficients.
+    For simplicity, there also exists the interface
+    ```
+        evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)
+    ```
+    which is defined as
+    ```
+        evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly) = evaluate(n,x,op.α,op.β)
+    ```
+    So fret not upon the encounter of multiply-dispatched versions of the same thing. It's there to simplify your life (so we hope).
+
+    The idea of this approach is to make it simpler for others to copy and paste code snippets and use them in their own work.
+
 List of all functions in `PolyChaos`.
 
 ```@index

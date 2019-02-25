@@ -1,3 +1,6 @@
+```@setup mysetup
+using PolyChaos
+```
 # Overview
 PolyChaos is a collection of numerical routines for orthogonal polynomials written in the [Julia](https://julialang.org/) programming language.
 Starting from some non-negative weight (aka an absolutely continuous nonnegative measure), PolyChaos allows
@@ -37,7 +40,18 @@ julia> using PolyChaos
 ```
 That's it.
 
-To get going check out the tutorials such as the one on [numerical integration](@ref NumericalIntegration).
+Let's take a look at a simple example.
+We would like to solve the integral
+```math
+\int_0^1 6 x^5 \mathrm{d}x.
+```
+Exploiting the underlying uniform measure, the integration can be done exactly with a 3-point quadrature rule.
+```@example mysetup
+opq = OrthoPolyQ("uniform01",3)
+integrate(x->6x^5,opq)
+```
+
+To get going with PolyChaos check out the tutorials such as the one on [numerical integration](@ref NumericalIntegration).
 In case you are unfamiliar with orthogonal polynomials, perhaps [this background information](@ref MathematicalBackground) is of help.
 
 ## References
@@ -52,3 +66,5 @@ Meanwhile, in case you find `PolyChaos` useful, feel free to get in touch, or si
 ## Collaboration
 We are always looking for contributors.
 If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [dot] edu.
+Or just fork and/or star the repository.
+Much appreciated.
