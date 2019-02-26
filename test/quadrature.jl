@@ -26,15 +26,15 @@ end
 
 N, Nrec, dim = 4, 1000, 3
 tol=1e-4
-##
-# op = OrthoPoly("gaussian",N;Nrec=Nrec);
-# opq = OrthoPolyQ(op);
-# integration_test(opq,dim,"gaussian";tol=tol,dom=(-10.,10.))
-##
-# α, β = 1.32, 3.23
-# op = OrthoPoly("beta01",N,Dict(:shape_a=>α,:shape_b=>β);Nrec=Nrec);
-# opq = OrthoPolyQ(op);
-# set_beta = integration_test(opq,dim,"beta01";tol=tol)
+#
+op = OrthoPoly("gaussian",N;Nrec=Nrec);
+opq = OrthoPolyQ(op);
+integration_test(opq,dim,"gaussian";tol=tol,dom=(-10.,10.))
+#
+α, β = 1.32, 3.23
+op = OrthoPoly("beta01",N,Dict(:shape_a=>α,:shape_b=>β);Nrec=Nrec);
+opq = OrthoPolyQ(op);
+set_beta = integration_test(opq,dim,"beta01";tol=tol)
 
 
 op = OrthoPoly("gamma",N,Dict(:shape=>1.0,:rate=>1.);Nrec=Nrec);

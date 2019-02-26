@@ -92,3 +92,30 @@ end
         end
     end
 end
+
+
+function testInt(lb,ub)
+        # analytic integral of f(x) = exp(-|x|)
+        @assert lb < ub "lower bound has to be smaller than upper bound"
+        lb > 0 && return -exp(-ub) + exp(-lb)
+        ub < 0 && return exp(ub) - exp(lb)
+        return 2 - exp(lb) - exp(-ub)
+end
+
+
+ns[3]=700
+intervals = [(-5.,5.),(-Inf,Inf),(-Inf,-1.),(1.,Inf),(-3.,5.),(-10.,1.)]
+@time @testset "gpquad" begin
+        for n in intervals
+                nod1,wei1 = quadgp(x->exp.(-abs.(x)),n[1],n[2],ns[3],quadrature=fejer)
+                #print("Nodes: ",nod1,"\n")
+                #print("Weights: ",wei1,"\n")
+                analytic = testInt(n[1],n[2])
+            @test isapprox(sum(wei1)-analytic,0;atol=1e-4)
+        end
+        for n in intervals
+                nod2,wei2 = quadgp(x->1.,n[1],n[2],ns[3],quadrature=fejer)
+                analytic = testInt(n[1],n[2])
+            @test isapprox(exp.(-abs.(nod2))'*wei2-analytic,0;atol=1e-4)
+        end
+end
