@@ -1,4 +1,4 @@
-using PolyChaos, Test, LinearAlgebra, IterTools
+using PolyChaos, Test, LinearAlgebra
 import QuadGK: quadgk
 
 function integration_test(opq::OrthoPolyQ,dim::Int64,name::String;tol::Float64=1e-6,
@@ -8,7 +8,7 @@ function integration_test(opq::OrthoPolyQ,dim::Int64,name::String;tol::Float64=1
     w::Function = op.meas.w
     ind = zeros(Int64,dim)
     @testset "$name" begin
-        for ind_ in IterTools.product([collect(1:N) for i=1:dim]...)
+        for ind_ in Iterators.product([collect(1:N) for i=1:dim]...)
             ind[:] .= ind_[:]
             s1 = computeSP(ind,opq)
             f(t) = prod(evaluate(ind[i],t,op) for i=1:dim)*w(t)
@@ -24,7 +24,7 @@ function integration_test(opq::OrthoPolyQ,dim::Int64,name::String;tol::Float64=1
 end
 ##
 
-N, Nrec, dim, tol = 4, 1000, 3, 1e-4
+N, Nrec, dim, tol = 3, 1000, 3, 1e-4
 
 op = OrthoPoly("gaussian",N;Nrec=Nrec);
 opq = OrthoPolyQ(op);
