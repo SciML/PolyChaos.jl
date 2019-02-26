@@ -182,7 +182,7 @@ Multivariate extension which provides array of samples with `n` rows and
 as many columns as the multimeasure has univariate measures.
 """
 function sampleMeasure(n::Int64,name::String,w::Function,dom::Tuple{Float64,Float64},symm::Bool,d::Dict;method::String="adaptiverejection")
-    # symmetry is currently not exploited, but could be for rejection sampling
+    # ToDo: symmetry is currently not exploited, but could be for rejection sampling
     name = lowercase(name)
     if name in ["gaussian","uniform01","beta01","gamma","logistic"]
         sampleMeasure_byName(n,name,d)
@@ -222,16 +222,14 @@ where `L+1 = length(x)` and ``x_j`` is the ``j``th sample where ``j=1,\\dots,m``
 with `m = length(ξ)`.
 """
 function evaluatePCE(x::Vector{Float64},ξ::Vector{Float64},α::Vector{Float64},β::Vector{Float64})
-    @assert length(α)==length(β) "inconsistent number of recurrence coefficients"
+    @assert length(α) == length(β) "inconsistent number of recurrence coefficients"
     Nsmpl = length(ξ)
     @assert Nsmpl>=1 "inconsistent number $Nsmpl of samples"
     Nx, Nrec = length(x), length(α)
     @assert Nx<=Nrec "not enough recursion coefficients"
-    if Nrec>Nx
-        α,β = α[1:Nx],β[1:Nx]
-    end
-    ϕ = zeros(Nsmpl,Nx)
-    for n=1:Nx
+    if Nrec > Nx α,β = α[1:Nx], β[1:Nx] end
+    ϕ = zeros(Float64,Nsmpl,Nx)
+    for n in 1:Nx
         ϕ[:,n] = evaluate(n-1,ξ,α,β)
     end
     ϕ*x
@@ -245,9 +243,9 @@ function evaluatePCE(x::Vector{Float64},ξ::Matrix{Float64},α::Vector{Vector{Fl
     @assert Nsmpl>=1 "inconsistent number $Nsmpl of samples"
     @assert length(α)==length(β)==size(ξ,2)==size(ind,2) "inconsistent number of coefficients"
     Nx = length(x)
-    @assert Nx<=size(ind,1) "too few pc coefficients (resp: too small basis)"
-    ϕ = zeros(Nsmpl,Nx)
-    for n=1:Nx
+    @assert Nx <= size(ind,1) "too few pc coefficients (resp: too small basis)"
+    ϕ = zeros(Float64,Nsmpl,Nx)
+    for n in 1:Nx
         ϕ[:,n] = evaluate(ind[n,:],ξ,α,β)
     end
     ϕ*x
@@ -319,7 +317,7 @@ compute variance of random variable with PCE `x`
 function var(x::Vector{Float64},op::OrthoPoly)::Float64
     t2 = computeSP2(op)
     @assert length(t2)>=length(x) "cannot compute variance; too many PCE coefficients"
-    sum( x[i]^2*t2[i] for i=2:length(x))
+    sum( x[i]^2*t2[i] for i=2:length(x) )
 end
 var(x::Vector{Float64},opq::OrthoPolyQ)::Float64 = var(x,opq.op)
 
