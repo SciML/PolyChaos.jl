@@ -1,51 +1,88 @@
-# Test whether the numerically computed recursion coefficients match the analytic expressions
+# Test whether the numerically computed recursion coefficients are correct
 using PolyChaos, Test
 import LinearAlgebra: norm
-tol=1e-4
-N = collect(2:6)
-# hermite
-mu = 0.:0.2:1
+# load config
+myfile = open("dataRecCoeffs/config.txt")
+ns = parse.(Int,readlines(myfile))
 
-test = []
+nodes = ns[1]:ns[2]:ns[3]
+mus = 0.:0.1:1
+albe = 0.:0.2:2
+tol = 1e-9
 
-newtest = @testset "generalized Hermite" begin
-    for N_ in N, mu_ in mu, disc in [stieltjes]
-        # display("N = $N_, μ = $mu_, $disc")
-        a_ana,b_ana = rm_hermite(N_,mu_)
-        w = build_w_genhermite(mu_)
-        a_num,b_num = rm_compute(w,-Inf,Inf;Npoly=N_,Nquad=max(10000,10*N_),discretization=disc)
-        @test isapprox(norm(a_ana-a_num,Inf),0.; atol=tol)
-        @test isapprox(norm(b_ana-b_num,Inf),0.; atol=tol)
+
+@time for n in nodes
+        @testset "Hermite $n nodes" begin
+            for m in mus
+            myfile = open("dataRecCoeffs/hermite$(n)mu$m.txt")
+            αβref = parse.(Float64,readlines(myfile))
+            αβcom = rm_hermite(n,m)
+            @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+            close(myfile)
+        end
     end
 end
-push!(test,newtest)
 
-# a = 0.:1.:4
-# b = 0.:1.:4
-# # if shape parameters are negative, the weight till go to infinity at its bounds!
-# newtest = @testset "Jacobi" begin
-#     for N_ in N, a_ in a, b_ in b, disc in [stieltjes]
-#         # display("N = $N_, a = $a_, b = $b_, disc=$disc")
-#         a_ana,b_ana = rm_jacobi(N_,a_,b_)
-#         w = build_w_jacobi(a_,b_)
-#         a_num,b_num = rm_compute(w,-1.,1.;Npoly=N_,Nquad=max(1000,10*N_),discretization=disc)
-#         @test isapprox(norm(a_ana-a_num,Inf),0.; atol=tol)
-#         @test isapprox(norm(b_ana-b_num,Inf),0.; atol=tol)
-#     end
-# end
-#
-# push!(test,newtest)
-#
-# newtest = @testset "Jacobi01" begin
-#     for N_ in N, a_ in a, b_ in b, disc in [stieltjes]
-#         # display("N = $N_, a = $a_, b = $b_, disc=$disc")
-#         a_ana,b_ana = rm_jacobi01(N_,a_,b_)
-#         w = build_w_jacobi01(a_,b_)
-#         a_num,b_num = rm_compute(w,0.,1.;Npoly=N_,Nquad=max(1000,10*N_),discretization=disc)
-#         # @show a_ana-a_num
-#         @test isapprox(norm(a_ana-a_num,Inf),0.; atol=tol)
-#         @test isapprox(norm(b_ana-b_num,Inf),0.; atol=tol)
-#     end
-# end
-#
-# push!(test,newtest)
+@time for n in nodes
+        @testset "Logistic $n nodes" begin
+            myfile = open("dataRecCoeffs/log$(n).txt")
+            αβref = parse.(Float64,readlines(myfile))
+            αβcom = rm_logistic(n)
+            @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+            close(myfile)
+    end
+end
+
+@time for n in nodes
+        @testset "Jacobi $n nodes" begin
+            for al in albe
+                for be in albe
+                    myfile = open("dataRecCoeffs/jac$(n)al$(al)be$(be).txt")
+                    αβref = parse.(Float64,readlines(myfile))
+                    αβcom = rm_jacobi(n,al,be)
+                    @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+                end
+            end
+    end
+end
+
+@time for n in nodes
+        @testset "Jacobi01 $n nodes" begin
+            for al in albe
+                for be in albe
+                    myfile = open("dataRecCoeffs/jac01$(n)al$(al)be$(be).txt")
+                    αβref = parse.(Float64,readlines(myfile))
+                    αβcom = rm_jacobi01(n,al,be)
+                    @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+                    close(myfile)
+                end
+            end
+    end
+end
+
+@time for n in nodes
+        @testset "Laguerre $n nodes" begin
+            for m in mus
+            myfile = open("dataRecCoeffs/laguerre$(n)a$m.txt")
+            αβref = parse.(Float64,readlines(myfile))
+            αβcom = rm_laguerre(n,m)
+            @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+            close(myfile)
+        end
+    end
+end
+
+meipol = 0.1:0.2:2
+@time for n in nodes
+        @testset "meixner_pollaczek $n nodes" begin
+            for lambda in meipol
+                for phi in meipol
+                    myfile = open("dataRecCoeffs/meixpol$(n)la$(lambda)phi$(phi).txt")
+                    αβref = parse.(Float64,readlines(myfile))
+                    αβcom = rm_meixner_pollaczek(n,lambda,phi)
+                    @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+                    close(myfile)
+                end
+            end
+    end
+end

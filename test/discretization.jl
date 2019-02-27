@@ -14,6 +14,7 @@ tol = 1e-14
         βref = parse.(Float64,readlines(myfile))
         βcom = stieltjes(n,fejer(n)...)[2]
         @test isapprox(norm(βref-βcom,Inf),0.;atol=tol)
+        close(myfile)
     end
 end
 
@@ -23,5 +24,6 @@ end
         βref = parse.(Float64,readlines(myfile))
         βcom = lanczos(n,fejer(n)...)[2]
         @test isapprox(norm(βref-βcom,Inf),0.;atol=tol)
+        close(myfile)
     end
 end

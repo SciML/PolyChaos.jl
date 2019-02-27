@@ -13,7 +13,7 @@ struct Measure
     symmetric::Bool
     pars::Dict
     function Measure(name::String,w::Function,dom::Tuple{Real,Real},symm::Bool,d::Dict=Dict())
-      @assert dom[1]<dom[2] "Invalid support."
+      @assert dom[1] < dom[2] "Invalid support."
       new(lowercase(name),w,Float64.(dom),symm,d)
     end
 end
@@ -34,53 +34,53 @@ function Measure(name::String,d::Dict=Dict())
       s = (-1,1); symm = true
       return Measure(name,w_legendre,s,symm,d)
     elseif name == "jacobi"
-      s = (-1,1)
-      par1, par2 = d[:shape_a], d[:shape_b]
-      par1==par2 ? symm=true : symm=false
-      return Measure(name,build_w_jacobi(par1,par2),s,symm,d)
-  elseif name == "laguerre"
-      s = (0,Inf); symm = false
-      return Measure(name,w_laguerre,s,symm,d)
-  elseif name == "genlaguerre"
-      s = (0,Inf); symm = false
-      return Measure(name,build_w_genlaguerre(d[:shape]),s,symm,d)
-  elseif name == "hermite"
-      s = (-Inf,Inf); symm = true
-      return Measure(name,w_hermite,s,symm,d)
-  elseif name == "genhermite"
-      s = (-Inf,Inf); symm = true
-      return Measure(name,build_w_genhermite(Float64(d[:mu])),s,symm,d)
-  elseif name == "meixnerpollaczek"
-      s = (-Inf,Inf); symm = false
-      par1, par2 = d[:lambda], d[:phi]
-      return Measure(name,build_w_meixner_pollaczek(par1,par2),s,symm,d)
+        s = (-1,1)
+        par1, par2 = d[:shape_a], d[:shape_b]
+        par1==par2 ? symm=true : symm=false
+        return Measure(name,build_w_jacobi(par1,par2),s,symm,d)
+    elseif name == "laguerre"
+        s = (0,Inf); symm = false
+        return Measure(name,w_laguerre,s,symm,d)
+    elseif name == "genlaguerre"
+        s = (0,Inf); symm = false
+        return Measure(name,build_w_genlaguerre(d[:shape]),s,symm,d)
+    elseif name == "hermite"
+        s = (-Inf,Inf); symm = true
+        return Measure(name,w_hermite,s,symm,d)
+    elseif name == "genhermite"
+        s = (-Inf,Inf); symm = true
+        return Measure(name,build_w_genhermite(Float64(d[:mu])),s,symm,d)
+    elseif name == "meixnerpollaczek"
+        s = (-Inf,Inf); symm = false
+        par1, par2 = d[:lambda], d[:phi]
+        return Measure(name,build_w_meixner_pollaczek(par1,par2),s,symm,d)
   ########################################################
   ########################################################
   ########################################################
   # measures corresponding to probability density functions:
-  elseif name == "gaussian"
-      s = (-Inf, Inf)
-      return Measure(name,w_gaussian,s,true,d)
-  elseif name == "uniform01"
-      s = (0,1)
-      return Measure(name,w_uniform01,s,true,d)
-  elseif name == "beta01"  # parameters of beta distribution
-      s = (0,1)
-      par1, par2 = d[:shape_a], d[:shape_b]
-      @assert par1>0 && par2>0 "Invalid shape parameters."
-      par1==par2 ? symm=true : symm=false
-      return Measure(name,build_w_beta(par1,par2),s,symm,d)
-  elseif name == "gamma"
-      shape, rate = d[:shape], d[:rate]
-      @assert rate==1. "rates different from one not yet supported."
-      s = (0,Inf)
-      return Measure(name,build_w_gamma(shape),s,false,d)
-  elseif name == "logistic"
-      s = (-Inf,Inf)
-      return Measure(name,w_logistic,s,true,d)
-  else
-      error("Measure named `$name` is not yet implemented.")
-  end
+    elseif name == "gaussian"
+        s = (-Inf, Inf)
+        return Measure(name,w_gaussian,s,true,d)
+    elseif name == "uniform01"
+        s = (0,1)
+        return Measure(name,w_uniform01,s,true,d)
+    elseif name == "beta01"  # parameters of beta distribution
+        s = (0,1)
+        par1, par2 = d[:shape_a], d[:shape_b]
+        @assert par1 > 0 && par2 > 0 "Invalid shape parameters."
+        symm = (par1 == par2)
+    return Measure(name,build_w_beta(par1,par2),s,symm,d)
+        elseif name == "gamma"
+        shape, rate = d[:shape], d[:rate]
+        @assert rate==1. "rates different from one not yet supported."
+        s = (0,Inf)
+        return Measure(name,build_w_gamma(shape),s,false,d)
+    elseif name == "logistic"
+        s = (-Inf,Inf)
+        return Measure(name,w_logistic,s,true,d)
+    else
+        error("Measure named `$name` is not yet implemented.")
+    end
 end
 
 struct OrthoPoly
@@ -91,7 +91,7 @@ struct OrthoPoly
   meas::Measure
   # inner constructor
   function OrthoPoly(name::String,deg::Int64,α::Vector{Float64},β::Vector{Float64},m::Measure)
-    @assert deg>=0 "Degree has to be non-negative."
+    @assert deg >= 0 "Degree has to be non-negative."
     @assert length(α)==length(β) "Different number of recursion coefficients α and β supplied."
     new(lowercase(name),deg,α,β,m)
   end
@@ -99,15 +99,14 @@ end
 
 # constructor for classic distributions
 function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-  @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
+  @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
-
   if name == "legendre"
     d = Dict()
     a,b = rm_legendre(Nrec)
   elseif name == "jacobi"
     par1, par2 = d[:shape_a], d[:shape_b]
-    par1==par2 ? symm=true : symm=false
+    symm = (par1 == par2)
     a,b = rm_jacobi(Nrec,Float64(par1),Float64(par2))
   elseif name == "laguerre"
     d = Dict()
@@ -153,9 +152,9 @@ end
 
 # general constructor
 function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
-  @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
+  @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
-  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
+  a,b = rm_compute(m,Nrec,Nquad,quadrature=quadrature,discretization=discretization)
   return OrthoPoly(name,deg,a,b,m)
 end
 
@@ -163,7 +162,7 @@ function OrthoPoly(name::String,deg::Int64,w::Function,s::Tuple{Real,Real},symm:
   @assert Nrec>=deg+1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
   m = Measure(name,w,s,symm,d)
-  a,b = rm_compute(m;Npoly=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
+  a,b = rm_compute(m,Nrec,Nquad,quadrature=quadrature,discretization=discretization)
   return OrthoPoly(name,deg,a,b,m)
 end
 
@@ -174,8 +173,8 @@ struct Quad
   weights::Vector{Float64}
   meas::Measure
   function Quad(name::String,N::Int64,nodes::Vector{Float64},weights::Vector{Float64},m::Measure)
-    @assert N>=1 "Number of qudrature points has to be positive"
-    @assert length(nodes)==length(weights) "Inconsistent number of nodes and weights inconsistent."
+    @assert N >= 1 "Number of qudrature points has to be positive"
+    @assert length(nodes) == length(weights) "Inconsistent number of nodes and weights inconsistent."
     new(lowercase(name),N,nodes,weights,m)
   end
 end
@@ -187,16 +186,16 @@ end
 
 # general constructor
 function Quad(N::Int,α::Vector{Float64},β::Vector{Float64},m::Measure)
-  @assert length(α)==length(β) "Inconsistent length of recurrence coefficients."
-  @assert N<=length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
-  n,w = golubwelsch(α[1:N],β[1:N])
-  Quad("golubwelsch",N,n,w,m)
+    @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
+    @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
+    n,w = golubwelsch(α[1:N],β[1:N])
+    Quad("golubwelsch",N,n,w,m)
 end
 Quad(N::Int,op::OrthoPoly) = Quad(N,op.α,op.β,op.meas)
 
 function Quad(N::Int64,weight::Function,α::Vector{Float64},β::Vector{Float64},supp::Tuple{Float64,Float64},symm::Bool,d::Dict=Dict())
-    @assert length(α)==length(β) "Inconsistent length of recurrence coefficients."
-    @assert N<=length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
+    @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
+    @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
     n,w = golubwelsch(α[1:N],β[1:N])
     Quad("golubwelsch",N,n,w,m)
@@ -204,7 +203,7 @@ end
 
 # all-purpose constructor (last resort!)
 function Quad(N::Int64,weight::Function,supp::Tuple{Real,Real},symm::Bool,d::Dict=Dict();quadrature::Function=clenshaw_curtis)
-    @assert N>=1 "Number of qudrature points has to be positive"
+    @assert N >= 1 "Number of qudrature points has to be positive"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
     n,w = quadgp(weight,Float64(supp[1]),Float64(supp[2]),N;quadrature=quadrature)
     Quad("quadgp",N,n,w,m)
@@ -238,8 +237,8 @@ end
 OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α))
 
 function OrthoPolyQ(name::String,N::Int64,d::Dict=Dict();Nrec::Int64=N+1)
-  op = OrthoPoly(name,N,d;Nrec=Nrec)
-  OrthoPolyQ(op)
+    op = OrthoPoly(name,N,d;Nrec=Nrec)
+    OrthoPolyQ(op)
 end
 
 
@@ -271,7 +270,7 @@ uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
       new(name,deg,dim,ind,m,uni)
     end
     function MultiOrthoPoly(uni::Union{Vector{OrthoPolyQ}},deg::Int64)
-      @assert deg>=0 "degree has to be non-negative"
+      @assert deg >= 0 "degree has to be non-negative"
       degs = [ s.op.deg for s in uni ]
       @assert deg<=minimum(degs) "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."
       Nuni::Int64 = length(uni)

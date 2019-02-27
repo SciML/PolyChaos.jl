@@ -1,5 +1,6 @@
-# include("quadrature.jl")
+include("quadrature.jl")
 include("recurrence_coefficients.jl")
 include("discretization.jl")
 include("logistic.jl")
 include("comparison_fastgaussquadrature.jl")
+include("quadrature_rules.jl")

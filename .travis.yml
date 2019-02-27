@@ -1,7 +1,19 @@
+codecov: true
+coveralls: true
 language: julia
 julia:
   - 1.0
   - 1.1
+
+before_script:
+  - julia --color=yes -e 'using Pkg;
+      Pkg.add(PackageSpec(name = "MbedTLS", version="0.6.6"));
+      Pkg.pin(PackageSpec(name = "MbedTLS", version="0.6.6"));
+      Pkg.add(PackageSpec(name="BinaryProvider", rev="master"));
+      Pkg.add(PackageSpec(name="BinaryBuilder", rev="master"))'
+
+after_success:
+  - julia -e 'using Pkg; Pkg.add("Coverage"); cd(Pkg.dir("PolyChaos")); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
 
 jobs:
   include:
