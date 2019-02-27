@@ -25,9 +25,9 @@ That's it.
 
 Let's take a look at a simple example.
 We would like to solve the integral
-```math
-\int_0^1 6 x^5 \mathrm{d}x.
-```
+
+![equation](https://latex.codecogs.com/gif.latex?%5Cint_0%5E1%206%20x%5E5%20%5Cmathrm%7Bd%7Dx.)
+
 Exploiting the underlying uniform measure, the integration can be done exactly with a 3-point quadrature rule.
 ```@example mysetup
 opq = OrthoPolyQ("uniform01",3)
