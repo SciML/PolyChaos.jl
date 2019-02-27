@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Overview",
     "title": "Overview",
     "category": "page",
-    "text": ""
+    "text": "using PolyChaos"
 },
 
 {
@@ -13,7 +13,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Overview",
     "title": "Overview",
     "category": "section",
-    "text": "PolyChaos is a collection of numerical routines for orthogonal polynomials written in the Julia programming language. Starting from some non-negative weight (aka an absolutely continuous nonnegative measure), PolyChaos allowsto compute the coefficients for the monic three-term recurrence relation,\nto evaluate the orthogonal polynomials at arbitrary points,\nto compute the quadrature rule,\nto compute tensors of scalar products,\nto do all of the above in a multivariate setting (aka product measures).If the weight function is a probability density function, PolyChaos further provides routines to compute polynomial chaos expansions (PCEs) of random variables with this very density function. These routines allowto compute affine PCE coefficients for arbitrary densities,\nto compute moments,\nto compute the tensors of scalar products.PolyChaos contains several canonical orthogonal polynomials such as Jacobi or Hermite polynomials. For these, closed-form expressions and state-of-the art quadrature rules are used whenever possible. However, a cornerstone principle of PolyChaos is to provide all the functionality for user-specific, arbitrary weights.A very specific application of orthogonal polynomials is the theory of polynomial chaos expansions–-for which PolyChaos provides rich functionalities. Loosely speaking, polynomial chaos is to random variables what Fourier series expansion is to periodic signals: a Hilbert space technique that allows to represent an infinite-dimensional mathematical object in terms of finitely many coefficients.note: Note\nWhat PolyChaos is not (at least currently):a self-contained introduction to orthogonal polynomials, quadrature rules and/or polynomial chaos expansions. We assume the user brings some experience to the table. However, over time we will focus on strengthening the tutorial charater of the package.\na symbolic toolbox\na replacement for FastGaussQuadrature.jl"
+    "text": "PolyChaos is a collection of numerical routines for orthogonal polynomials written in the Julia programming language. Starting from some non-negative weight (aka an absolutely continuous nonnegative measure), PolyChaos allowsto compute the coefficients for the monic three-term recurrence relation,\nto evaluate the orthogonal polynomials at arbitrary points,\nto compute the quadrature rule,\nto compute tensors of scalar products,\nto do all of the above in a multivariate setting (aka product measures).If the weight function is a probability density function, PolyChaos further provides routines to compute polynomial chaos expansions (PCEs) of random variables with this very density function. These routines allowto compute affine PCE coefficients for arbitrary densities,\nto compute moments,\nto compute the tensors of scalar products.PolyChaos contains several canonical orthogonal polynomials such as Jacobi or Hermite polynomials. For these, closed-form expressions and state-of-the art quadrature rules are used whenever possible. However, a cornerstone principle of PolyChaos is to provide all the functionality for user-specific, arbitrary weights.note: Note\nWhat PolyChaos is not (at least currently):a self-contained introduction to orthogonal polynomials, quadrature rules and/or polynomial chaos expansions. We assume the user brings some experience to the table. However, over time we will focus on strengthening the tutorial charater of the package.\na symbolic toolbox\na replacement for FastGaussQuadrature.jl"
+},
+
+{
+    "location": "#Installation-1",
+    "page": "Overview",
+    "title": "Installation",
+    "category": "section",
+    "text": "The package requires Julia 1.0 or newer. In Julia switch to the package managerjulia> ]\n(v1.0) pkg> add PolyChaosThis will install PolyChaos and its dependencies. Once that is done, load the package:julia> using PolyChaosThat\'s it.Let\'s take a look at a simple example. We would like to solve the integralint_0^1 6 x^5 mathrmdxExploiting the underlying uniform measure, the integration can be done exactly with a 3-point quadrature rule.opq = OrthoPolyQ(\"uniform01\",3)\nintegrate(x->6x^5,opq)To get going with PolyChaos check out the tutorials such as the one on numerical integration. In case you are unfamiliar with orthogonal polynomials, perhaps this background information is of help."
 },
 
 {
@@ -30,6 +38,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Citing",
     "category": "section",
     "text": "Currently, there is no publication about PolyChaos. Meanwhile, in case you find PolyChaos useful, feel free to get in touch, or simply participate in Github\'s gamification. ;)"
+},
+
+{
+    "location": "#Collaboration-1",
+    "page": "Overview",
+    "title": "Collaboration",
+    "category": "section",
+    "text": "We are always looking for contributors. If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [dot] edu. Or just fork and/or star the repository. Much appreciated."
 },
 
 {
@@ -637,7 +653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "Functions",
     "category": "section",
-    "text": "List of all functions in PolyChaos."
+    "text": "note: Note\nThe core interface of (so we hope) all essential functions are not dependent on specialized types such as OrthoPoly/OrthoPolyQ. Having said that, for exactly those essential functions there exist overloaded functions that accept specialized types such as OrthoPoly/OrthoPolyQ as arguments.Too abstract? For example, the function evaluate() that evaluates a polynomial of degree n at points x has the core interface    evaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})where a and b are the vectors of recurrence coefficients. For simplicity, there also exists the interface    evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)which is defined as    evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly) = evaluate(n,x,op.α,op.β)So fret not upon the encounter of multiply-dispatched versions of the same thing. It\'s there to simplify your life (so we hope).The idea of this approach is to make it simpler for others to copy and paste code snippets and use them in their own work.List of all functions in PolyChaos."
 },
 
 {
@@ -653,7 +669,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.rm_compute",
     "category": "method",
-    "text": "rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)\n\nGiven a positive weight function with domain (lb,ub), i.e. a function w lb ub  rightarrow mathbbR_geq 0, this function creates Npoly recursion coefficients (α,β).\n\nThe keyword quadrature specifies what quadrature rule is being used.\n\n\n\n\n\n"
+    "text": "rm_compute(weight::Function,lb::Float64,ub::Float64,Npoly::Int64=4,Nquad::Int64=10;quadrature::Function=clenshaw_curtis)\n\nGiven a positive weight function with domain (lb,ub), i.e. a function w lb ub  rightarrow mathbbR_geq 0, this function creates Npoly recursion coefficients (α,β).\n\nThe keyword quadrature specifies what quadrature rule is being used.\n\n\n\n\n\n"
 },
 
 {
@@ -741,7 +757,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.lanczos",
     "category": "function",
-    "text": "lanczos(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)\n\nLanczos procedure–-given the nodes and weights the function generates the first N recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nSet the Boolean removezeroweights to true if zero weights should be removed.\n\nThe script is adapted from the routine RKPW in W.B. Gragg and W.J. Harrod, The numerically stable reconstruction of Jacobi matrices from spectral data, Numer. Math. 44 (1984), 317-335.\n\n\n\n\n\n"
+    "text": "lanczos(N::Int64,nodes::Vector{Float64},weights::Vector{Float64};removezeroweights::Bool=true)\n\nLanczos procedure–-given the nodes and weights the function generates the first N recurrence coefficients of the corresponding discrete orthogonal polynomials.\n\nSet the Boolean removezeroweights to true if zero weights should be removed.\n\nThe script is adapted from the routine RKPW in W.B. Gragg and W.J. Harrod, The numerically stable reconstruction of Jacobi matrices from spectral data, Numer. Math. 44 (1984), 317-335.\n\n\n\n\n\n"
 },
 
 {
@@ -789,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.evaluate",
     "category": "function",
-    "text": "Univariate\n\nevaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Float64,a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)\nevaluate(n::Int64,x::Float64,op::OrthoPoly)\nevaluate(n::Int64,x::Vector{Float64},opq::OrthoPolyQ) = evaluate(n,x,opq.op)\nevaluate(n::Int64,x::Float64,opq::OrthoPolyQ) = evaluate(n,[x],opq.op)\n\nEvaluate the n-th univariate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type OrthoPoly\n\nIf several basis polynomials (stored in ns) are to be evaluated at points x, then call\n\nevaluate(ns::Vector{Int64},x::Vector{Float64},op::OrthoPoly) = evaluate(ns,x,op.α,op.β)\nevaluate(ns::Vector{Int64},x::Float64,op::OrthoPoly) = evaluate(ns,[x],op)\nevaluate(ns::Vector{Int64},x::Vector{Float64},opq::OrthoPolyQ) = evaluate(ns,x,opq.op)\nevaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Vector{Float64},op::OrthoPoly) = evaluate(collect(0:op.deg),x,op)\nevaluate(x::Float64,op::OrthoPoly) = evaluate([x],op)\nevaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)\nevaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)\n\nwhich returns an Array of dimensions (length(x),op.deg+1).\n\nnote: Note\nn is the degree of the univariate basis polynomial\nlength(x) = N, where N is the number of points\n(a,b) are the recursion coefficients\n\nMultivariate\n\nevaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\nevaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly)\n\nEvaluate the n-th p-variate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type MultiOrthoPoly\n\nIf several basis polynomials are to be evaluated at points x, then call\n\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\n\nwhere ind is a matrix of multi-indices.\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)\n\nwhich returns an array of dimensions (mop.dim,size(x,1)).\n\nnote: Note\n`n is a multi-index\nlength(n) == p, i.e. a p-variate basis polynomial\nsize(x) = (N,p), where N is the number of points\nsize(a)==size(b)=p.\n\n\n\n\n\n"
+    "text": "Univariate\n\nevaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Float64,a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)\nevaluate(n::Int64,x::Float64,op::OrthoPoly)\nevaluate(n::Int64,x::Vector{Float64},opq::OrthoPolyQ) = evaluate(n,x,opq.op)\nevaluate(n::Int64,x::Float64,opq::OrthoPolyQ) = evaluate(n,[x],opq.op)\n\nEvaluate the n-th univariate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type OrthoPoly\n\nIf several basis polynomials (stored in ns) are to be evaluated at points x, then call\n\nevaluate(ns::Vector{Int64},x::Vector{Float64},op::OrthoPoly) = evaluate(ns,x,op.α,op.β)\nevaluate(ns::Vector{Int64},x::Float64,op::OrthoPoly) = evaluate(ns,[x],op)\nevaluate(ns::Vector{Int64},x::Vector{Float64},opq::OrthoPolyQ) = evaluate(ns,x,opq.op)\nevaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Vector{Float64},op::OrthoPoly) = evaluate(collect(0:op.deg),x,op)\nevaluate(x::Float64,op::OrthoPoly) = evaluate([x],op)\nevaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)\nevaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)\n\nwhich returns an Array of dimensions (length(x),op.deg+1).\n\nnote: Note\nn is the degree of the univariate basis polynomial\nlength(x) = N, where N is the number of points\n(a,b) are the recursion coefficients\n\nMultivariate\n\nevaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\nevaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly)\n\nEvaluate the n-th p-variate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type MultiOrthoPoly\n\nIf several basis polynomials are to be evaluated at points x, then call\n\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\n\nwhere ind is a matrix of multi-indices.\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)\n\nwhich returns an array of dimensions (mop.dim,size(x,1)).\n\nnote: Note\nn is a multi-index\nlength(n) == p, i.e. a p-variate basis polynomial\nsize(x) = (N,p), where N is the number of points\nsize(a)==size(b)=p.\n\n\n\n\n\n"
 },
 
 {
@@ -829,7 +845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.quadgp",
     "category": "function",
-    "text": "quadgp(weight::Function,a::Float64,b::Float64,N::Int64=10;quadrature::Function=clenshaw_curti\n\ngeneral purpose quadrature based on Gautschi, \"Orthogonal Polynomials: Computation and Approximation\", Section 2.2.2, pp. 93-95\n\n\n\n\n\n"
+    "text": "quadgp(weight::Function,lb::Float64,ub::Float64,N::Int64=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)\n\ngeneral purpose quadrature based on Gautschi, \"Orthogonal Polynomials: Computation and Approximation\", Section 2.2.2, pp. 93-95\n\nCompute the N-point quadrature rule for weight with support (lb, ub). The quadrature rule can be specified by the keyword quadrature. The keyword bnd sets the numerical value for infinity.\n\n\n\n\n\n"
 },
 
 {
