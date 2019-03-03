@@ -149,8 +149,8 @@ function sampleMeasure_byFun(n::Int64,w::Function,dom::Tuple{Float64,Float64};me
         # all purpose method but needs a solid envelope PDF
         error("method $method not yet implemented")
     elseif method == "inversecdf"
-        error("method $method not yet implemented")
         # requires CDF and reliable root-finding method
+        return sample_withoutOOP(w, dom, n)
     end
 end
 
