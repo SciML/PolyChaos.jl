@@ -92,7 +92,7 @@ struct OrthoPoly
   # inner constructor
   function OrthoPoly(name::String,deg::Int64,α::Vector{Float64},β::Vector{Float64},m::Measure)
     @assert deg >= 0 "Degree has to be non-negative."
-    @assert length(α)==length(β) "Different number of recursion coefficients α and β supplied."
+    @assert length(α) == length(β) "Different number of recursion coefficients α and β supplied."
     new(lowercase(name),deg,α,β,m)
   end
 end

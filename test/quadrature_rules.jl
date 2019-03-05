@@ -53,11 +53,15 @@ end
             αβref = parse.(Float64,readlines(myfile))
             αβcom = gauss(n,d1[:,1],d1[:,2])
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+            q = Quad(n,d1[:,1],d1[:,2],Measure("gaussian"))
+            @test isapprox(norm(αβref - vcat(nw(q)...),Inf),0.;atol=tol)
             close(myfile)
             myfile = open("dataQuadratureRules/gaussHerm$n.txt")
             αβref = parse.(Float64,readlines(myfile))
             αβcom = gauss(n,d2[:,1],d2[:,2])
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+            q = Quad(n,d2[:,1],d2[:,2],Measure("hermite"))
+            @test isapprox(norm(αβref - vcat(nw(q)...),Inf),0.;atol=tol)
             close(myfile)
     end
 end
