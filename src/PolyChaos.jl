@@ -7,6 +7,7 @@ import Combinatorics: with_replacement_combinations
 import Base: show
 import AdaptiveRejectionSampling: RejectionSampler, run_sampler!
 import Statistics: mean, std, var
+import GaussQuadrature: special_eigenproblem!
 
 include("types.jl")
 include("multiIndices.jl")
