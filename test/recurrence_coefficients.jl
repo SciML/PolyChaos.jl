@@ -41,6 +41,7 @@ end
                     αβref = parse.(Float64,readlines(myfile))
                     αβcom = rm_jacobi(n,al,be)
                     @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
+                    close(myfile)
                 end
             end
     end

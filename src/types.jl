@@ -187,18 +187,15 @@ end
 # general constructor
 function Quad(N::Int,α::Vector{Float64},β::Vector{Float64},m::Measure)
     @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
-    @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
-    n,w = golubwelsch(α[1:N],β[1:N])
+    @assert N <= length(α) - 1 "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
+    n,w = gauss(N,α,β)
     Quad("golubwelsch",N,n,w,m)
 end
 Quad(N::Int,op::OrthoPoly) = Quad(N,op.α,op.β,op.meas)
 
 function Quad(N::Int64,weight::Function,α::Vector{Float64},β::Vector{Float64},supp::Tuple{Float64,Float64},symm::Bool,d::Dict=Dict())
-    @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
-    @assert N <= length(α) "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
-    n,w = golubwelsch(α[1:N],β[1:N])
-    Quad("golubwelsch",N,n,w,m)
+    Quad(N,α,β,m)
 end
 
 # all-purpose constructor (last resort!)
@@ -217,24 +214,10 @@ struct OrthoPolyQ
 end
 
 function OrthoPolyQ(op::OrthoPoly,N::Int64)
-    # name=op.name
-    # s = [ "gaussian",
-    #       "hermite",
-    #       "uniform01",
-    #       "legendre",
-    #       "beta01",
-    #       "jacobi",
-    #       "gamma",
-    #       "laguerre", "genlaguerre",
-    #       "logistic"]
-    # if name in s
-    #   q = Quad(op.name,N,op.meas.pars)
-    # else
     q = Quad(N,op.α,op.β,op.meas)
-    # end
     return OrthoPolyQ(op,q)
 end
-OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α))
+OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α)-1)
 
 function OrthoPolyQ(name::String,N::Int64,d::Dict=Dict();Nrec::Int64=N+1)
     op = OrthoPoly(name,N,d;Nrec=Nrec)
