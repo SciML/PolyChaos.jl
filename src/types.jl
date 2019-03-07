@@ -40,7 +40,7 @@ function Measure(name::String,d::Dict=Dict())
     # measures corresponding to probability density functions:
     name == "gaussian"  &&  return Measure(name,w_gaussian,(-Inf,Inf),true,d)
     name == "uniform01" &&  return Measure(name,w_uniform01,(0,1),true,d)
-    name == "beta01"    &&  d[:shape_a] > 0 && d[:shape_b] > 0 &&  return Measure(name,build_w_beta(par1,par2),(0,1),d[:shape_a] == d[:shape_b],d)
+    name == "beta01"    &&  d[:shape_a] > 0 && d[:shape_b] > 0 &&  return Measure(name,build_w_beta(d[:shape_a],d[:shape_b]),(0,1),d[:shape_a] == d[:shape_b],d)
     name == "gamma"     &&  d[:rate] == 1. && return Measure(name,build_w_gamma(d[:shape]),(0, Inf),false,d)
     name == "logistic"  &&  return Measure(name,w_logistic,(-Inf,Inf),true,d)
     # error handling

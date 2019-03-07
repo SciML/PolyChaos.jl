@@ -59,12 +59,27 @@ The code base of `PolyChaos` is partially based on Walter Gautschi's [Matlab sui
 
 For the theory of polynomial chaos expansion we mainly consulted T. J. Sullivan. *Introduction to Uncertainty Quantification*. Springer International Publishing Switzerland. 2015.
 
+## Contributing
+We are always looking for contributors.
+If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [dot] edu.
+
+Or just fork and/or star the repository:
+
+Julia's package manager works nicely with Github: simply install the hosted package via `Pkg.clone` and the [repository's URL](https://help.github.com/articles/which-remote-url-should-i-use/).
+A so-called fork is created with
+
+```julia
+Pkg.clone("https://github.com/timueh/PolyChaos.jl")
+```
+The fork will replace the original package.
+
+Call
+```julia
+Pkg.dir("PolyChaos")
+```
+to figure out where the package was cloned to.
+Go to that location and figure out what branch you are on via `git branch`.
+
 ## Citing
 Currently, there is no publication about `PolyChaos`.
 Meanwhile, in case you find `PolyChaos` useful, feel free to get in touch, or simply participate in Github's gamification. ;)
-
-## Collaboration
-We are always looking for contributors.
-If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [dot] edu.
-Or just fork and/or star the repository.
-Much appreciated.
