@@ -44,10 +44,10 @@ function Measure(name::String,d::Dict=Dict())
     name == "gamma"     &&  d[:rate] == 1. && return Measure(name,build_w_gamma(d[:shape]),(0, Inf),false,d)
     name == "logistic"  &&  return Measure(name,w_logistic,(-Inf,Inf),true,d)
     # error handling
-    name == "jacobi" && !(d[:shape_a] > -1 && d[:shape_b] > -1) &&  error("Invalid shape parameters.")
-    name == "beta01" && !(d[:shape_a] >  0 && d[:shape_b] >  0) &&  error("Invalid shape parameters.")
+    name == "jacobi" && !(d[:shape_a] > -1 && d[:shape_b] > -1) &&  throw(AssertionError("Invalid shape parameters."))
+    name == "beta01" && !(d[:shape_a] >  0 && d[:shape_b] >  0) &&  throw(AssertionError("Invalid shape parameters."))
     name == "gamma"  && !(d[:rate] == 1.) &&  error("Rates different from one not supported currently.")
-    error("A measure of name $name is not implemented.")
+    throw(error("A measure of name $name is not implemented."))
 end
 
 struct OrthoPoly
@@ -85,7 +85,7 @@ function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
   error("$name is not yet implemented.")
 end
 
-# general constructor
+# constructor for known Measure
 function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
   @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
@@ -93,12 +93,11 @@ function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec,q
   return OrthoPoly(name,deg,a,b,m)
 end
 
+# general constructor
 function OrthoPoly(name::String,deg::Int64,w::Function,s::Tuple{Real,Real},symm::Bool,d::Dict=Dict();Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
-  @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
   name = lowercase(name)
   m = Measure(name,w,s,symm,d)
-  a,b = rm_compute(m,Nrec,Nquad,quadrature=quadrature,discretization=discretization)
-  return OrthoPoly(name,deg,a,b,m)
+  OrthoPoly(name,deg,m;Nrec=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
 end
 
 struct Quad
@@ -112,11 +111,6 @@ struct Quad
         @assert length(nodes) == length(weights) "Inconsistent number of nodes and weights inconsistent."
         new(lowercase(name),N,nodes,weights,m)
     end
-end
-
-function Quad(N::Int64,m::Measure;quadrature::Function=clenshaw_curtis)
-  n,w = quadgp(m.w,m.dom[1],m.dom[2],N;quadrature=quadrature)
-  Quad("quadgp",N,n,w,m)
 end
 
 # general constructor
@@ -134,13 +128,16 @@ function Quad(N::Int64,weight::Function,α::Vector{Float64},β::Vector{Float64},
 end
 
 # all-purpose constructor (last resort!)
+function Quad(N::Int64,m::Measure;quadrature::Function=clenshaw_curtis)
+  n, w = quadgp(m.w,m.dom[1],m.dom[2],N;quadrature=quadrature)
+  Quad("quadgp",N,n,w,m)
+end
+
 function Quad(N::Int64,weight::Function,supp::Tuple{Real,Real},symm::Bool,d::Dict=Dict();quadrature::Function=clenshaw_curtis)
     @assert N >= 1 "Number of qudrature points has to be positive"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
-    n,w = quadgp(weight,Float64(supp[1]),Float64(supp[2]),N;quadrature=quadrature)
-    Quad("quadgp",N,n,w,m)
+    Quad(N,m;quadrature=quadrature)
 end
-
 
 # Struct that contains pre-computed nodes and weights
 struct OrthoPolyQ
@@ -167,41 +164,21 @@ dim::Int64
 ind::Matrix{Int64} # multi-index
 meas::MultiMeasure
 uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
-    function MultiOrthoPoly(uni::Union{Vector{OrthoPoly}},deg::Int64)
-      @assert deg>=0 "degree has to be non-negative"
-      degs = [ op.deg for op in uni ]
-      @assert deg<=minimum(degs) "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."
+    function MultiOrthoPoly(uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}},deg::Int64)
+      t = typeof(uni) == Vector{OrthoPoly}
+      degs = [ t ? u.deg : u.op.deg for u in uni ]
+      @assert deg <= minimum(degs) "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."
       Nuni::Int64 = length(uni)
 
-      name_meas = [ op.meas.name for op in uni      ]
-      supp      = [ op.meas.dom for op in uni       ]
-      symm      = [ op.meas.symmetric for op in uni ]
-      pars      = [ op.meas.pars for op in uni      ]
-      w_uni     = [ op.meas.w for op in uni         ]
-      w(t) = prod([uni[i].meas.w(t[i]) for i=1:Nuni])
+      name_meas = [ t ? u.meas.name : u.op.meas.name for u in uni ]
+      supp      = [ t ? u.meas.dom : u.op.meas.dom for u in uni       ]
+      symm      = [ t ? u.meas.symmetric : u.op.meas.symmetric for u in uni ]
+      pars      = [ t ? u.meas.pars : u.op.meas.pars for u in uni      ]
+      w_uni     = [ t ? u.meas.w : u.op.meas.w for u in uni         ]
+      w(t) = t ? prod([uni[i].meas.w(t[i]) for i=1:Nuni]) : prod([uni[i].op.meas.w(t[i]) for i=1:Nuni])
       m = MultiMeasure(name_meas,w,w_uni,supp,symm,pars)
 
       name = [ op.name for op in uni ]
-      ind = calculateMultiIndices(Nuni,deg)
-      dim = size(ind,1)
-
-      new(name,deg,dim,ind,m,uni)
-    end
-    function MultiOrthoPoly(uni::Union{Vector{OrthoPolyQ}},deg::Int64)
-      @assert deg >= 0 "degree has to be non-negative"
-      degs = [ s.op.deg for s in uni ]
-      @assert deg<=minimum(degs) "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."
-      Nuni::Int64 = length(uni)
-
-      name_meas = [ s.op.meas.name for s in uni         ]
-      supp      = [ s.op.meas.dom for s in uni          ]
-      symm      = [ s.op.meas.symmetric for s in uni    ]
-      pars      = [ s.op.meas.pars for s in uni         ]
-      w_uni     = [ s.op.meas.w for s in uni            ]
-      w(t) = prod([uni[i].op.meas.w(t[i]) for i=1:Nuni])
-      m = MultiMeasure(name_meas,w,w_uni,supp,symm,pars)
-
-      name = [ s.op.name for s in uni ]
       ind = calculateMultiIndices(Nuni,deg)
       dim = size(ind,1)
 
