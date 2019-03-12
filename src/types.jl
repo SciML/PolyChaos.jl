@@ -178,7 +178,7 @@ uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
       w(t) = t ? prod([uni[i].meas.w(t[i]) for i=1:Nuni]) : prod([uni[i].op.meas.w(t[i]) for i=1:Nuni])
       m = MultiMeasure(name_meas,w,w_uni,supp,symm,pars)
 
-      name = [ op.name for op in uni ]
+      name = [ t ? u.name : u.op.name for u in uni ]
       ind = calculateMultiIndices(Nuni,deg)
       dim = size(ind,1)
 
