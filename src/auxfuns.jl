@@ -7,11 +7,11 @@ export  coeffs,
         issymmetric,
         integrate
 
-dim(op::OrthoPoly)::Int64 = op.deg+1
+dim(op::OrthoPoly)::Int64 = op.deg + 1
 dim(opq::OrthoPolyQ) = dim(opq.op)
 dim(mop::MultiOrthoPoly) = mop.dim
 
-deg(op::OrthoPoly)::Int64 = op.deg
+deg(op::OrthoPoly) = op.deg
 deg(opq::OrthoPolyQ) = deg(opq.op)
 deg(mop::MultiOrthoPoly) = mop.deg
 
