@@ -6,12 +6,16 @@ opq = OrthoPolyQ(op)
 mop = MultiOrthoPoly([op for i in 1:nunc],d)
 mopq = MultiOrthoPoly([opq for i in 1:nunc],d)
 @testset "dimenions" begin
-    @test dim(op) == d + 1
-    @test dim(opq) == d + 1
-    @test dim(mop) == factorial(d + nunc) / (factorial(d) * factorial(nunc)) == dim(mopq)
+    @test isequal(dim(op), d + 1)
+    @test isequal(dim(opq), d + 1)
+    @test isequal(dim(mop), factorial(d + nunc) / (factorial(d) * factorial(nunc)))
 end
 
-# @test deg(op) == deg(opq) == deg(mop)
+@testset "degrees" begin
+    @test isequal(deg(op),d)
+    @test isequal(deg(opq),d)
+    @test isequal(deg(mop),d)
+end
 
 NW = [ opq.quad.nodes opq.quad.weights ]
 @testset "nodes and weights" begin
