@@ -70,6 +70,5 @@ x = [1., 2., 3.]
 @testset "Evaluation of multivariate basis" begin
     for ind in Iterators.product([collect(0:d) for i = 1:n]...)
         @test isapprox(prod( map(i->evaluate(ind[i],x[i],ops[i]),1:n) ) -  evaluate([ind...],x,mop)[1],0;atol=tol)
-
     end
 end

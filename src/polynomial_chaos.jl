@@ -118,23 +118,14 @@ function assign2multi(x::Vector{Float64},i::Int64,ind::Matrix{Int64})
 end
 
 function sampleMeasure_byName(n::Int64,name::String,d::Dict=Dict())::Vector{Float64}
-    @assert n>=1 "invalid number $n of samples."
+    @assert n >= 1 "invalid number $n of samples."
     name = lowercase(name)
-    if name=="gaussian"
-        x = Normal()
-    elseif name=="uniform01"
-        x = Uniform()
-    elseif name=="beta01"
-        x = Beta(d[:shape_a],d[:shape_b])
-    elseif name=="gamma"
-        shape, scale = d[:shape], 1/d[:rate]
-        x = Gamma(shape,scale)
-    elseif name=="logistic"
-        x = Logistic()
-    else
-        error("$name is not implemented")
-    end
-    return rand(x,n)
+    name == "gaussian" && return rand(Normal(),n)
+    name == "uniform01" && return rand(Uniform(),n)
+    name == "beta01" && return rand(Beta(d[:shape_a],d[:shape_b]),n)
+    name == "gamma" && return rand(Gamma(d[:shape],1/d[:rate]),n)
+    name == "logistic" && return rand(Logistic(),n)
+    throw(error("$name is not implemented"))
 end
 
 function sampleMeasure_byFun(n::Int64,w::Function,dom::Tuple{Float64,Float64};method::String="adaptiverejection")

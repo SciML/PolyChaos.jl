@@ -106,5 +106,5 @@ end
 
 
 function w_logistic(t::Float64)
-    exp(-t)/(1-exp(-t))^2
+    0.25*sech(0.5t)^2
 end
