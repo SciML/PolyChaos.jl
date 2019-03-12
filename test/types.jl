@@ -83,7 +83,7 @@ end
 # TENSOR
 ##########################################################
 deg, M = 5, 1:4
-opq = OrthoPolyQ("w_legendre",deg;Nrec=3*deg)
+opq = OrthoPolyQ("legendre",deg;Nrec=3*deg)
 mop = MultiOrthoPoly([OrthoPolyQ("gaussian",deg;Nrec=3*deg), OrthoPolyQ("logistic",deg;Nrec=3*deg), OrthoPolyQ("uniform01",deg;Nrec=3*deg)], deg)
 
 @test_throws AssertionError Tensor(0,mop)

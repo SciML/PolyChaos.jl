@@ -97,10 +97,13 @@ evaluate(n::Int64,x::Float64,opq::OrthoPolyQ) = evaluate(n,[x],opq.op)
 function evaluate(ns::Vector{Int64},x::Array{Float64},a::Vector{Float64},b::Vector{Float64})
     hcat(map(i->evaluate(i,x,a,b),ns)...)
 end
+evaluate(ns::Vector{Int64},x::Float64,a::Vector{Float64},b::Vector{Float64}) = evaluate(ns,[x],a,b)
+
 evaluate(ns::Vector{Int64},x::Vector{Float64},op::OrthoPoly) = evaluate(ns,x,op.α,op.β)
 evaluate(ns::Vector{Int64},x::Float64,op::OrthoPoly) = evaluate(ns,[x],op)
 evaluate(x::Vector{Float64},op::OrthoPoly) = evaluate(collect(0:op.deg),x,op)
 evaluate(x::Float64,op::OrthoPoly) = evaluate([x],op)
+
 evaluate(ns::Vector{Int64},x::Vector{Float64},opq::OrthoPolyQ) = evaluate(ns,x,opq.op)
 evaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)
 evaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)
@@ -115,7 +118,7 @@ function evaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}}
     end
     return val
 end
-evaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}}) = evaluate(n,reshape(x,length(x),1),a,b)
+evaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}}) = evaluate(n,reshape(x,1,length(x)),a,b)
 evaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly) = evaluate(n,x,coeffs(op)...)
 evaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly) = evaluate(n,reshape(x,1,length(x)),op)
 
@@ -126,3 +129,7 @@ function evaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64
 end
 evaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly) = evaluate(ind,x,coeffs(op)...)
 evaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)
+
+evaluate(ind::Matrix{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}}) = evaluate(ind,reshape(x,1,length(x)),a,b)
+evaluate(ind::Matrix{Int64},x::Vector{Float64},op::MultiOrthoPoly) = evaluate(ind,reshape(x,1,length(x)),coeffs(op)...)
+evaluate(x::Vector{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,reshape(x,1,length(x)),mop)
