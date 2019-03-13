@@ -1,14 +1,14 @@
 name = "PolyChaos"
 uuid = "8d666b04-775d-5f6e-b778-5ac7c70f65a3"
 authors = ["timueh <tillmann.muehlpfordt@kit.edu>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 AdaptiveRejectionSampling = "c75e803d-635f-53bd-ab7d-544e482d8c75"
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
+GaussQuadrature = "d54b0c1a-921d-58e0-8e36-89d8069c0969"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"

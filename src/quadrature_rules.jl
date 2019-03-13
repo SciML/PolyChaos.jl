@@ -1,3 +1,4 @@
+
 export  fejer,
         fejer2,
         clenshaw_curtis,
@@ -5,10 +6,7 @@ export  fejer,
         golubwelsch,
         gauss,
         radau,
-        radau_jacobi,
-        radau_laguerre,
-        lobatto,
-        lobatto_jacobi
+        lobatto
 """
     fejer(N::Int64)
 Fejer's first quadrature rule.
@@ -89,13 +87,15 @@ end
 ####################################################
 # Quadrature rules based on recurrence coefficients
 
-function golubwelsch(α::Vector{Float64},β::Vector{Float64})
-    n = length(α)
-    @inbounds J = SymTridiagonal( α, sqrt.(β[2:n]) )
-    nodes, V = eigen(J)
-    @inbounds weights = V[1,1:n].^2*first(β)
-    return nodes, weights
+function golubwelsch(α::Vector{Float64},β::Vector{Float64},maxiter::Int=30)
+    N = length(α) - 1
+    a, β0 = copy(α[1:N]), β[1]
+    w = zero(a)
+    special_eigenproblem!(a,copy(sqrt.(β)),w,maxiter)
+    idx = sortperm(a)
+    a[idx], (β0*w.^2)[idx]
 end
+
 golubwelsch(op::OrthoPoly) = golubwelsch(op.α,op.β)
 
 """
@@ -113,13 +113,14 @@ with respect to the weight function.
     If no `N` is provided, then `N = length(α)`.
 """
 function gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})
+    N += 1
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) "inconsistent number of recurrence coefficients"
     N0 = length(α)
-    @assert N0 >= N "not enough recurrence coefficients"
+    @assert N0 >= N  "not enough recurrence coefficients"
     @inbounds golubwelsch(α[1:N],β[1:N])
 end
-gauss(α::Vector{Float64},β::Vector{Float64}) = gauss(length(α),α,β)
+gauss(α::Vector{Float64},β::Vector{Float64}) = gauss(length(α)-1,α,β)
 gauss(N::Int64,op::OrthoPoly) = gauss(N::Int64,op.α,op.β)
 gauss(op::OrthoPoly) = gauss(op.α,op.β)
 
@@ -142,9 +143,10 @@ interval of w, or outside thereof).
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
-function radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)
+function radau(N::Int64,α_::Vector{Float64},β::Vector{Float64},end0::Float64)
+    α = copy(α_)
     @assert N > 0 "only positive N allowed"
-    @assert length(α) == length(β) > 0. "inconsistent number of recurrence coefficients"
+    @assert length(α) == length(β) > 0 "inconsistent number of recurrence coefficients"
     @assert length(α) >= N + 1 "not enough recurrence coefficients"
     p0 = 0.
     p1 = 1.
@@ -159,52 +161,6 @@ end
 radau(α::Vector{Float64},β::Vector{Float64},end0::Float64) = radau(length(α)-1,α,β,end0)
 radau(N::Int64,op::OrthoPoly,end0::Float64) = radau(N,op.α,op.β,end0)
 radau(op::OrthoPoly,end0::Float64) = radau(op.α,op.β,end0::Float64)
-
-"""
-    radau_jacobi(N::Int64,a::Float64,b::Float64;endpoint::String="left")
-    endpoint in ["left", "right"]
-    radau_jacobi(N::Int64,a::Float64;endpoint::String="left") = radau_jacobi(N,a,a;endpoint=endpoint)
-    radau_jacobi(N::Int64;endpoint::String="left") = radau_jacobi(N,0.;endpoint=endpoint)
-Gauss-Radau quadrature rule for Jacobi weight function, which
-generates the `(n+1)`-point Gauss-Radau
-rule for the Jacobi weight function on `[-1,1]` with parameters
-`a` and `b`.
-
-!!! note
-    REFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and
-    Laguerre weight functions'', Math. Comput. Simulation 54
-    (2000), 403-412.
-"""
-function radau_jacobi(N::Int64,a::Float64,b::Float64;endpoint::String="left")
-    @assert N > 0 "only positive N allowed"
-    endpoint = lowercase(endpoint)
-    @assert endpoint in ["left", "right"] "$endpoint is no valid specification"
-    α, β = rm_jacobi(N+1,a,b);
-    @inbounds α[N+1] = endpoint == "left" ? -1+2*N*(N+a)/((2*N+a+b)*(2*N+a+b+1)) : 1-2*N*(N+b)/((2*N+a+b)*(2*N+a+b+1))
-    gauss(α,β)
-end
-radau_jacobi(N::Int64,a::Float64;endpoint::String="left") = radau_jacobi(N,a,a;endpoint=endpoint)
-radau_jacobi(N::Int64;endpoint::String="left") = radau_jacobi(N,0.;endpoint=endpoint)
-
-"""
-    radau_laguerre(N::Int64,a::Float64)
-    radau_laguerre(N::Int64) = radau_laguerre(N,0.)
-Gauss-Radau quadrature rule for Laguerre weight function, which
-generates the `(n+1)`-point Gauss-Radau
-rule for the Laguerre weight function on ``[0,\\infty]`` with parameter `a`.
-
-!!! note
-    REFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and
-    Laguerre weight functions'', Math. Comput. Simulation 54
-    (2000), 403-412.
-"""
-function radau_laguerre(N::Int64,a::Float64)
-    @assert N>=0 "only positive N allowed"
-    α, β = rm_laguerre(N+1,a);
-    @inbounds α[N+1] = N
-    gauss(α,β)
-end
-radau_laguerre(N::Int64) = radau_laguerre(N,0.)
 
 """
     lobatto(N::Int64,α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)
@@ -226,7 +182,8 @@ resp. to the right therof).
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
-function lobatto(N::Int64,α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)
+function lobatto(N::Int64,α_::Vector{Float64},β_::Vector{Float64},endl::Float64,endr::Float64)
+    α, β = copy(α_), copy(β_)
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) > 0 "inconsistent number of recurrence coefficients"
     @assert endl < endr "inconsistent end points"
@@ -248,26 +205,3 @@ end
 lobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64) = lobatto(length(α)-2,α,β,endl,endr)
 lobatto(N::Int64,op::OrthoPoly,endl::Float64,endr::Float64) = lobatto(N,op.α,op.β,endl,endr)
 lobatto(op::OrthoPoly,endl::Float64,endr::Float64) = lobatto(op.α,op.β,endl,endr)
-
-"""
-    lobatto_jacobi(N::Int64,a::Float64,b::Float64)
-    lobatto_jacobi(N::Int64,a::Float64) = lobatto_jacobi(N,a,a)
-    lobatto_jacobi(N::Int64) = lobatto_jacobi(N,0.)
-Gauss-Lobatto quadrature rule for Jacobi weight function, which
-generates the `(n+2)`-point Gauss-
-Lobatto rule for the Jacobi weight function on ``[-1,1]`` with
-parameters `a` and `b`.
-
-!!! note
-    REFERENCE: W. Gautschi,``High-order Gauss-Lobatto formulae'',
-    Numer. Algorithms 25 (2000), 213-222.
-"""
-function lobatto_jacobi(N::Int64,a::Float64,b::Float64)
-    @assert N > 0 "only positive N allowed"
-    α,β = rm_jacobi(N+2,a,b);
-    @inbounds α[N+2] = (a-b) / (2*N+a+b+2)
-    @inbounds β[N+2] = 4 * (N + a + 1) * (N + b + 1) * (N + a + b + 1) / ((2 * N + a + b + 1) * (2*N + a + b + 2)^2)
-    gauss(α,β)
-end
-lobatto_jacobi(N::Int64,a::Float64) = lobatto_jacobi(N,a,a)
-lobatto_jacobi(N::Int64) = lobatto_jacobi(N,0.)

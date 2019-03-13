@@ -18,7 +18,7 @@ export  w_legendre,
         build_w_gamma
 
 function w_legendre(t)
-    -1. <= t <= 1. ? 1. : (error("$t not in support"))
+    -1. <= t <= 1. ? 1. : throw(error("$t not in support"))
 end
 
 function build_w_jacobi(a,b)
@@ -27,7 +27,7 @@ function build_w_jacobi(a,b)
     return t->w_jacobi(t,a,b)
 end
 function w_jacobi(t,a,b)
-    -1. <=t<= 1. ? ((1-t)^a*(1+t)^b) : (error("$t not in support"))
+    -1. <=t<= 1. ? ((1-t)^a*(1+t)^b) : throw(error("$t not in support"))
 end
 
 function build_w_jacobi01(a,b)
@@ -36,7 +36,7 @@ function build_w_jacobi01(a,b)
     return t->w_jacobi01(t,a,b)
 end
 function w_jacobi01(t,a,b)
-    0. <=t<= 1. ? ((1-t)^a*t^b) : (error("$t not in support"))
+    0. <=t<= 1. ? ((1-t)^a*t^b) : throw(error("$t not in support"))
 end
 
 function w_hermite(t)
@@ -53,14 +53,14 @@ end
 function build_w_genlaguerre(a)
     @assert a>-1 "Invalid shape parameter"
     # return w(t) = Float64(t)^a*exp(-Float64(t))
-    return t->w_laguerre(t,a)
+    return t->w_genlaguerre(t,a)
 end
 function w_genlaguerre(t,a)
-    t>=0. ? w(t) = Float64(t)^a*exp(-Float64(t)) : (error("$t not in support"))
+    t>=0. ? Float64(t)^a*exp(-Float64(t)) : throw(error("$t not in support"))
 end
 
 function w_laguerre(t)
-    t>=0. ? w(t) = exp(-Float64(t)) : (error("$t not in support"))
+    t>=0. ? exp(-t) : throw(error("$t not in support"))
 end
 
 function w_meixner_pollaczek(t,lambda,phi)
@@ -106,5 +106,5 @@ end
 
 
 function w_logistic(t::Float64)
-    exp(-t)/(1-exp(-t))^2
+    0.25*sech(0.5t)^2
 end

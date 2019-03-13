@@ -5,9 +5,9 @@ using PolyChaos, Test
 import LinearAlgebra: norm
 
 function myquad(N::Int64,pos::Bool)
-    a,b = rm_laguerre(N)
+    a,b = rm_laguerre(N+1)
     n,w = golubwelsch(a,b)
-    w = w./((1 .+ exp.(-n)).^2)
+    w = w ./ ((1 .+ exp.(-n)).^2)
     pos ? (n,w) : (-n,w)
 end
 

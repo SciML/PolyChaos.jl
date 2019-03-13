@@ -7,11 +7,11 @@ export  coeffs,
         issymmetric,
         integrate
 
-dim(op::OrthoPoly)::Int64 = op.deg+1
+dim(op::OrthoPoly)::Int64 = op.deg + 1
 dim(opq::OrthoPolyQ) = dim(opq.op)
 dim(mop::MultiOrthoPoly) = mop.dim
 
-deg(op::OrthoPoly)::Int64 = op.deg
+deg(op::OrthoPoly) = op.deg
 deg(opq::OrthoPolyQ) = deg(opq.op)
 deg(mop::MultiOrthoPoly) = mop.deg
 
@@ -74,11 +74,18 @@ integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})
 integrate(f::Function,q::Quad)
 integrate(f::Function,opq::OrthogonalPolyQ)
 ```
-integrate function `f` using quadrature rule specified via `nodes`, `weights`
+integrate function `f` using quadrature rule specified via `nodes`, `weights`.
+For example ``\\int_0^1 6x^5 = 1`` can be solved as follows:
+
+```@repl
+julia> opq = OrthoPolyQ("uniform01",3)
+julia> integrate(x->6x^5,opq)
+1.0000000000000002
+```
 
 !!! note
-- function ``f`` is assumed to return a scalar
-- interval of integration is "hidden" in ``nodes``
+- function ``f`` is assumed to return a scalar.
+- interval of integration is "hidden" in `nodes`.
 """
 function integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})::Float64
     dot(weights,f.(nodes))
@@ -93,7 +100,7 @@ issymmetric(op::OrthoPoly)::Bool
 issymmetric(q::Quad)::Bool
 issymmetric(opq::OrthoPolyQ)::Bool
 ```
-is measure symmetric (around any point in the domain)?
+Is the measure symmetric (around any point in the domain)?
 """
 function issymmetric(m::Measure)::Bool
     m.symmetric

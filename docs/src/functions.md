@@ -51,15 +51,28 @@ lanczos
 mcdiscretization
 ```
 
+## Show Orthogonal Polynomials
+
+To get a human-readable output of the orthognoal polynomials there is the function `showpoly()`
+
+```@docs
+showpoly
+```
+
+This function makes excessive use of
+```@docs
+rec2coeff
+```
+
+## Evaluate Orthogonal Polynomials
+```@docs
+evaluate
+```
+
 ## Scalar Products
 ```@docs
 computeSP2
 computeSP
-```
-
-## Evaluating Orthogonal Polynomials
-```@docs
-evaluate
 ```
 
 ## Quadrature Rules
@@ -93,5 +106,5 @@ convert2affinePCE
 nw
 coeffs
 integrate
-issymmetric
+PolyChaos.issymmetric
 ```
