@@ -8,18 +8,18 @@ julia&gt; f(t) = sin(t);
 julia&gt; opq = OrthoPolyQ(&quot;uniform01&quot;,n-1);
 
 julia&gt; I0 = integrate(f,opq)
-0.45969769413204864
+0.4596976938638928
 
 julia&gt; print(&quot;Numerical error: $(abs(1-cos(1)-I0))&quot;)
-Numerical error: 1.8840484727888906e-13</code></pre><p>with negligible numerical errors.</p><h3><a class="nav-anchor" id="Variant-1-1" href="#Variant-1-1">Variant 1</a></h3><p>Let us  now solve the same problem, while elaborating what is going on under the hood. At first, we load the package by calling</p><pre><code class="language-julia-repl">julia&gt; using PolyChaos</code></pre><p>Now we define a measure, specifically the uniform measure <span>$\mathrm{d}\lambda(t) = w(t) \mathrm{d} t$</span> with the weight <span>$w$</span> defined as</p><div>\[  w: \mathcal{W} = [0,1] \rightarrow \mathbb{R}, \quad w(t) = 1.\]</div><p>This measure can be defined using the composite type <code>Measure</code>:</p><pre><code class="language-julia-repl">julia&gt; m = Measure(&quot;uniform01&quot;);</code></pre><p>Next, we need to compute the quadrature rule relative to the uniform measure. To do this we use the composite type <code>Quad</code>.</p><pre><code class="language-julia-repl">julia&gt; q1 = Quad(n-1,m);
+Numerical error: 2.6796742602641643e-10</code></pre><p>with negligible numerical errors.</p><h3><a class="nav-anchor" id="Variant-1-1" href="#Variant-1-1">Variant 1</a></h3><p>Let us  now solve the same problem, while elaborating what is going on under the hood. At first, we load the package by calling</p><pre><code class="language-julia-repl">julia&gt; using PolyChaos</code></pre><p>Now we define a measure, specifically the uniform measure <span>$\mathrm{d}\lambda(t) = w(t) \mathrm{d} t$</span> with the weight <span>$w$</span> defined as</p><div>\[  w: \mathcal{W} = [0,1] \rightarrow \mathbb{R}, \quad w(t) = 1.\]</div><p>This measure can be defined using the composite type <code>Measure</code>:</p><pre><code class="language-julia-repl">julia&gt; m = Measure(&quot;uniform01&quot;);</code></pre><p>Next, we need to compute the quadrature rule relative to the uniform measure. To do this we use the composite type <code>Quad</code>.</p><pre><code class="language-julia-repl">julia&gt; q1 = Quad(n-1,m);
 
 julia&gt; nw(q)
 5×2 Array{Float64,2}:
- 0.0469101  0.118463
- 0.230765   0.239314
- 0.5        0.284444
- 0.769235   0.239314
- 0.95309    0.118463</code></pre><p>This creates a quadrature rule <code>q</code> named <code>&quot;myq&quot;</code> with <code>n-1</code> nodes and weights relative to the measure <code>m</code>. The function <code>nw()</code> prints the nodes and weights. To solve the integral we call <code>integrate()</code></p><pre><code class="language-julia-repl">julia&gt; I1 = integrate(f,q1)
+ 1.0       0.0333333
+ 0.853553  0.266667
+ 0.5       0.4
+ 0.146447  0.266667
+ 0.0       0.0333333</code></pre><p>This creates a quadrature rule <code>q</code> named <code>&quot;myq&quot;</code> with <code>n-1</code> nodes and weights relative to the measure <code>m</code>. The function <code>nw()</code> prints the nodes and weights. To solve the integral we call <code>integrate()</code></p><pre><code class="language-julia-repl">julia&gt; I1 = integrate(f,q1)
 0.4596977927043755
 
 julia&gt; print(&quot;Numerical error: $(abs(1-cos(1)-I1))&quot;)
@@ -32,19 +32,19 @@ julia&gt; coeffs(op)
  0.5  0.0666667
  0.5  0.0642857
  0.5  0.0634921</code></pre><p>The resulting system of orthogonal polynomials is characterized by its recursion coefficients <span>$(\alpha, \beta)$</span>, which can be extracted with the function <code>coeffs()</code>.</p><p>Now, the quadrature rule can be constructed based on <code>op</code>, and the integral be solved.</p><pre><code class="language-julia-repl">julia&gt; q2 = Quad(n,op)
+ERROR: AssertionError: Requested number of quadrature points 5 cannot be provided with 5 recurrence coefficients
 
 julia&gt; nw(q)
 5×2 Array{Float64,2}:
- 0.0469101  0.118463
- 0.230765   0.239314
- 0.5        0.284444
- 0.769235   0.239314
- 0.95309    0.118463
+ 1.0       0.0333333
+ 0.853553  0.266667
+ 0.5       0.4
+ 0.146447  0.266667
+ 0.0       0.0333333
 
 julia&gt; I2 = integrate(f,q2)
-0.45969769413204864
+ERROR: UndefVarError: q2 not defined
 
 julia&gt; print(&quot;Numerical error: $(abs(1-cos(1)-I2))&quot;)
-Numerical error: 1.8840484727888906e-13</code></pre><h3><a class="nav-anchor" id="Comparison-1" href="#Comparison-1">Comparison</a></h3><p>We see that the different variants provide slightly different results:</p><pre><code class="language-julia-repl">julia&gt; 1-cos(1) .- [I0 I1 I2]
-1×3 Array{Float64,2}:
- -1.88405e-13  -9.85725e-8  -1.88405e-13</code></pre><p>with <code>I0</code> and <code>I2</code> being the same and more accurate than <code>I1</code>. The increased accuracy is based on the fact that for <code>I0</code> and <code>I2</code> the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials. The quadrature for <code>I1</code> is based on an general-purpose method that can be significantly less accurate, see also <a href="../quadrature_rules/#QuadratureRules-1">the next tutorial</a>.</p><footer><hr/><a class="previous" href="../type_hierarchy/"><span class="direction">Previous</span><span class="title">Type Hierarchy</span></a><a class="next" href="../quadrature_rules/"><span class="direction">Next</span><span class="title">Quadrature Rules</span></a></footer></article></body></html>
+ERROR: UndefVarError: I2 not defined</code></pre><h3><a class="nav-anchor" id="Comparison-1" href="#Comparison-1">Comparison</a></h3><p>We see that the different variants provide slightly different results:</p><pre><code class="language-julia-repl">julia&gt; 1-cos(1) .- [I0 I1 I2]
+ERROR: UndefVarError: I2 not defined</code></pre><p>with <code>I0</code> and <code>I2</code> being the same and more accurate than <code>I1</code>. The increased accuracy is based on the fact that for <code>I0</code> and <code>I2</code> the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials. The quadrature for <code>I1</code> is based on an general-purpose method that can be significantly less accurate, see also <a href="../quadrature_rules/#QuadratureRules-1">the next tutorial</a>.</p><footer><hr/><a class="previous" href="../type_hierarchy/"><span class="direction">Previous</span><span class="title">Type Hierarchy</span></a><a class="next" href="../quadrature_rules/"><span class="direction">Next</span><span class="title">Quadrature Rules</span></a></footer></article></body></html>
