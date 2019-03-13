@@ -1,11 +1,7 @@
 name = "PolyChaos"
 uuid = "8d666b04-775d-5f6e-b778-5ac7c70f65a3"
 authors = ["timueh <tillmann.muehlpfordt@kit.edu>"]
-<<<<<<< HEAD
 version = "0.1.2"
-=======
-version = "0.1.1"
->>>>>>> master
 
 [deps]
 AdaptiveRejectionSampling = "c75e803d-635f-53bd-ab7d-544e482d8c75"
