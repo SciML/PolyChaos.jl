@@ -3,25 +3,19 @@
 my_f(t) = t^2
 a, b = 1.23, 3.45 # shape parameters of Jacobi weight
 int_exact = 0.353897; # reference value</code></pre></div><p>Now we compute <span>$N$</span> recurrence coefficients.</p><div><pre><code class="language-julia">N = 4
-α, β = rm_jacobi(N,a,b)</code></pre><pre><code class="language-none">([0.332335, 0.179185, 0.112075, 0.07672], [1.56402, 0.115827, 0.167954, 0.194976])</code></pre></div><h2><a class="nav-anchor" id="Gauss-1" href="#Gauss-1">Gauss</a></h2><p>The first quadrature rule is Gauss quadrature. This method goes back to <a href="https://en.wikipedia.org/wiki/Gaussian_quadrature#The_Golub-Welsch_algorithm">Golub and Welsch</a>.</p><div><pre><code class="language-julia">n_gauss, w_gauss = gauss(N,α,β)
+α, β = rm_jacobi(N,a,b)</code></pre><pre><code class="language-none">([0.332335, 0.179185, 0.112075, 0.07672], [1.56402, 0.115827, 0.167954, 0.194976])</code></pre></div><h2><a class="nav-anchor" id="Gauss-1" href="#Gauss-1">Gauss</a></h2><p>The first quadrature rule is Gauss quadrature. This method goes back to <a href="https://en.wikipedia.org/wiki/Gaussian_quadrature#The_Golub-Welsch_algorithm">Golub and Welsch</a>.</p><pre><code class="language-">n_gauss, w_gauss = gauss(N,α,β)
 int_gauss = dot(w_gauss,my_f.(n_gauss))
 print(&quot;first point:\t $(n_gauss[1])\n&quot;)
 print(&quot;end point:\t $(n_gauss[end])\n&quot;)
-print(&quot;error Gauss:\t $(int_gauss-int_exact)\n&quot;)</code></pre><pre><code class="language-none">first point:	 -0.516697243999982
-end point:	 0.81015635650748
-error Gauss:	 4.202394474628335e-7</code></pre></div><p>Since Gauss quadrature has a degree of exactness of <span>$2N-1$</span>, the value of the integral is exact.</p><h2><a class="nav-anchor" id="Gauss-Radau-1" href="#Gauss-Radau-1">Gauss-Radau</a></h2><p>Gauss-Radau quadrature is a variant of Gauss quadrature that allows to specify a value of a node that <em>has to be included</em>. We choose to include the right end point <span>$t = 1.0$</span>.</p><div><pre><code class="language-julia">n_radau, w_radau = radau(N-1,α,β,1.)
+print(&quot;error Gauss:\t $(int_gauss-int_exact)\n&quot;)</code></pre><p>Since Gauss quadrature has a degree of exactness of <span>$2N-1$</span>, the value of the integral is exact.</p><h2><a class="nav-anchor" id="Gauss-Radau-1" href="#Gauss-Radau-1">Gauss-Radau</a></h2><p>Gauss-Radau quadrature is a variant of Gauss quadrature that allows to specify a value of a node that <em>has to be included</em>. We choose to include the right end point <span>$t = 1.0$</span>.</p><pre><code class="language-">n_radau, w_radau = radau(N-1,α,β,1.)
 int_radau = dot(w_radau,my_f.(n_radau))
 print(&quot;first point:\t $(n_radau[1])\n&quot;)
 print(&quot;end point:\t $(n_radau[end])\n&quot;)
-print(&quot;error Radau:\t $(int_radau-int_exact)&quot;)</code></pre><pre><code class="language-none">first point:	 -0.4296992840328391
-end point:	 1.0
-error Radau:	 4.2023944762936694e-7</code></pre></div><h2><a class="nav-anchor" id="Gauss-Lobatto-1" href="#Gauss-Lobatto-1">Gauss-Lobatto</a></h2><p>Next, we look at Gauss-Lobatto quadrature, which allows to include two points. We choose to include the left and end point of the interval, which are <span>$t \in [-1.0, 1.0]$</span>.</p><div><pre><code class="language-julia">n_lob, w_lob = lobatto(N-2,α,β,-1.,1.)
+print(&quot;error Radau:\t $(int_radau-int_exact)&quot;)</code></pre><h2><a class="nav-anchor" id="Gauss-Lobatto-1" href="#Gauss-Lobatto-1">Gauss-Lobatto</a></h2><p>Next, we look at Gauss-Lobatto quadrature, which allows to include two points. We choose to include the left and end point of the interval, which are <span>$t \in [-1.0, 1.0]$</span>.</p><pre><code class="language-">n_lob, w_lob = lobatto(N-2,α,β,-1.,1.)
 int_lob = dot(w_lob,my_f.(n_lob))
 print(&quot;first point:\t $(n_lob[1])\n&quot;)
 print(&quot;end point:\t $(n_lob[end])\n&quot;)
-print(&quot;error Lobatto:\t $(int_lob-int_exact)&quot;)</code></pre><pre><code class="language-none">first point:	 -0.9999999999999987
-end point:	 0.9999999999999999
-error Lobatto:	 4.2023944774038924e-7</code></pre></div><p>There are other quadratures that we subsume as <em>all-purpose</em> quadrature rules. These include Fejér&#39;s first and second rule, and Clenshaw-Curtis quadrature.</p><h2><a class="nav-anchor" id="Fejér&#39;s-First-Rule-1" href="#Fejér&#39;s-First-Rule-1">Fejér&#39;s First Rule</a></h2><p>Fejér&#39;s first rule does <em>not</em> include the end points of the interval.</p><div><pre><code class="language-julia">n_fej, w_fej = fejer(N)
+print(&quot;error Lobatto:\t $(int_lob-int_exact)&quot;)</code></pre><p>There are other quadratures that we subsume as <em>all-purpose</em> quadrature rules. These include Fejér&#39;s first and second rule, and Clenshaw-Curtis quadrature.</p><h2><a class="nav-anchor" id="Fejér&#39;s-First-Rule-1" href="#Fejér&#39;s-First-Rule-1">Fejér&#39;s First Rule</a></h2><p>Fejér&#39;s first rule does <em>not</em> include the end points of the interval.</p><div><pre><code class="language-julia">n_fej, w_fej = fejer(N)
 int_fej = dot(w_fej,my_f.(n_fej).*(1 .- n_fej).^a.*(1 .+ n_fej).^b)
 print(&quot;first point:\t $(n_fej[1])\n&quot;)
 print(&quot;end point:\t $(n_fej[end])\n&quot;)

@@ -33,19 +33,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "#Contributing-1",
+    "page": "Overview",
+    "title": "Contributing",
+    "category": "section",
+    "text": "We are always looking for contributors. If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [dot] edu.Or just fork and/or star the repository:Julia\'s package manager works nicely with Github: simply install the hosted package via Pkg.clone and the repository\'s URL. A so-called fork is created withPkg.clone(\"https://github.com/timueh/PolyChaos.jl\")The fork will replace the original package.CallPkg.dir(\"PolyChaos\")to figure out where the package was cloned to. Go to that location and figure out what branch you are on via git branch."
+},
+
+{
     "location": "#Citing-1",
     "page": "Overview",
     "title": "Citing",
     "category": "section",
     "text": "Currently, there is no publication about PolyChaos. Meanwhile, in case you find PolyChaos useful, feel free to get in touch, or simply participate in Github\'s gamification. ;)"
-},
-
-{
-    "location": "#Collaboration-1",
-    "page": "Overview",
-    "title": "Collaboration",
-    "category": "section",
-    "text": "We are always looking for contributors. If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [dot] edu. Or just fork and/or star the repository. Much appreciated."
 },
 
 {
@@ -777,6 +777,46 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "functions/#PolyChaos.showpoly",
+    "page": "Functions",
+    "title": "PolyChaos.showpoly",
+    "category": "function",
+    "text": "showpoly(coeffs::Vector{Float64};sym::String,digits::Integer)\nshowpoly(coeffs::Vector{Vector{Float64}};sym::String,digits::Integer)\n\nShow the monic polynomial with coefficients coeffs in a human readable way. They keyword sym sets the name of the variable, and digits controls the number of shown digits.\n\njulia> showpoly([1.2, 2.3, 3.4456])\nx^3 + 3.45x^2 + 2.3x + 1.2\njulia> showpoly([1.2, 2.3, 3.4456], sym=\"t\", digits=2)\nt^3 + 3.45t^2 + 2.3t + 1.2\n\nTailored to types from PolyChaos.jl\n\nshowpoly(d::Integer,α::Vector{Float64},β::Vector{Float64};upto::Bool,sym::String,digits::Integer)\nshowpoly(d::Integer,op::OrthoPoly;upto::Bool=true,sym::String,digits::Integer)\nshowpoly(d::Integer,opq::OrthoPolyQ;upto::Bool=true,sym::String,digits::Integer)\n\nShow the monic orthogonal polynomials with recurrence coefficients (α,β) up to degree d. Setting the keyword upto to false prints the monic polynomial of degree equal to d.\n\njulia> op = OrthoPoly(\"gaussian\",5);\njulia> showpoly(3,op)\n1\nx\nx^2 - 1.0\nx^3 - 3.0x\n\njulia> showpoly(3,op; upto=false)\nx^3 - 3.0x\n\njulia> showpoly(3,op; sym=\"t\")\n1\nt\nt^2 - 1.0\nt^3 - 3.0t\n\nThe following function calls show all orthogonal polynomials given (α,β).\n\nshowpoly(α::Vector{Float64},β::Vector{Float64};sym::String,digits::Integer)\nshowpoly(op::Union{OrthoPoly,OrthoPolyQ};sym::String,digits::Integer)\n\njulia> showpoly(op; sym=\"y\")\n1\ny\ny^2 - 1.0\ny^3 - 3.0y\ny^4 - 6.0y^2 + 3.0\ny^5 - 10.0y^3 + 15.0y\ny^6 - 15.0y^4 + 45.0y^2 - 15.0\n\nThanks @pfitzseb for providing this functionality.\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#PolyChaos.rec2coeff",
+    "page": "Functions",
+    "title": "PolyChaos.rec2coeff",
+    "category": "function",
+    "text": "rec2coeff(deg::Int,a::Vector{Float64},b::Vector{Float64})\nrec2coeff(a,b) = rec2coeff(length(a),a,b)\n\nGet the coefficients of the orthogonal polynomial of degree up to deg specified by its recurrence coefficients (a,b). The function returns the values c_i^(k) from\n\np_k (t) = t^d + sum_i=0^k-1 c_i t^i\n\nwhere k runs from 1 to deg.\n\nThe call rec2coeff(a,b) outputs all possible recurrence coefficients given (a,b).\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#Show-Orthogonal-Polynomials-1",
+    "page": "Functions",
+    "title": "Show Orthogonal Polynomials",
+    "category": "section",
+    "text": "To get a human-readable output of the orthognoal polynomials there is the function showpoly()showpolyThis function makes excessive use ofrec2coeff"
+},
+
+{
+    "location": "functions/#PolyChaos.evaluate",
+    "page": "Functions",
+    "title": "PolyChaos.evaluate",
+    "category": "function",
+    "text": "Univariate\n\nevaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Float64,a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)\nevaluate(n::Int64,x::Float64,op::OrthoPoly)\nevaluate(n::Int64,x::Vector{Float64},opq::OrthoPolyQ) = evaluate(n,x,opq.op)\nevaluate(n::Int64,x::Float64,opq::OrthoPolyQ) = evaluate(n,[x],opq.op)\n\nEvaluate the n-th univariate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type OrthoPoly\n\nIf several basis polynomials (stored in ns) are to be evaluated at points x, then call\n\nevaluate(ns::Vector{Int64},x::Vector{Float64},op::OrthoPoly) = evaluate(ns,x,op.α,op.β)\nevaluate(ns::Vector{Int64},x::Float64,op::OrthoPoly) = evaluate(ns,[x],op)\nevaluate(ns::Vector{Int64},x::Vector{Float64},opq::OrthoPolyQ) = evaluate(ns,x,opq.op)\nevaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Vector{Float64},op::OrthoPoly) = evaluate(collect(0:op.deg),x,op)\nevaluate(x::Float64,op::OrthoPoly) = evaluate([x],op)\nevaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)\nevaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)\n\nwhich returns an Array of dimensions (length(x),op.deg+1).\n\nnote: Note\nn is the degree of the univariate basis polynomial\nlength(x) = N, where N is the number of points\n(a,b) are the recursion coefficients\n\nMultivariate\n\nevaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\nevaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly)\n\nEvaluate the n-th p-variate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type MultiOrthoPoly\n\nIf several basis polynomials are to be evaluated at points x, then call\n\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\n\nwhere ind is a matrix of multi-indices.\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)\n\nwhich returns an array of dimensions (mop.dim,size(x,1)).\n\nnote: Note\nn is a multi-index\nlength(n) == p, i.e. a p-variate basis polynomial\nsize(x) = (N,p), where N is the number of points\nsize(a)==size(b)=p.\n\n\n\n\n\n"
+},
+
+{
+    "location": "functions/#Evaluate-Orthogonal-Polynomials-1",
+    "page": "Functions",
+    "title": "Evaluate Orthogonal Polynomials",
+    "category": "section",
+    "text": "evaluate"
+},
+
+{
     "location": "functions/#PolyChaos.computeSP2",
     "page": "Functions",
     "title": "PolyChaos.computeSP2",
@@ -798,102 +838,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Scalar Products",
     "category": "section",
     "text": "computeSP2\ncomputeSP"
-},
-
-{
-    "location": "functions/#PolyChaos.evaluate",
-    "page": "Functions",
-    "title": "PolyChaos.evaluate",
-    "category": "function",
-    "text": "Univariate\n\nevaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Float64,a::Vector{Float64},b::Vector{Float64})\nevaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)\nevaluate(n::Int64,x::Float64,op::OrthoPoly)\nevaluate(n::Int64,x::Vector{Float64},opq::OrthoPolyQ) = evaluate(n,x,opq.op)\nevaluate(n::Int64,x::Float64,opq::OrthoPolyQ) = evaluate(n,[x],opq.op)\n\nEvaluate the n-th univariate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type OrthoPoly\n\nIf several basis polynomials (stored in ns) are to be evaluated at points x, then call\n\nevaluate(ns::Vector{Int64},x::Vector{Float64},op::OrthoPoly) = evaluate(ns,x,op.α,op.β)\nevaluate(ns::Vector{Int64},x::Float64,op::OrthoPoly) = evaluate(ns,[x],op)\nevaluate(ns::Vector{Int64},x::Vector{Float64},opq::OrthoPolyQ) = evaluate(ns,x,opq.op)\nevaluate(ns::Vector{Int64},x::Float64,opq::OrthoPolyQ) = evaluate(ns,[x],opq.op)\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Vector{Float64},op::OrthoPoly) = evaluate(collect(0:op.deg),x,op)\nevaluate(x::Float64,op::OrthoPoly) = evaluate([x],op)\nevaluate(x::Vector{Float64},opq::OrthoPolyQ) = evaluate(x,opq.op)\nevaluate(x::Float64,opq::OrthoPolyQ) = evaluate([x],opq)\n\nwhich returns an Array of dimensions (length(x),op.deg+1).\n\nnote: Note\nn is the degree of the univariate basis polynomial\nlength(x) = N, where N is the number of points\n(a,b) are the recursion coefficients\n\nMultivariate\n\nevaluate(n::Vector{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(n::Vector{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\nevaluate(n::Vector{Int64},x::Vector{Float64},op::MultiOrthoPoly)\n\nEvaluate the n-th p-variate basis polynomial at point(s) x The function is multiply dispatched to facilitate its use with the composite type MultiOrthoPoly\n\nIf several basis polynomials are to be evaluated at points x, then call\n\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}})\nevaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly)\n\nwhere ind is a matrix of multi-indices.\n\nIf all basis polynomials are to be evaluated at points x, then call\n\nevaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)\n\nwhich returns an array of dimensions (mop.dim,size(x,1)).\n\nnote: Note\nn is a multi-index\nlength(n) == p, i.e. a p-variate basis polynomial\nsize(x) = (N,p), where N is the number of points\nsize(a)==size(b)=p.\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#Evaluating-Orthogonal-Polynomials-1",
-    "page": "Functions",
-    "title": "Evaluating Orthogonal Polynomials",
-    "category": "section",
-    "text": "evaluate"
-},
-
-{
-    "location": "functions/#PolyChaos.fejer",
-    "page": "Functions",
-    "title": "PolyChaos.fejer",
-    "category": "function",
-    "text": "fejer(N::Int64)\n\nFejer\'s first quadrature rule.\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.fejer2",
-    "page": "Functions",
-    "title": "PolyChaos.fejer2",
-    "category": "function",
-    "text": "fejer2(n::Int64)\n\nFejer\'s second quadrature rule according to Waldvogel, J. Bit Numer Math (2006) 46: 195.\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.clenshaw_curtis",
-    "page": "Functions",
-    "title": "PolyChaos.clenshaw_curtis",
-    "category": "function",
-    "text": "clenshaw_curtis(n::Int64)\n\nClenshaw-Curtis quadrature according to Waldvogel, J. Bit Numer Math (2006) 46: 195.\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.quadgp",
-    "page": "Functions",
-    "title": "PolyChaos.quadgp",
-    "category": "function",
-    "text": "quadgp(weight::Function,lb::Float64,ub::Float64,N::Int64=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)\n\ngeneral purpose quadrature based on Gautschi, \"Orthogonal Polynomials: Computation and Approximation\", Section 2.2.2, pp. 93-95\n\nCompute the N-point quadrature rule for weight with support (lb, ub). The quadrature rule can be specified by the keyword quadrature. The keyword bnd sets the numerical value for infinity.\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.gauss",
-    "page": "Functions",
-    "title": "PolyChaos.gauss",
-    "category": "function",
-    "text": "gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})\ngauss(α::Vector{Float64},β::Vector{Float64})\ngauss(N::Int64,op::OrthoPoly)\ngauss(op::OrthoPoly)\n\nGauss quadrature rule, also known as Golub-Welsch algorithm\n\ngauss() generates the N Gauss quadrature nodes and weights for a given weight function. The weight function is represented by the N recurrence coefficients for the monic polynomials orthogonal with respect to the weight function.\n\nnote: Note\nIf no N is provided, then N = length(α).\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.radau",
-    "page": "Functions",
-    "title": "PolyChaos.radau",
-    "category": "function",
-    "text": "radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(α::Vector{Float64},β::Vector{Float64},end0::Float64)\nradau(N::Int64,op::OrthoPoly,end0::Float64)\nradau(op::OrthoPoly,end0::Float64)\n\nGauss-Radau quadrature rule. Given a weight function encoded by the recurrence coefficients (α,β)for the associated orthogonal polynomials, the function generates the nodes and weights (n+1)-point Gauss-Radau quadrature rule for the weight function having a prescribed node end0 (typically at one of the end points of the support interval of w, or outside thereof).\n\nnote: Note\nIf no N is specified, then N = length(α)-1.\n\nnote: Note\nReference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.radau_jacobi",
-    "page": "Functions",
-    "title": "PolyChaos.radau_jacobi",
-    "category": "function",
-    "text": "radau_jacobi(N::Int64,a::Float64,b::Float64;endpoint::String=\"left\")\nendpoint in [\"left\", \"right\"]\nradau_jacobi(N::Int64,a::Float64;endpoint::String=\"left\") = radau_jacobi(N,a,a;endpoint=endpoint)\nradau_jacobi(N::Int64;endpoint::String=\"left\") = radau_jacobi(N,0.;endpoint=endpoint)\n\nGauss-Radau quadrature rule for Jacobi weight function, which generates the (n+1)-point Gauss-Radau rule for the Jacobi weight function on [-1,1] with parameters a and b.\n\nnote: Note\nREFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and Laguerre weight functions\'\', Math. Comput. Simulation 54 (2000), 403-412.\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.radau_laguerre",
-    "page": "Functions",
-    "title": "PolyChaos.radau_laguerre",
-    "category": "function",
-    "text": "radau_laguerre(N::Int64,a::Float64)\nradau_laguerre(N::Int64) = radau_laguerre(N,0.)\n\nGauss-Radau quadrature rule for Laguerre weight function, which generates the (n+1)-point Gauss-Radau rule for the Laguerre weight function on 0infty with parameter a.\n\nnote: Note\nREFERENCE: W. Gautschi, ``Gauss-Radau formulae for Jacobi and Laguerre weight functions\'\', Math. Comput. Simulation 54 (2000), 403-412.\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.lobatto",
-    "page": "Functions",
-    "title": "PolyChaos.lobatto",
-    "category": "function",
-    "text": "lobatto(N::Int64,α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)\nlobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)\nlobatto(N::Int64,op::OrthoPoly,endl::Float64,endr::Float64)\nlobatto(op::OrthoPoly,endl::Float64,endr::Float64)\n\nGauss-Lobatto quadrature rule. Given a weight function encoded by the recurrence coefficients for the associated orthogonal polynomials, the function generates the nodes and weights of the (N+2)-point Gauss-Lobatto quadrature rule for the weight function, having two prescribed nodes endl, endr (typically the left and right end points of the support interval, or points to the left resp. to the right therof).\n\nnote: Note\nIf no N is specified, then N = length(α)-2.\n\nnote: Note\nReference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi\n\n\n\n\n\n"
-},
-
-{
-    "location": "functions/#PolyChaos.lobatto_jacobi",
-    "page": "Functions",
-    "title": "PolyChaos.lobatto_jacobi",
-    "category": "function",
-    "text": "lobatto_jacobi(N::Int64,a::Float64,b::Float64)\nlobatto_jacobi(N::Int64,a::Float64) = lobatto_jacobi(N,a,a)\nlobatto_jacobi(N::Int64) = lobatto_jacobi(N,0.)\n\nGauss-Lobatto quadrature rule for Jacobi weight function, which generates the (n+2)-point Gauss- Lobatto rule for the Jacobi weight function on -11 with parameters a and b.\n\nnote: Note\nREFERENCE: W. Gautschi,``High-order Gauss-Lobatto formulae\'\', Numer. Algorithms 25 (2000), 213-222.\n\n\n\n\n\n"
 },
 
 {
@@ -997,7 +941,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "PolyChaos.integrate",
     "category": "function",
-    "text": "integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})\nintegrate(f::Function,q::Quad)\nintegrate(f::Function,opq::OrthogonalPolyQ)\n\nintegrate function f using quadrature rule specified via nodes, weights\n\nnote: Note\n\n\nfunction f is assumed to return a scalar\ninterval of integration is \"hidden\" in nodes\n\n\n\n\n\n"
+    "text": "integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})\nintegrate(f::Function,q::Quad)\nintegrate(f::Function,opq::OrthogonalPolyQ)\n\nintegrate function f using quadrature rule specified via nodes, weights. For example int_0^1 6x^5 = 1 can be solved as follows:\n\njulia> opq = OrthoPolyQ(\"uniform01\",3)\njulia> integrate(x->6x^5,opq)\n1.0000000000000002\n\nnote: Note\n\n\nfunction f is assumed to return a scalar.\ninterval of integration is \"hidden\" in nodes.\n\n\n\n\n\n"
 },
 
 {
@@ -1005,7 +949,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "LinearAlgebra.issymmetric",
     "category": "function",
-    "text": "issymmetric(m::Measure)::Bool\nissymmetric(op::OrthoPoly)::Bool\nissymmetric(q::Quad)::Bool\nissymmetric(opq::OrthoPolyQ)::Bool\n\nis measure symmetric (around any point in the domain)?\n\n\n\n\n\n"
+    "text": "issymmetric(m::Measure)::Bool\nissymmetric(op::OrthoPoly)::Bool\nissymmetric(q::Quad)::Bool\nissymmetric(opq::OrthoPolyQ)::Bool\n\nIs the measure symmetric (around any point in the domain)?\n\n\n\n\n\n"
 },
 
 {
@@ -1013,7 +957,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functions",
     "title": "Auxiliary Functions",
     "category": "section",
-    "text": "nw\ncoeffs\nintegrate\nissymmetric"
+    "text": "nw\ncoeffs\nintegrate\nPolyChaos.issymmetric"
 },
 
 ]}
