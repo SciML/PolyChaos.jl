@@ -81,5 +81,17 @@ to figure out where the package was cloned to.
 Go to that location and figure out what branch you are on via `git branch`.
 
 ## Citing
-Currently, there is no publication about `PolyChaos`.
-Meanwhile, in case you find `PolyChaos` useful, feel free to get in touch, or simply participate in Github's gamification. ;)
+If you found the software useful and applied it to your own research, we'd appreciate a citation.
+Add the following to your BibTeX file
+
+```tex
+@misc{Muehlpfordt18,
+  author       = {T. Mühlpfordt and F. Zahn and F. Becker and T. Faulwasser and V. Hagenmeyer},
+  title        = {PolyChaos.jl -- A Julia package for orthogonal polynomials, quadrature, and polynomial chaos expansion},
+  year         = 2019,
+  doi          = {10.5281/zenodo.2592031},
+  url          = {https://doi.org/10.5281/zenodo.2592031}
+}
+```
+
+Of course you are more than welcome to partake in GitHub's gamification aka :star: and :fork_and_knife:.

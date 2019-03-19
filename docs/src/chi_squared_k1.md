@@ -1,9 +1,11 @@
 ```@setup mysetup
-k = 1
 using PolyChaos
+k = 1
 deg, Nrec = 2, 20
 op = OrthoPoly("gaussian",deg;Nrec=Nrec);
 opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
+showbasis(opq; sym="ξ") # works for `op` too!
+showpoly(0:2:deg,opq)
 L = dim(opq)
 mu, sig = 0., 1.
 x = [ convert2affinePCE("gaussian",mu,sig); zeros(Float64,L-2) ]
@@ -27,7 +29,7 @@ using Plots
 gr()
 Nsmpl = 10000
 ysmpl = samplePCE(Nsmpl,y,opq)
-histogram(ysmpl;normalize=true,xlabel="t",ylabel="rho(t)")
+histogram(ysmpl;normalize=true,xlabel="t",ylabel="\rho(t)")
 import SpecialFunctions: gamma
 ρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
@@ -72,11 +74,25 @@ Notice that we consider a total of `Nrec` recursion coefficients, and that we al
 
 
 ```@example mysetup
-k = 1
 using PolyChaos
+k = 1
 deg, Nrec = 2, 20
 op = OrthoPoly("gaussian",deg;Nrec=Nrec);
 opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
+```
+
+What are the basis polynomials?
+
+
+```@example mysetup
+showbasis(opq; sym="ξ") # works for `op` too!
+```
+
+Note that the command `showbasis` is based on the more general `showpoly`:
+
+
+```@example mysetup
+showpoly(0:2:deg,opq)
 ```
 
 Next, we define the PCE for $X$.
@@ -137,7 +153,7 @@ Nsmpl = 10000
 #ξ = sampleMeasure(Nsmpl,opq)
 #ysmpl = evaluatePCE(y,ξ,opq)
 ysmpl = samplePCE(Nsmpl,y,opq)
-histogram(ysmpl;normalize=true,xlabel="t",ylabel="rho(t)")
+histogram(ysmpl;normalize=true,xlabel="t",ylabel="\rho(t)")
 
 
 import SpecialFunctions: gamma
