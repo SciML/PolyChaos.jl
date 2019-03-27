@@ -1,4 +1,4 @@
-export rec2coeff, showpoly
+export rec2coeff, showpoly, showbasis
 
 title_color =   :underline
 name_color  =   :light_blue
@@ -145,60 +145,62 @@ rec2coeff(α,β) = rec2coeff(length(α),α,β)
 """
 ```
 showpoly(coeffs::Vector{Float64};sym::String,digits::Integer)
-showpoly(coeffs::Vector{Vector{Float64}};sym::String,digits::Integer)
 ```
 Show the monic polynomial with coefficients `coeffs` in a human readable way.
 They keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
-```@repl
+```jldoctest
+julia> using PolyChaos
+
 julia> showpoly([1.2, 2.3, 3.4456])
 x^3 + 3.45x^2 + 2.3x + 1.2
 julia> showpoly([1.2, 2.3, 3.4456], sym="t", digits=2)
 t^3 + 3.45t^2 + 2.3t + 1.2
 ```
 
+```
+showpoly(d::Integer,α::Vector{Float64},β::Vector{Float64}; sym::String,digits::Integer)
+showpoly(d::Range,α::Vector{Float64},β::Vector{Float64};sym::String,digits::Integer) where Range <: OrdinalRange
+```
+Show the monic polynomial of degree/range `d` that has the recurrence coefficients `α`, `β`.
+```jldoctest
+julia> using PolyChaos
+
+julia> α, β = rm_hermite(10)
+([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.77245, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5])
+julia> showpoly(3,α,β)
+x^3 - 1.5x
+
+julia> showpoly(0:2:10,α,β)
+1
+x^2 - 0.5
+x^4 - 3.0x^2 + 0.75
+x^6 - 7.5x^4 + 11.25x^2 - 1.88
+x^8 - 14.0x^6 + 52.5x^4 - 52.5x^2 + 6.56
+x^10 - 22.5x^8 + 157.5x^6 - 393.75x^4 + 295.31x^2 - 29.53
+```
+
 Tailored to types from `PolyChaos.jl`
 ```
-showpoly(d::Integer,α::Vector{Float64},β::Vector{Float64};upto::Bool,sym::String,digits::Integer)
-showpoly(d::Integer,op::OrthoPoly;upto::Bool=true,sym::String,digits::Integer)
-showpoly(d::Integer,opq::OrthoPolyQ;upto::Bool=true,sym::String,digits::Integer)
+showpoly(d::Union{Integer,Range},op::OrthoPoly;sym::String,digits::Integer) where Range <: OrdinalRange
+showpoly(d::Union{Integer,Range},opq::OrthoPolyQ;sym::String,digits::Integer) where Range <: OrdinalRange
 ```
-Show the monic orthogonal polynomials with recurrence coefficients `(α,β)` up to degree `d`.
-Setting the keyword `upto` to false prints the monic polynomial of degree equal to `d`.
-```@repl
+Show the monic polynomial of degree/range `d` of an `OrthoPoly`/`OrthoPolyQ`.
+```jldoctest
+julia> using PolyChaos
+
 julia> op = OrthoPoly("gaussian",5);
+
 julia> showpoly(3,op)
-1
-x
-x^2 - 1.0
 x^3 - 3.0x
 
-julia> showpoly(3,op; upto=false)
-x^3 - 3.0x
-
-julia> showpoly(3,op; sym="t")
+julia> showpoly(0:op.deg,op; sym="t")
 1
 t
 t^2 - 1.0
 t^3 - 3.0t
+t^4 - 6.0t^2 + 3.0
+t^5 - 10.0t^3 + 15.0t
 ```
-
-The following function calls show all orthogonal polynomials given `(α,β)`.
-```
-showpoly(α::Vector{Float64},β::Vector{Float64};sym::String,digits::Integer)
-showpoly(op::Union{OrthoPoly,OrthoPolyQ};sym::String,digits::Integer)
-```
-
-```@repl
-julia> showpoly(op; sym="y")
-1
-y
-y^2 - 1.0
-y^3 - 3.0y
-y^4 - 6.0y^2 + 3.0
-y^5 - 10.0y^3 + 15.0y
-y^6 - 15.0y^4 + 45.0y^2 - 15.0
-```
-
 [Thanks @pfitzseb for providing this functionality.](https://discourse.julialang.org/t/how-to-define-verbose-output-for-a-polynomial/21317/5)
 
 """
@@ -216,21 +218,62 @@ function showpoly(coeffs::Vector{Float64};sym::String="x",digits::Integer=2)
     print(io, '\n')
 end
 
-function showpoly(coeffs::Vector{Vector{Float64}};sym::String="x",digits::Integer=2)
-    print("1\n")
-    map(c->showpoly(c,sym=sym,digits=digits),coeffs)
+function showpoly(d::Integer,α::Vector{Float64},β::Vector{Float64}; sym::String="x",digits::Integer=2)
+    @assert d >= 0 "degree has to be non-negative."
+    d == 0 && return print("1\n")
+    showpoly(rec2coeff(d,α,β)[end],sym=sym,digits=digits)
+end
+
+function showpoly(d::Range,α::Vector{Float64},β::Vector{Float64};sym::String="x",digits::Integer=2) where Range <: OrdinalRange
+    map(c->showpoly(c,α,β;sym=sym,digits=digits),d)
     print()
 end
 
-function showpoly(d::Integer,α::Vector{Float64},β::Vector{Float64};upto::Bool=true,sym::String="x",digits::Integer=2)
-    @assert d >= 0 "degree has to be non-negative."
-    d == 0 && return print("1")
-    cfs = upto ? rec2coeff(d,α,β) : rec2coeff(d,α,β)[end]
-    showpoly(cfs,sym=sym,digits=digits)
+showpoly(d::Union{Integer,Range},op::OrthoPoly;sym::String="x",digits::Integer=2) where Range <: OrdinalRange = showpoly(d,op.α,op.β;sym=sym,digits=digits)
+showpoly(d::Union{Integer,Range},opq::OrthoPolyQ;sym::String="x",digits::Integer=2) where Range <: OrdinalRange = showpoly(d,opq.op;sym=sym,digits=digits)
+
+
+"""
+```
+showbasis(α::Vector{Float64},β::Vector{Float64};sym::String,digits::Integer)
+```
+Show all basis polynomials given the recurrence coefficients `α`, `β`.
+They keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
+```jldoctest
+julia> using PolyChaos
+
+julia> α, β = rm_hermite(5);
+
+julia> showbasis(α,β)
+1
+x
+x^2 - 0.5
+x^3 - 1.5x
+x^4 - 3.0x^2 + 0.75
+x^5 - 5.0x^3 + 3.75x
+```
+
+Tailored to types from `PolyChaos.jl`
+```
+showbasis(op::OrthoPoly;sym::String,digits::Integer)
+showbasis(opq::OrthoPolyQ;sym::String,digits::Integer)
+```
+Show all basis polynomials of an `OrthoPoly`/`OrthoPolyQ`.
+```jldoctest
+julia> using PolyChaos
+
+julia> op = OrthoPoly("legendre",4);
+
+julia> showbasis(op)
+1
+x
+x^2 - 0.33
+x^3 - 0.6x
+x^4 - 0.86x^2 + 0.09
+```
+"""
+function showbasis(α::Vector{Float64},β::Vector{Float64};sym::String="x",digits::Integer=2)
+    showpoly(0:length(α),α,β;sym=sym,digits=digits)
 end
-
-showpoly(d::Integer,op::OrthoPoly;upto::Bool=true,sym::String="x",digits::Integer=2) = showpoly(d,op.α,op.β;upto=upto,sym=sym,digits=digits)
-showpoly(d::Integer,opq::OrthoPolyQ;upto::Bool=true,sym::String="x",digits::Integer=2) = showpoly(d,opq.op;upto=upto,sym=sym,digits=digits)
-
-showpoly(α::Vector{Float64},β::Vector{Float64};sym::String="x",digits::Integer=2) = showpoly(length(α),α,β;sym=sym,digits=digits)
-showpoly(op::Union{OrthoPoly,OrthoPolyQ};sym::String="x",digits::Integer=2) = showpoly(size(coeffs(op),1),op;sym=sym,digits=digits)
+showbasis(op::OrthoPoly;sym::String="x",digits::Integer=2) = showbasis(op.α[1:op.deg],op.β[1:op.deg];sym=sym,digits=digits)
+showbasis(opq::OrthoPolyQ;sym::String="x",digits::Integer=2) = showbasis(opq.op;sym=sym,digits=digits)

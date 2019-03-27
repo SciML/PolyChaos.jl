@@ -110,7 +110,11 @@ The weight function is represented by the `N` recurrence coefficients for the mo
 with respect to the weight function.
 
 !!! note
-    If no `N` is provided, then `N = length(α)`.
+    The function `gauss` accepts at most `N = length(α) - 1` quadrature points,
+        hence providing at most an `(length(α) - 1)`-point quadrature rule.
+
+!!! note
+    If no `N` is provided, then `N = length(α) - 1`.
 """
 function gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})
     N += 1
@@ -132,13 +136,14 @@ gauss(op::OrthoPoly) = gauss(op.α,op.β)
 Gauss-Radau quadrature rule.
 Given a weight function encoded by the recurrence coefficients `(α,β)`for the associated
 orthogonal polynomials, the function generates the
-nodes and weights `(n+1)`-point Gauss-Radau
+nodes and weights `(N+1)`-point Gauss-Radau
 quadrature rule for the weight function having a prescribed
 node `end0` (typically at one of the end points of the support
 interval of w, or outside thereof).
 
 !!! note
-    If no `N` is specified, then `N = length(α)-1`.
+    The function `radau` accepts at most `N = length(α) - 2` as an input,
+        hence providing at most an `(length(α) - 1)`-point quadrature rule.
 
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
@@ -158,7 +163,7 @@ function radau(N::Int64,α_::Vector{Float64},β::Vector{Float64},end0::Float64)
     @inbounds α[N+1] = end0 - β[N+1]*p0/p1
     gauss(N+1,α,β)
 end
-radau(α::Vector{Float64},β::Vector{Float64},end0::Float64) = radau(length(α)-1,α,β,end0)
+radau(α::Vector{Float64},β::Vector{Float64},end0::Float64) = radau(length(α)-2,α,β,end0)
 radau(N::Int64,op::OrthoPoly,end0::Float64) = radau(N,op.α,op.β,end0)
 radau(op::OrthoPoly,end0::Float64) = radau(op.α,op.β,end0::Float64)
 
@@ -174,10 +179,11 @@ the nodes and weights of the `(N+2)`-point Gauss-Lobatto
 quadrature rule for the weight function, having two
 prescribed nodes `endl`, `endr` (typically the left and right end
 points of the support interval, or points to the left
-resp. to the right therof).
+resp. to the right thereof).
 
 !!! note
-    If no `N` is specified, then `N = length(α)-2`.
+    The function `radau` accepts at most `N = length(α) - 3` as an input,
+    hence providing at most an `(length(α) - 1)`-point quadrature rule.
 
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
@@ -202,6 +208,6 @@ function lobatto(N::Int64,α_::Vector{Float64},β_::Vector{Float64},endl::Float6
     @inbounds β[N+2] = (endr - endl) * p1l * p1r / det;
     gauss(N+2,α,β)
 end
-lobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64) = lobatto(length(α)-2,α,β,endl,endr)
+lobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64) = lobatto(length(α)-3,α,β,endl,endr)
 lobatto(N::Int64,op::OrthoPoly,endl::Float64,endr::Float64) = lobatto(N,op.α,op.β,endl,endr)
 lobatto(op::OrthoPoly,endl::Float64,endr::Float64) = lobatto(op.α,op.β,endl,endr)
