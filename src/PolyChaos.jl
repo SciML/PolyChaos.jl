@@ -1,7 +1,7 @@
 module PolyChaos
 
 using SpecialFunctions, SparseArrays, Distributions
-import LinearAlgebra: I, dot, SymTridiagonal, eigen, issymmetric
+import LinearAlgebra: I, dot, SymTridiagonal, eigen, issymmetric, pinv
 import FFTW: ifft
 import Combinatorics: with_replacement_combinations
 import Base: show

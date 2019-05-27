@@ -127,7 +127,7 @@ function evaluate(ind::Matrix{Int64},x::Matrix{Float64},a::Vector{Vector{Float64
     vals = map(i->evaluate(ind[i,:],x,a,b),Base.OneTo(size(ind,1)))
     hcat(vals...) |> transpose |> Matrix
 end
-evaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly) = evaluate(ind,x,coeffs(op)...)
+    evaluate(ind::Matrix{Int64},x::Matrix{Float64},op::MultiOrthoPoly) = evaluate(ind,x,coeffs(op)...)
 evaluate(x::Matrix{Float64},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)
 
 evaluate(ind::Matrix{Int64},x::Vector{Float64},a::Vector{Vector{Float64}},b::Vector{Vector{Float64}}) = evaluate(ind,reshape(x,1,length(x)),a,b)
