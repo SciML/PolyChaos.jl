@@ -3,7 +3,7 @@ export rec2coeff, showpoly, showbasis
 title_color =   :underline
 name_color  =   :light_blue
 
-function show(io::IO,m::Measure)
+function show(m::Measure)
     printstyled("Measure dλ(t)=w(t)dt\n";color=title_color)
     print("name:\t\t")
     printstyled("$(m.name)\n"; color=name_color)
@@ -20,7 +20,7 @@ function show(io::IO,m::Measure)
     end
 end
 
-function show(io::IO,m::MultiMeasure)
+function show(m::MultiMeasure)
     p = length(m.name)
     printstyled("$p-variate measure dλ(t)= ∏_{i=1}^$p w_i(t)dt_i\n";color=title_color)
     print("name:")
@@ -48,7 +48,7 @@ function show(io::IO,m::MultiMeasure)
     end
 end
 
-function show(io::IO,op::OrthoPoly;showmeasure::Bool=true)
+function show(op::OrthoPoly;showmeasure::Bool=true)
     printstyled("\nUnivariate orthogonal polynomials\n";color=title_color)
     print("name:"); printstyled("\t\t$(op.name)\n";color=name_color)
     print("degree:"); printstyled("\t\t$(op.deg)\n")
@@ -64,7 +64,7 @@ function show(io::IO,op::OrthoPoly;showmeasure::Bool=true)
     end
 end
 
-function show(io::IO,q::Quad;showmeasure::Bool=true)
+function show(q::Quad;showmeasure::Bool=true)
     printstyled("\nQuadrature rule\n";color=title_color)
     print("name:"); printstyled("\t\t$(q.name)\n";color=name_color)
     print("N:"); printstyled("\t\t$(q.Nquad)\n")
@@ -79,12 +79,12 @@ function show(io::IO,q::Quad;showmeasure::Bool=true)
     end
 end
 
-function show(io::IO,opq::OrthoPolyQ;showmeasure::Bool=false)
+function show(opq::OrthoPolyQ;showmeasure::Bool=false)
     show(io,opq.op)
     show(io,opq.quad;showmeasure=showmeasure)
 end
 
-function show(io::IO,mop::MultiOrthoPoly;showmeasure::Bool=false)
+function show(mop::MultiOrthoPoly;showmeasure::Bool=false)
     p = length(mop.name)
     printstyled("\n$p-variate orthogonal polynomials\n";color=title_color)
     print("name:");
@@ -101,7 +101,7 @@ function show(io::IO,mop::MultiOrthoPoly;showmeasure::Bool=false)
     showmeasure ? show(io,mop.meas) : ()
 end
 
-function show(io::IO,t::Tensor)
+function show(t::Tensor)
     printstyled("\n$(t.dim)-dimensional tensor\n";color=title_color)
     print("dim:"); printstyled("\t\t$(t.dim)\n")
     print("nonzeros:"); printstyled("\t$(length(t.T.nzind))\n")

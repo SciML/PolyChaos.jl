@@ -21,5 +21,6 @@ include("scalarproduct.jl")
 include("tensor.jl")
 include("show.jl")
 include("polynomial_chaos.jl")
+include("sparse_basis.jl")
 
 end
