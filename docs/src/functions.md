@@ -83,10 +83,7 @@ clenshaw_curtis
 quadgp
 gauss
 radau
-radau_jacobi
-radau_laguerre
 lobatto
-lobatto_jacobi
 ```
 
 ## Polynomial Chaos

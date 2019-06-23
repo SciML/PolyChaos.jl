@@ -84,6 +84,21 @@ function addSetupAndMakeMarkdown(name::String,envname::String="mysetup")
     close(fout)
     return newname
 end
+
+function createPreamble(name::String)
+    fname = "preamble.md"
+    f = open(fname,"w")
+    print(f,"----------------------------\n")
+    print(f,"----------------------------\n")
+    print(f,"----------------------------\n")
+    print(f, "This file was automatically created from $name.\n")
+    print(f,"----------------------------\n")
+    print(f,"----------------------------\n")
+    print(f,"----------------------------\n")
+    close(f)
+    return fname
+end
+
 """
     notebook2markdown(fname::String)
 Workflow to get markdown file from Julia notebook
@@ -95,6 +110,8 @@ function notebook2markdown(fname::String)
     name = removeFileEnding(fname)
     file_text = convertMathMode!("$name.md")
 end
+
+
 
 """
     notebook2markdown_repl(fname::String;envname::String="mysetup")
@@ -109,6 +126,7 @@ function notebook2markdown_repl(fname::String;envname::String="mysetup")
     run(`jupyter-nbconvert $fname --to python`) # ipynb to python
     run(`mv $name.py $name.jl`) # python to julia
     removeComments!("$name.jl")
+    # file_preamble = createPreamble("$name.jl")
     file_setup = addSetupAndMakeMarkdown("$name.jl",envname)
 
     # convert $$...$$ to ```math...```
