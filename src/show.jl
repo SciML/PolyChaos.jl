@@ -33,10 +33,10 @@ function show(m::MultiMeasure)
         m.symmetric[i] ? col=:green : col=:red
         i==1 ? printstyled("\t$(m.symmetric[i])\n";color=col) : printstyled("\t\t$(m.symmetric[i])\n";color=col)
     end
-    if length(findall(x->typeof(x)!=Dict{Any,Any},m.pars))>=1 print("pars:")
+    if length(findall(x -> typeof(x) != Dict{Any,Any},m.pars)) >= 1 print("pars:")
         for i=1:p
             print("\t\t")
-            if typeof(m.pars[i])!=Dict{Any,Any}
+            if typeof(m.pars[i]) != Dict{Any,Any}
                 for (i,d) in enumerate(m.pars[i])
                     i==1 ? print("$d") : print(", $d")
                 end
@@ -48,7 +48,7 @@ function show(m::MultiMeasure)
     end
 end
 
-function show(op::OrthoPoly;showmeasure::Bool=true)
+function show(op::OrthoPoly; showmeasure::Bool=true)
     printstyled("\nUnivariate orthogonal polynomials\n";color=title_color)
     print("name:"); printstyled("\t\t$(op.name)\n";color=name_color)
     print("degree:"); printstyled("\t\t$(op.deg)\n")
@@ -60,11 +60,11 @@ function show(op::OrthoPoly;showmeasure::Bool=true)
     n<length(op.α) ? print("...\n") : print("\n")
     if showmeasure
         print("\n")
-        show(io,op.meas)
+        show(op.meas)
     end
 end
 
-function show(q::Quad;showmeasure::Bool=true)
+function show(q::Quad; showmeasure::Bool=true)
     printstyled("\nQuadrature rule\n";color=title_color)
     print("name:"); printstyled("\t\t$(q.name)\n";color=name_color)
     print("N:"); printstyled("\t\t$(q.Nquad)\n")
@@ -75,37 +75,35 @@ function show(q::Quad;showmeasure::Bool=true)
     n<q.Nquad ? print("...\n") : print("\n")
     if showmeasure
         print("\n")
-        show(io,q.meas)
+        show(q.meas)
     end
 end
 
-function show(opq::OrthoPolyQ;showmeasure::Bool=false)
-    show(io,opq.op)
-    show(io,opq.quad;showmeasure=showmeasure)
+function show(opq::OrthoPolyQ; showmeasure::Bool=false)
+    show(opq.op)
+    show(opq.quad; showmeasure=showmeasure)
 end
 
-function show(mop::MultiOrthoPoly;showmeasure::Bool=false)
+function show(mop::MultiOrthoPoly; showmeasure::Bool=false)
     p = length(mop.name)
-    printstyled("\n$p-variate orthogonal polynomials\n";color=title_color)
+    printstyled("\n$p-variate orthogonal polynomials\n"; color = title_color)
     print("name:");
-    [ printstyled("\t\t$(mop.name[i])\n";color=name_color) for i=1:p ]
+    [ printstyled("\t\t$(mop.name[i])\n"; color = name_color) for i = 1:p ]
     print("deg:"); printstyled("\t\t$(mop.deg)\n")
     print("dim:"); printstyled("\t\t$(mop.dim)\n")
     print("ind:");
-    mop.dim<=7 ? n=mop.dim : n=7
-    # printstyled("\t$(mop.ind[1,:])\n")
-    [ printstyled("\t\t$(mop.ind[i,:])\n") for i=1:n ]
-    n<mop.dim ? print("\t\t...\n") : print("\n")
-
+    mop.dim <= 7 ? n = mop.dim : n = 7
+    [ printstyled("\t\t$(mop.ind[i,:])\n") for i = 1:n ]
+    n < mop.dim ? print("\t\t...\n") : print("\n")
     print("\n")
-    showmeasure ? show(io,mop.meas) : ()
+    showmeasure && show(mop.meas)
 end
 
 function show(t::Tensor)
-    printstyled("\n$(t.dim)-dimensional tensor\n";color=title_color)
+    printstyled("\n$(t.dim)-dimensional tensor\n"; color = title_color)
     print("dim:"); printstyled("\t\t$(t.dim)\n")
     print("nonzeros:"); printstyled("\t$(length(t.T.nzind))\n")
-    show(io,t.op;showmeasure=false)
+    show(t.op; showmeasure = false)
 end
 
 """
