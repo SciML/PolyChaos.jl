@@ -4,12 +4,9 @@ using Documenter, PolyChaos
 
 makedocs(
     sitename = "PolyChaos.jl",
-    format = Documenter.HTML(),
-    assets = ["assets/myfont.css"],
-    # format = LaTeX(),
+    format = Documenter.HTML(assets = ["assets/myfont.css"]),
     modules = [PolyChaos],
     authors = "tillmann.muehlpfordt@kit.edu",
-    # repo = "github.com/timueh/PolyChaos.jl.git",
     doctest = true,
     pages = Any[
         "index.md",
