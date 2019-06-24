@@ -275,20 +275,22 @@ end
 """
 __Univariate__
 ```
-mean(x::Vector{Float64},op::OrthoPoly)
-mean(x::Vector{Float64},opq::OrthoPolyQ)
+mean(x::Vector{},op::OrthoPoly)
+mean(x::Vector{},opq::OrthoPolyQ)
 ```
 __Multivariate__
 ```
-mean(x::Vector{Float64},mop::MultiOrthoPoly)
+mean(x::Vector{},mop::MultiOrthoPoly)
 ```
 compute mean of random variable with PCE `x`
 """
-function mean(x::Vector{Float64},op::OrthoPoly)::Float64
+function mean(x::Vector{},op::OrthoPoly)
     x[1]*computeSP2(0,op.β)
 end
-mean(x::Vector{Float64},opq::OrthoPolyQ)::Float64 = mean(x,opq.op)
-function mean(x::Vector{Float64},mop::MultiOrthoPoly)::Float64
+
+mean(x::Vector{},opq::OrthoPolyQ) = mean(x,opq.op)
+
+function mean(x::Vector{},mop::MultiOrthoPoly)
     nunc = length(mop.uni)
     x[1]*computeSP(zeros(Int64,nunc),mop)
 end
@@ -296,48 +298,52 @@ end
 """
 __Univariate__
 ```
-var(x::Vector{Float64},op::OrthoPoly)
-var(x::Vector{Float64},opq::OrthoPolyQ)
+var(x::Vector{},op::OrthoPoly)
+var(x::Vector{},opq::OrthoPolyQ)
+var(x::Vector{},t2::Tensor)
 ```
 __Multivariate__
 ```
-var(x::Vector{Float64},mop::MultiOrthoPoly)
+var(x::Vector{},mop::MultiOrthoPoly)
+var(x::Vector{},t2::Tensor)
 ```
 compute variance of random variable with PCE `x`
 """
-function var(x::Vector{Float64},op::OrthoPoly)::Float64
+function var(x::Vector{},op::OrthoPoly)
     t2 = computeSP2(op)
     @assert length(t2)>=length(x) "cannot compute variance; too many PCE coefficients"
     sum( x[i]^2*t2[i] for i=2:length(x) )
 end
-var(x::Vector{Float64},opq::OrthoPolyQ)::Float64 = var(x,opq.op)
+var(x::Vector{},opq::OrthoPolyQ) = var(x,opq.op)
 
-function var(x::Vector{Float64},mop::MultiOrthoPoly)::Float64
-    L = size(mop.ind,1)
-    @assert length(x)<=L "cannot compute variance; too many PCE coefficients"
-    t2 = Tensor(2,mop)
-    sum( x[i]^2*t2.get([i-1,i-1]) for i=2:length(x))
+function var(x::Vector{},t2::Tensor)
+    sum( x[i]^2*t2.get([i-1,i-1]) for i in 2:length(x) )
+end
+
+function var(x::Vector{},mop::MultiOrthoPoly)
+    @assert length(x) <= size(mop.ind,1) "cannot compute variance; too many PCE coefficients"
+    var(x,Tensor(2,mop))
 end
 
 """
 __Univariate__
 ```
-std(x::Vector{Float64},op::OrthoPoly)
-std(x::Vector{Float64},opq::OrthoPolyQ)
+std(x::Vector{},op::OrthoPoly)
+std(x::Vector{},opq::OrthoPolyQ)
 ```
 __Multivariate__
 ```
-std(x::Vector{Float64},mop::MultiOrthoPoly)
+std(x::Vector{},mop::MultiOrthoPoly)
 ```
 compute standard deviation of random variable with PCE `x`
 """
-function std(x::Vector{Float64},op::OrthoPoly)::Float64
+function std(x::Vector{},op::OrthoPoly)
     sqrt(var(x,op))
 end
-std(x::Vector{Float64},opq::OrthoPolyQ)::Float64 = std(x,opq.op)
-std(x::Vector{Float64},mop::MultiOrthoPoly)::Float64 = sqrt(var(x,mop))
+std(x::Vector{},opq::OrthoPolyQ) = std(x,opq.op)
+std(x::Vector{},mop::MultiOrthoPoly) = sqrt(var(x,mop))
 
-function moment(n::Int64,x::Vector{Float64},op::OrthoPoly)
+function moment(n::Int64,x::Vector{},op::OrthoPoly)
     @assert 1<=n<=2 "for moments greater than 2 a quadrature rule is required"
     n==1 ? mean(x,op) : (mean(x,op)^2+var(x,op))
 end
