@@ -43,7 +43,7 @@ Specifically, we study chance-constrained DC optimal power flow as it is present
 
 We consider the following 4-bus system that has a total of two generators (buses 1 and 3) and two loads (buses 2 and 4):
 
-![4-bus system](assets/TypeHierarchy_transparent.png)
+![4-bus system](assets/DCsOPF_drawing.png)
 
 We formalize the numbering of the generators (superscript $g$), loads (superscript $d$ for demand), and branches (superscript $br$) as follows
 ```math
