@@ -4,7 +4,7 @@ my_f(t) = t^2
 a, b = 1.23, 3.45 # shape parameters of Jacobi weight
 int_exact = 0.353897; # reference value 
 N = 4
-α, β = rm_jacobi(N,a,b)
+α, β = rm_jacobi(N+1,a,b)
 n_gauss, w_gauss = gauss(N,α,β)
 int_gauss = dot(w_gauss,my_f.(n_gauss))
 print("first point:\t $(n_gauss[1])\n")
@@ -78,7 +78,7 @@ Now we compute $N$ recurrence coefficients.
 
 ```@example mysetup
 N = 4
-α, β = rm_jacobi(N,a,b)
+α, β = rm_jacobi(N+1,a,b)
 ```
 
 ## Gauss

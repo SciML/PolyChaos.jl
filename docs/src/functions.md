@@ -5,7 +5,7 @@
     Having said that, for exactly those essential functions there exist overloaded functions that accept specialized types such as `OrthoPoly`/`OrthoPolyQ` as arguments.
 
     Too abstract?
-    For example, the function `evaluate()` that evaluates a polynomial of degree `n` at points `x` has the core interface
+    For example, the function `evaluate` that evaluates a polynomial of degree `n` at points `x` has the core interface
     ```
         evaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})
     ```
@@ -53,13 +53,18 @@ mcdiscretization
 
 ## Show Orthogonal Polynomials
 
-To get a human-readable output of the orthognoal polynomials there is the function `showpoly()`
+To get a human-readable output of the orthognoal polynomials there is the function `showpoly`
 
 ```@docs
 showpoly
 ```
 
-This function makes excessive use of
+In case you want to see the entire basis, just use `showbasis`
+```@docs
+showbasis
+```
+
+Both of these functions make excessive use of
 ```@docs
 rec2coeff
 ```
@@ -83,10 +88,7 @@ clenshaw_curtis
 quadgp
 gauss
 radau
-radau_jacobi
-radau_laguerre
 lobatto
-lobatto_jacobi
 ```
 
 ## Polynomial Chaos

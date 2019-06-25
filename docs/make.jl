@@ -4,12 +4,9 @@ using Documenter, PolyChaos
 
 makedocs(
     sitename = "PolyChaos.jl",
-    format = Documenter.HTML(),
-    assets = ["assets/myfont.css"],
-    # format = LaTeX(),
+    format = Documenter.HTML(assets = ["assets/myfont.css"]),
     modules = [PolyChaos],
     authors = "tillmann.muehlpfordt@kit.edu",
-    # repo = "github.com/timueh/PolyChaos.jl.git",
     doctest = true,
     pages = Any[
         "index.md",
@@ -23,7 +20,9 @@ makedocs(
             "Polynomial Chaos" => [ "Basic Usage" => "pce_tutorial.md",
                                     "Chi Squared, One DOF" => "chi_squared_k1.md",
                                     "Chi Squared, Several DOFs" => "chi_squared_k_greater1.md",
-                                    "Random ODE" => "random_ode.md"]
+                                    "Random ODE" => "random_ode.md"
+                                  ],
+            "Optimal Power Flow" => "DCsOPF.md"
             ],
     "math.md",
     "functions.md"

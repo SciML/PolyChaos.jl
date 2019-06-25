@@ -1,23 +1,17 @@
-export calculateMultiIndices, findUnivariateIndices
+export calculateMultiIndices, findUnivariateIndices, calculateMultiIndices_interaction
 
 function calculateMultiIndices(d::Int, n::Int)
-    #d denotes dimension of random variables/number of sources of uncertainty,
-    #n the maximum degree of multivariate basis
-  #function to calculate indices of multivariate basis following the algorithm
-  #from "Spectral Methods for Uncertainty Quantiﬁcation; Le Maitre, Knio;2014" p.516-517
-  # No::BigInt = factorial(BigInt(d+n))/(factorial(Bigint(d))*factorial(BigInt(n)));  #number of polynomials of multivariate basis
-  No = numberPolynomials(d,n)
-  if d==0
-    print("Input zero in indicesMulti!")
-    return zeros(Int64, 1,d)
-  end
-
+    # d denotes dimension of random variables/number of sources of uncertainty,
+    # n the maximum degree of multivariate basis
+    # function to calculate indices of multivariate basis following the algorithm
+    # from "Spectral Methods for Uncertainty Quantiﬁcation; Le Maitre, Knio;2014" p.516-517
+    # No::BigInt = factorial(BigInt(d+n))/(factorial(Bigint(d))*factorial(BigInt(n)));  #number of polynomials of multivariate basis
+  n < 0 && throw(error("maximum degree must be non-negative"))
+  d <= 0 && throw(error("number of uncertainties must be positive"))
   # catch case n == 0 --> No-d==0
-  if n==0
-    inds=zeros(Int64,1,d)
-    return inds
-  end
-
+  n == 0 && return zeros(Int64,1,d)
+  # non-pathological cases begin here
+  No = numberPolynomials(d,n)
   inds = vcat(zeros(Int64,1,d),Matrix(1I,d,d),zeros(Int64, No-d-1, d));  #initiate index matrix for basis
   pi=ones(Int64,No,d);
 
@@ -42,14 +36,13 @@ function calculateMultiIndices(d::Int, n::Int)
   return inds
 end
 
-
 function calculateMultiIndices(a::Array{T,1}) where T<:Integer
   #a contains maximum degrees of univariate bases
   #function to calculate indices of multivariate basis following the algorithm
   #from "Spectral Methods for Uncertainty Quantiﬁcation; Le Maitre, Knio;2014" p.516-517
-  d=length(a)
-  n=maximum(a)
-  No::Int64 = numberPolynomials(d,n)  #number of polynomials of multivariate basis
+  d = length(a)
+  n = maximum(a)
+  No = numberPolynomials(d,n)  #number of polynomials of multivariate basis
   if d==0
     print("Input zero in indicesMulti!")
     return zeros(Int64, 1,d)
@@ -137,4 +130,17 @@ function findUnivariateIndices(i::Int64,ind::Matrix{Int64})::Vector{Int64}
       myind[deg_] = findfirst(x->x==deg_,col)
   end
   pushfirst!(myind,1)
+end
+
+#################################################################
+function calculateMultiIndices_interaction(nξ::Int,deg::Int,j::Int,p::Int)
+    inds = calculateMultiIndices(nξ,deg)
+    get_interaction(inds,j,p)
+end
+
+function get_interaction(inds::Matrix{Int},j::Int,p::Int)
+    j < 0 && throw(error("interaction order must be non-negative"))
+    j > size(inds,2) && throw(error("interaction order cannot be greater than number of uncertainties"))
+    Iterators.filter(x -> count(!iszero,x) == j && sum(x) == p, eachrow(inds))
+    # alternative -> collect
 end
