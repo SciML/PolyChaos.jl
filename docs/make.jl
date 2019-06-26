@@ -15,6 +15,7 @@ makedocs(
             "numerical_integration.md",
             "quadrature_rules.md",
             "orthogonal_polynomials_canonical.md",
+            "GaussianMixtureModel.md",
             "multiple_discretization.md",
             "scalar_products.md",
             "Polynomial Chaos" => [ "Basic Usage" => "pce_tutorial.md",
