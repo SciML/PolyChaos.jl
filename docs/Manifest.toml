@@ -200,6 +200,18 @@ version = "0.4.1"
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
+[[Mosek]]
+deps = ["Libdl", "MathProgBase", "Pkg", "Printf", "SparseArrays", "Test"]
+git-tree-sha1 = "032bd53d5d2c1a28ca4b684d0bcb43bf50ed1d5f"
+uuid = "6405355b-0ac2-5fba-af84-adbd65488c0e"
+version = "0.9.11"
+
+[[MosekTools]]
+deps = ["MathOptInterface", "Mosek", "Printf"]
+git-tree-sha1 = "c498c5cf8b1fa6705161dfe6275dfcd6708d6e63"
+uuid = "1ec41992-ff65-5c91-ac43-2df89e9693a4"
+version = "0.7.4"
+
 [[NaNMath]]
 deps = ["Compat"]
 git-tree-sha1 = "ce3b85e484a5d4c71dd5316215069311135fa9f2"

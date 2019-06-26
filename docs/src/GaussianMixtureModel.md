@@ -1,5 +1,5 @@
 ```@setup mysetup
-using Plots, LaTeXStrings
+using Plots
 function f(x,μ,σ)
     1/sqrt(2 *π*σ^2) * exp(-(x - μ)^2 / (2σ^2))
 end
@@ -7,8 +7,8 @@ end
 ρ(x) = 0.5*f(x,μ[1],σ[1]) + 0.5*f(x,μ[2],σ[2])
 x = 0:0.01:3
 plot(x,ρ.(x))
-xlabel!(L"x")
-ylabel!(L"\rho(x)")
+xlabel!("x")
+ylabel!("rho(x)")
 using PolyChaos
 deg = 4
 meas = Measure("my_GaussMixture",ρ,(-Inf,Inf),false,Dict(:μ=>μ, σ=>σ)) # build measure
@@ -33,7 +33,7 @@ Let's consider a simple example.
 
 
 ```@example mysetup
-using Plots, LaTeXStrings
+using Plots
 function f(x,μ,σ)
     1/sqrt(2 *π*σ^2) * exp(-(x - μ)^2 / (2σ^2))
 end
@@ -41,8 +41,8 @@ end
 ρ(x) = 0.5*f(x,μ[1],σ[1]) + 0.5*f(x,μ[2],σ[2])
 x = 0:0.01:3
 plot(x,ρ.(x))
-xlabel!(L"x")
-ylabel!(L"\rho(x)")
+xlabel!("x")
+ylabel!("\rho(x)")
 ```
 
 This looks nice!
