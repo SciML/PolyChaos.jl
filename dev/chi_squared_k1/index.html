@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Chi Squared, One DOF · PolyChaos.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="../index.html"><img class="logo" src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><h1>PolyChaos.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Overview</a></li><li><a class="toctext" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="toctext">Usage</span><ul><li><a class="toctext" href="../numerical_integration/">Numerical Integration</a></li><li><a class="toctext" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="toctext" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li><a class="toctext" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="toctext" href="../scalar_products/">Computation of Scalar Products</a></li><li><span class="toctext">Polynomial Chaos</span><ul><li><a class="toctext" href="../pce_tutorial/">Basic Usage</a></li><li class="current"><a class="toctext" href>Chi Squared, One DOF</a><ul class="internal"><li><a class="toctext" href="#Theory-1">Theory</a></li><li><a class="toctext" href="#Practice-1">Practice</a></li></ul></li><li><a class="toctext" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="toctext" href="../random_ode/">Random ODE</a></li></ul></li><li><a class="toctext" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="toctext" href="../math/">Mathematical Background</a></li><li><a class="toctext" href="../functions/">Functions</a></li></ul></nav><article id="docs"><header><nav><ul><li>Usage</li><li>Polynomial Chaos</li><li><a href>Chi Squared, One DOF</a></li></ul><a class="edit-page" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/chi_squared_k1.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Chi Squared, One DOF</span><a class="fa fa-bars" href="#"></a></div></header><div></div><h1><a class="nav-anchor" id="Chi-squared-Distribution-(k1)-1" href="#Chi-squared-Distribution-(k1)-1">Chi-squared Distribution (<span>$k=1$</span>)</a></h1><h2><a class="nav-anchor" id="Theory-1" href="#Theory-1">Theory</a></h2><p>Given a standard random variable <span>$X \sim \mathcal{N}(0,1)$</span> we would like to find the random variable <span>$Y = X^2$</span>. The analytic solution is known: <span>$Y$</span> follows a chi-squared distribution with <span>$k=1$</span> degree of freedom.</p><p>Using polynomial chaos expansion (PCE), the problem can be solved using Galerkin projection. Let <span>$\{\phi_k \}_{k=0}^{n}$</span> be the monic orthogonal basis relative to the probability density of <span>$X$</span>, namely</p><div>\[f_X(x) = \frac{1}{\sqrt{2 \pi}} \exp \left( - \frac{x^2}{2} \right).\]</div><p>Then, the PCE of <span>$X$</span> is given by</p><div>\[X = \sum_{k=0}^n x_k \phi_k,\]</div><p>with</p><div>\[x_0 = 0, \quad x_1 = 1, \quad x_i = 0 \quad \forall i =2,\dots,n.\]</div><p>To find the PCE coefficients <span>$y_k$</span> for <span>$Y = \sum_{k=}^n y_k \phi_k$</span>, we apply Galerkin projection, which leads to</p><div>\[y_m \langle \phi_m, \phi_m \rangle = \sum_{i=0}^n \sum_{j=0}^n x_i x_j \langle \phi_i \phi_j, \phi_m \rangle \quad \forall m = 0, \dots, n.\]</div><p>Hence, knowing the scalars <span>$\langle \phi_m, \phi_m \rangle$</span>, and <span>$\langle \phi_i \phi_j, \phi_m \rangle$</span>, the PCE coefficients <span>$y_k$</span> can be obtained immediately. From the PCE coefficients we can get the moments and compare them to the closed-form expressions.</p><p><strong>Notice:</strong> A maximum degree of 2 suffices to get the <em>exact</em> solution with PCE. In other words, increasing the maximum degree to values greater than 2 introduces nothing but computational overhead (and numerical errors, possibly).</p><h2><a class="nav-anchor" id="Practice-1" href="#Practice-1">Practice</a></h2><p>First, we create a orthogonal basis relative to <span>$f_X(x)$</span> of degree at most <span>$d=2$</span> (<code>deg</code> below).</p><p>Notice that we consider a total of <code>Nrec</code> recursion coefficients, and that we also add a quadrature rule by calling <code>OrthoPolyQ()</code>.</p><pre><code class="language-julia">using PolyChaos
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Chi Squared, One DOF · PolyChaos.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="../index.html"><img class="logo" src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><h1>PolyChaos.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Overview</a></li><li><a class="toctext" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="toctext">Usage</span><ul><li><a class="toctext" href="../numerical_integration/">Numerical Integration</a></li><li><a class="toctext" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="toctext" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li><a class="toctext" href="../GaussianMixtureModel/">Gaussian mixture models</a></li><li><a class="toctext" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="toctext" href="../scalar_products/">Computation of Scalar Products</a></li><li><span class="toctext">Polynomial Chaos</span><ul><li><a class="toctext" href="../pce_tutorial/">Basic Usage</a></li><li class="current"><a class="toctext" href>Chi Squared, One DOF</a><ul class="internal"><li><a class="toctext" href="#Theory-1">Theory</a></li><li><a class="toctext" href="#Practice-1">Practice</a></li></ul></li><li><a class="toctext" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="toctext" href="../random_ode/">Random ODE</a></li></ul></li><li><a class="toctext" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="toctext" href="../math/">Mathematical Background</a></li><li><a class="toctext" href="../functions/">Functions</a></li></ul></nav><article id="docs"><header><nav><ul><li>Usage</li><li>Polynomial Chaos</li><li><a href>Chi Squared, One DOF</a></li></ul><a class="edit-page" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/chi_squared_k1.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Chi Squared, One DOF</span><a class="fa fa-bars" href="#"></a></div></header><div></div><h1><a class="nav-anchor" id="Chi-squared-Distribution-(k1)-1" href="#Chi-squared-Distribution-(k1)-1">Chi-squared Distribution (<span>$k=1$</span>)</a></h1><h2><a class="nav-anchor" id="Theory-1" href="#Theory-1">Theory</a></h2><p>Given a standard random variable <span>$X \sim \mathcal{N}(0,1)$</span> we would like to find the random variable <span>$Y = X^2$</span>. The analytic solution is known: <span>$Y$</span> follows a chi-squared distribution with <span>$k=1$</span> degree of freedom.</p><p>Using polynomial chaos expansion (PCE), the problem can be solved using Galerkin projection. Let <span>$\{\phi_k \}_{k=0}^{n}$</span> be the monic orthogonal basis relative to the probability density of <span>$X$</span>, namely</p><div>\[f_X(x) = \frac{1}{\sqrt{2 \pi}} \exp \left( - \frac{x^2}{2} \right).\]</div><p>Then, the PCE of <span>$X$</span> is given by</p><div>\[X = \sum_{k=0}^n x_k \phi_k,\]</div><p>with</p><div>\[x_0 = 0, \quad x_1 = 1, \quad x_i = 0 \quad \forall i =2,\dots,n.\]</div><p>To find the PCE coefficients <span>$y_k$</span> for <span>$Y = \sum_{k=}^n y_k \phi_k$</span>, we apply Galerkin projection, which leads to</p><div>\[y_m \langle \phi_m, \phi_m \rangle = \sum_{i=0}^n \sum_{j=0}^n x_i x_j \langle \phi_i \phi_j, \phi_m \rangle \quad \forall m = 0, \dots, n.\]</div><p>Hence, knowing the scalars <span>$\langle \phi_m, \phi_m \rangle$</span>, and <span>$\langle \phi_i \phi_j, \phi_m \rangle$</span>, the PCE coefficients <span>$y_k$</span> can be obtained immediately. From the PCE coefficients we can get the moments and compare them to the closed-form expressions.</p><p><strong>Notice:</strong> A maximum degree of 2 suffices to get the <em>exact</em> solution with PCE. In other words, increasing the maximum degree to values greater than 2 introduces nothing but computational overhead (and numerical errors, possibly).</p><h2><a class="nav-anchor" id="Practice-1" href="#Practice-1">Practice</a></h2><p>First, we create a orthogonal basis relative to <span>$f_X(x)$</span> of degree at most <span>$d=2$</span> (<code>deg</code> below).</p><p>Notice that we consider a total of <code>Nrec</code> recursion coefficients, and that we also add a quadrature rule by calling <code>OrthoPolyQ()</code>.</p><pre><code class="language-julia">using PolyChaos
 k = 1
 deg, Nrec = 2, 20
 op = OrthoPoly(&quot;gaussian&quot;,deg;Nrec=Nrec);
@@ -56,604 +56,580 @@ t = range(0.1; stop=maximum(ysmpl), length=100)
 plot!(t,ρ.(t),w=4)</code></pre><?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="400" viewBox="0 0 2400 1600">
 <defs>
-  <clipPath id="clip7100">
+  <clipPath id="clip8500">
     <rect x="0" y="0" width="2400" height="1600"/>
   </clipPath>
 </defs>
-<polygon clip-path="url(#clip7100)" points="
+<polygon clip-path="url(#clip8500)" points="
 0,1600 2400,1600 2400,0 0,0 
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip7101">
+  <clipPath id="clip8501">
     <rect x="480" y="0" width="1681" height="1600"/>
   </clipPath>
 </defs>
-<polygon clip-path="url(#clip7100)" points="
+<polygon clip-path="url(#clip8500)" points="
 102.74,1505.26 2352.76,1505.26 2352.76,47.2441 102.74,47.2441 
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip7102">
+  <clipPath id="clip8502">
     <rect x="102" y="47" width="2251" height="1459"/>
   </clipPath>
 </defs>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   226.495,1505.26 226.495,47.2441 
   "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  876.659,1505.26 876.659,47.2441 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  912.285,1505.26 912.285,47.2441 
   "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  1526.82,1505.26 1526.82,47.2441 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  1598.07,1505.26 1598.07,47.2441 
   "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  2176.99,1505.26 2176.99,47.2441 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  2283.86,1505.26 2283.86,47.2441 
   "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   102.74,1464 2352.76,1464 
   "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  102.74,1056.56 2352.76,1056.56 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,1070.66 2352.76,1070.66 
   "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  102.74,649.134 2352.76,649.134 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,677.329 2352.76,677.329 
   "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  102.74,241.703 2352.76,241.703 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,283.995 2352.76,283.995 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   102.74,1505.26 2352.76,1505.26 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   102.74,1505.26 102.74,47.2441 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   226.495,1505.26 226.495,1483.39 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  876.659,1505.26 876.659,1483.39 
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  912.285,1505.26 912.285,1483.39 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1526.82,1505.26 1526.82,1483.39 
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1598.07,1505.26 1598.07,1483.39 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2176.99,1505.26 2176.99,1483.39 
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2283.86,1505.26 2283.86,1483.39 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   102.74,1464 136.49,1464 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,1056.56 136.49,1056.56 
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,1070.66 136.49,1070.66 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,649.134 136.49,649.134 
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,677.329 136.49,677.329 
   "/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,241.703 136.49,241.703 
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,283.995 136.49,283.995 
   "/>
-<g clip-path="url(#clip7100)">
+<g clip-path="url(#clip8500)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 226.495, 1559.26)" x="226.495" y="1559.26">0</text>
 </g>
-<g clip-path="url(#clip7100)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 876.659, 1559.26)" x="876.659" y="1559.26">5</text>
+<g clip-path="url(#clip8500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 912.285, 1559.26)" x="912.285" y="1559.26">5</text>
 </g>
-<g clip-path="url(#clip7100)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1526.82, 1559.26)" x="1526.82" y="1559.26">10</text>
+<g clip-path="url(#clip8500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1598.07, 1559.26)" x="1598.07" y="1559.26">10</text>
 </g>
-<g clip-path="url(#clip7100)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2176.99, 1559.26)" x="2176.99" y="1559.26">15</text>
+<g clip-path="url(#clip8500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2283.86, 1559.26)" x="2283.86" y="1559.26">15</text>
 </g>
-<g clip-path="url(#clip7100)">
+<g clip-path="url(#clip8500)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 1481.5)" x="78.7402" y="1481.5">0.0</text>
 </g>
-<g clip-path="url(#clip7100)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 1074.06)" x="78.7402" y="1074.06">0.5</text>
+<g clip-path="url(#clip8500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 1088.16)" x="78.7402" y="1088.16">0.5</text>
 </g>
-<g clip-path="url(#clip7100)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 666.634)" x="78.7402" y="666.634">1.0</text>
+<g clip-path="url(#clip8500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 694.829)" x="78.7402" y="694.829">1.0</text>
 </g>
-<g clip-path="url(#clip7100)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 259.203)" x="78.7402" y="259.203">1.5</text>
+<g clip-path="url(#clip8500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 301.495)" x="78.7402" y="301.495">1.5</text>
 </g>
-<g clip-path="url(#clip7100)">
+<g clip-path="url(#clip8500)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1227.75, 1639.12)" x="1227.75" y="1639.12">t</text>
 </g>
-<g clip-path="url(#clip7100)">
+<g clip-path="url(#clip8500)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, -23.7278, 776.252)" x="-23.7278" y="776.252">ho(t)</text>
 </g>
-<polygon clip-path="url(#clip7102)" points="
-226.495,88.5087 226.495,1464 252.502,1464 252.502,88.5087 226.495,88.5087 226.495,88.5087 
+<polygon clip-path="url(#clip8502)" points="
+226.495,88.5087 226.495,1464 253.927,1464 253.927,88.5087 226.495,88.5087 226.495,88.5087 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  226.495,88.5087 226.495,1464 252.502,1464 252.502,88.5087 226.495,88.5087 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  226.495,88.5087 226.495,1464 253.927,1464 253.927,88.5087 226.495,88.5087 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-252.502,950.632 252.502,1464 278.508,1464 278.508,950.632 252.502,950.632 252.502,950.632 
+<polygon clip-path="url(#clip8502)" points="
+253.927,968.789 253.927,1464 281.358,1464 281.358,968.789 253.927,968.789 253.927,968.789 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  252.502,950.632 252.502,1464 278.508,1464 278.508,950.632 252.502,950.632 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  253.927,968.789 253.927,1464 281.358,1464 281.358,968.789 253.927,968.789 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-278.508,1104.64 278.508,1464 304.515,1464 304.515,1104.64 278.508,1104.64 278.508,1104.64 
+<polygon clip-path="url(#clip8502)" points="
+281.358,1122.98 281.358,1464 308.79,1464 308.79,1122.98 281.358,1122.98 281.358,1122.98 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  278.508,1104.64 278.508,1464 304.515,1464 304.515,1104.64 278.508,1104.64 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  281.358,1122.98 281.358,1464 308.79,1464 308.79,1122.98 281.358,1122.98 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-304.515,1184.91 304.515,1464 330.521,1464 330.521,1184.91 304.515,1184.91 304.515,1184.91 
+<polygon clip-path="url(#clip8502)" points="
+308.79,1212.26 308.79,1464 336.221,1464 336.221,1212.26 308.79,1212.26 308.79,1212.26 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  304.515,1184.91 304.515,1464 330.521,1464 330.521,1184.91 304.515,1184.91 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  308.79,1212.26 308.79,1464 336.221,1464 336.221,1212.26 308.79,1212.26 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-330.521,1244.39 330.521,1464 356.528,1464 356.528,1244.39 330.521,1244.39 330.521,1244.39 
+<polygon clip-path="url(#clip8502)" points="
+336.221,1256.32 336.221,1464 363.653,1464 363.653,1256.32 336.221,1256.32 336.221,1256.32 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  330.521,1244.39 330.521,1464 356.528,1464 356.528,1244.39 330.521,1244.39 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  336.221,1256.32 336.221,1464 363.653,1464 363.653,1256.32 336.221,1256.32 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-356.528,1278.61 356.528,1464 382.534,1464 382.534,1278.61 356.528,1278.61 356.528,1278.61 
+<polygon clip-path="url(#clip8502)" points="
+363.653,1292.11 363.653,1464 391.085,1464 391.085,1292.11 363.653,1292.11 363.653,1292.11 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  356.528,1278.61 356.528,1464 382.534,1464 382.534,1278.61 356.528,1278.61 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  363.653,1292.11 363.653,1464 391.085,1464 391.085,1292.11 363.653,1292.11 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-382.534,1302.65 382.534,1464 408.541,1464 408.541,1302.65 382.534,1302.65 382.534,1302.65 
+<polygon clip-path="url(#clip8502)" points="
+391.085,1316.5 391.085,1464 418.516,1464 418.516,1316.5 391.085,1316.5 391.085,1316.5 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  382.534,1302.65 382.534,1464 408.541,1464 408.541,1302.65 382.534,1302.65 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  391.085,1316.5 391.085,1464 418.516,1464 418.516,1316.5 391.085,1316.5 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-408.541,1336.47 408.541,1464 434.548,1464 434.548,1336.47 408.541,1336.47 408.541,1336.47 
+<polygon clip-path="url(#clip8502)" points="
+418.516,1336.95 418.516,1464 445.948,1464 445.948,1336.95 418.516,1336.95 418.516,1336.95 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  408.541,1336.47 408.541,1464 434.548,1464 434.548,1336.47 408.541,1336.47 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  418.516,1336.95 418.516,1464 445.948,1464 445.948,1336.95 418.516,1336.95 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-434.548,1358.47 434.548,1464 460.554,1464 460.554,1358.47 434.548,1358.47 434.548,1358.47 
+<polygon clip-path="url(#clip8502)" points="
+445.948,1363.3 445.948,1464 473.379,1464 473.379,1363.3 445.948,1363.3 445.948,1363.3 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  434.548,1358.47 434.548,1464 460.554,1464 460.554,1358.47 434.548,1358.47 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  445.948,1363.3 445.948,1464 473.379,1464 473.379,1363.3 445.948,1363.3 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-460.554,1371.1 460.554,1464 486.561,1464 486.561,1371.1 460.554,1371.1 460.554,1371.1 
+<polygon clip-path="url(#clip8502)" points="
+473.379,1374.32 473.379,1464 500.811,1464 500.811,1374.32 473.379,1374.32 473.379,1374.32 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  460.554,1371.1 460.554,1464 486.561,1464 486.561,1371.1 460.554,1371.1 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  473.379,1374.32 473.379,1464 500.811,1464 500.811,1374.32 473.379,1374.32 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-486.561,1381.69 486.561,1464 512.567,1464 512.567,1381.69 486.561,1381.69 486.561,1381.69 
+<polygon clip-path="url(#clip8502)" points="
+500.811,1386.51 500.811,1464 528.243,1464 528.243,1386.51 500.811,1386.51 500.811,1386.51 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  486.561,1381.69 486.561,1464 512.567,1464 512.567,1381.69 486.561,1381.69 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  500.811,1386.51 500.811,1464 528.243,1464 528.243,1386.51 500.811,1386.51 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-512.567,1398.81 512.567,1464 538.574,1464 538.574,1398.81 512.567,1398.81 512.567,1398.81 
+<polygon clip-path="url(#clip8502)" points="
+528.243,1398.7 528.243,1464 555.674,1464 555.674,1398.7 528.243,1398.7 528.243,1398.7 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  512.567,1398.81 512.567,1464 538.574,1464 538.574,1398.81 512.567,1398.81 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  528.243,1398.7 528.243,1464 555.674,1464 555.674,1398.7 528.243,1398.7 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-538.574,1403.29 538.574,1464 564.58,1464 564.58,1403.29 538.574,1403.29 538.574,1403.29 
+<polygon clip-path="url(#clip8502)" points="
+555.674,1407.75 555.674,1464 583.106,1464 583.106,1407.75 555.674,1407.75 555.674,1407.75 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  538.574,1403.29 538.574,1464 564.58,1464 564.58,1403.29 538.574,1403.29 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  555.674,1407.75 555.674,1464 583.106,1464 583.106,1407.75 555.674,1407.75 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-564.58,1412.25 564.58,1464 590.587,1464 590.587,1412.25 564.58,1412.25 564.58,1412.25 
+<polygon clip-path="url(#clip8502)" points="
+583.106,1413.26 583.106,1464 610.537,1464 610.537,1413.26 583.106,1413.26 583.106,1413.26 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  564.58,1412.25 564.58,1464 590.587,1464 590.587,1412.25 564.58,1412.25 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  583.106,1413.26 583.106,1464 610.537,1464 610.537,1413.26 583.106,1413.26 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-590.587,1420.81 590.587,1464 616.594,1464 616.594,1420.81 590.587,1420.81 590.587,1420.81 
+<polygon clip-path="url(#clip8502)" points="
+610.537,1416.4 610.537,1464 637.969,1464 637.969,1416.4 610.537,1416.4 610.537,1416.4 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  590.587,1420.81 590.587,1464 616.594,1464 616.594,1420.81 590.587,1420.81 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  610.537,1416.4 610.537,1464 637.969,1464 637.969,1416.4 610.537,1416.4 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-616.594,1422.84 616.594,1464 642.6,1464 642.6,1422.84 616.594,1422.84 616.594,1422.84 
+<polygon clip-path="url(#clip8502)" points="
+637.969,1424.66 637.969,1464 665.4,1464 665.4,1424.66 637.969,1424.66 637.969,1424.66 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  616.594,1422.84 616.594,1464 642.6,1464 642.6,1422.84 616.594,1422.84 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  637.969,1424.66 637.969,1464 665.4,1464 665.4,1424.66 637.969,1424.66 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-642.6,1436.29 642.6,1464 668.607,1464 668.607,1436.29 642.6,1436.29 642.6,1436.29 
+<polygon clip-path="url(#clip8502)" points="
+665.4,1429.38 665.4,1464 692.832,1464 692.832,1429.38 665.4,1429.38 665.4,1429.38 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  642.6,1436.29 642.6,1464 668.607,1464 668.607,1436.29 642.6,1436.29 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  665.4,1429.38 665.4,1464 692.832,1464 692.832,1429.38 665.4,1429.38 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-668.607,1429.36 668.607,1464 694.613,1464 694.613,1429.36 668.607,1429.36 668.607,1429.36 
+<polygon clip-path="url(#clip8502)" points="
+692.832,1439.22 692.832,1464 720.264,1464 720.264,1439.22 692.832,1439.22 692.832,1439.22 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  668.607,1429.36 668.607,1464 694.613,1464 694.613,1429.36 668.607,1429.36 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  692.832,1439.22 692.832,1464 720.264,1464 720.264,1439.22 692.832,1439.22 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-694.613,1441.59 694.613,1464 720.62,1464 720.62,1441.59 694.613,1441.59 694.613,1441.59 
+<polygon clip-path="url(#clip8502)" points="
+720.264,1435.28 720.264,1464 747.695,1464 747.695,1435.28 720.264,1435.28 720.264,1435.28 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  694.613,1441.59 694.613,1464 720.62,1464 720.62,1441.59 694.613,1441.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  720.264,1435.28 720.264,1464 747.695,1464 747.695,1435.28 720.264,1435.28 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-720.62,1437.92 720.62,1464 746.626,1464 746.626,1437.92 720.62,1437.92 720.62,1437.92 
+<polygon clip-path="url(#clip8502)" points="
+747.695,1441.97 747.695,1464 775.127,1464 775.127,1441.97 747.695,1441.97 747.695,1441.97 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  720.62,1437.92 720.62,1464 746.626,1464 746.626,1437.92 720.62,1437.92 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  747.695,1441.97 747.695,1464 775.127,1464 775.127,1441.97 747.695,1441.97 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-746.626,1446.48 746.626,1464 772.633,1464 772.633,1446.48 746.626,1446.48 746.626,1446.48 
+<polygon clip-path="url(#clip8502)" points="
+775.127,1447.08 775.127,1464 802.558,1464 802.558,1447.08 775.127,1447.08 775.127,1447.08 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  746.626,1446.48 746.626,1464 772.633,1464 772.633,1446.48 746.626,1446.48 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  775.127,1447.08 775.127,1464 802.558,1464 802.558,1447.08 775.127,1447.08 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-772.633,1447.7 772.633,1464 798.64,1464 798.64,1447.7 772.633,1447.7 772.633,1447.7 
+<polygon clip-path="url(#clip8502)" points="
+802.558,1443.15 802.558,1464 829.99,1464 829.99,1443.15 802.558,1443.15 802.558,1443.15 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  772.633,1447.7 772.633,1464 798.64,1464 798.64,1447.7 772.633,1447.7 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  802.558,1443.15 802.558,1464 829.99,1464 829.99,1443.15 802.558,1443.15 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-798.64,1447.7 798.64,1464 824.646,1464 824.646,1447.7 798.64,1447.7 798.64,1447.7 
+<polygon clip-path="url(#clip8502)" points="
+829.99,1446.69 829.99,1464 857.422,1464 857.422,1446.69 829.99,1446.69 829.99,1446.69 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  798.64,1447.7 798.64,1464 824.646,1464 824.646,1447.7 798.64,1447.7 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  829.99,1446.69 829.99,1464 857.422,1464 857.422,1446.69 829.99,1446.69 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-824.646,1444.44 824.646,1464 850.653,1464 850.653,1444.44 824.646,1444.44 824.646,1444.44 
+<polygon clip-path="url(#clip8502)" points="
+857.422,1455.34 857.422,1464 884.853,1464 884.853,1455.34 857.422,1455.34 857.422,1455.34 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  824.646,1444.44 824.646,1464 850.653,1464 850.653,1444.44 824.646,1444.44 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  857.422,1455.34 857.422,1464 884.853,1464 884.853,1455.34 857.422,1455.34 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-850.653,1446.88 850.653,1464 876.659,1464 876.659,1446.88 850.653,1446.88 850.653,1446.88 
+<polygon clip-path="url(#clip8502)" points="
+884.853,1453.77 884.853,1464 912.285,1464 912.285,1453.77 884.853,1453.77 884.853,1453.77 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  850.653,1446.88 850.653,1464 876.659,1464 876.659,1446.88 850.653,1446.88 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  884.853,1453.77 884.853,1464 912.285,1464 912.285,1453.77 884.853,1453.77 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-876.659,1450.96 876.659,1464 902.666,1464 902.666,1450.96 876.659,1450.96 876.659,1450.96 
+<polygon clip-path="url(#clip8502)" points="
+912.285,1450.23 912.285,1464 939.716,1464 939.716,1450.23 912.285,1450.23 912.285,1450.23 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  876.659,1450.96 876.659,1464 902.666,1464 902.666,1450.96 876.659,1450.96 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  912.285,1450.23 912.285,1464 939.716,1464 939.716,1450.23 912.285,1450.23 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-902.666,1451.77 902.666,1464 928.672,1464 928.672,1451.77 902.666,1451.77 902.666,1451.77 
+<polygon clip-path="url(#clip8502)" points="
+939.716,1454.56 939.716,1464 967.148,1464 967.148,1454.56 939.716,1454.56 939.716,1454.56 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  902.666,1451.77 902.666,1464 928.672,1464 928.672,1451.77 902.666,1451.77 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  939.716,1454.56 939.716,1464 967.148,1464 967.148,1454.56 939.716,1454.56 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-928.672,1453.4 928.672,1464 954.679,1464 954.679,1453.4 928.672,1453.4 928.672,1453.4 
+<polygon clip-path="url(#clip8502)" points="
+967.148,1455.34 967.148,1464 994.58,1464 994.58,1455.34 967.148,1455.34 967.148,1455.34 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  928.672,1453.4 928.672,1464 954.679,1464 954.679,1453.4 928.672,1453.4 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  967.148,1455.34 967.148,1464 994.58,1464 994.58,1455.34 967.148,1455.34 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-954.679,1452.18 954.679,1464 980.686,1464 980.686,1452.18 954.679,1452.18 954.679,1452.18 
+<polygon clip-path="url(#clip8502)" points="
+994.58,1456.52 994.58,1464 1022.01,1464 1022.01,1456.52 994.58,1456.52 994.58,1456.52 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  954.679,1452.18 954.679,1464 980.686,1464 980.686,1452.18 954.679,1452.18 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  994.58,1456.52 994.58,1464 1022.01,1464 1022.01,1456.52 994.58,1456.52 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-980.686,1459.11 980.686,1464 1006.69,1464 1006.69,1459.11 980.686,1459.11 980.686,1459.11 
+<polygon clip-path="url(#clip8502)" points="
+1022.01,1457.31 1022.01,1464 1049.44,1464 1049.44,1457.31 1022.01,1457.31 1022.01,1457.31 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  980.686,1459.11 980.686,1464 1006.69,1464 1006.69,1459.11 980.686,1459.11 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1022.01,1457.31 1022.01,1464 1049.44,1464 1049.44,1457.31 1022.01,1457.31 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1006.69,1458.29 1006.69,1464 1032.7,1464 1032.7,1458.29 1006.69,1458.29 1006.69,1458.29 
+<polygon clip-path="url(#clip8502)" points="
+1049.44,1457.7 1049.44,1464 1076.87,1464 1076.87,1457.7 1049.44,1457.7 1049.44,1457.7 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1006.69,1458.29 1006.69,1464 1032.7,1464 1032.7,1458.29 1006.69,1458.29 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1049.44,1457.7 1049.44,1464 1076.87,1464 1076.87,1457.7 1049.44,1457.7 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1032.7,1455.44 1032.7,1464 1058.71,1464 1058.71,1455.44 1032.7,1455.44 1032.7,1455.44 
+<polygon clip-path="url(#clip8502)" points="
+1076.87,1458.1 1076.87,1464 1104.31,1464 1104.31,1458.1 1076.87,1458.1 1076.87,1458.1 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1032.7,1455.44 1032.7,1464 1058.71,1464 1058.71,1455.44 1032.7,1455.44 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1076.87,1458.1 1076.87,1464 1104.31,1464 1104.31,1458.1 1076.87,1458.1 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1058.71,1457.48 1058.71,1464 1084.71,1464 1084.71,1457.48 1058.71,1457.48 1058.71,1457.48 
+<polygon clip-path="url(#clip8502)" points="
+1104.31,1459.28 1104.31,1464 1131.74,1464 1131.74,1459.28 1104.31,1459.28 1104.31,1459.28 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1058.71,1457.48 1058.71,1464 1084.71,1464 1084.71,1457.48 1058.71,1457.48 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1104.31,1459.28 1104.31,1464 1131.74,1464 1131.74,1459.28 1104.31,1459.28 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1084.71,1458.7 1084.71,1464 1110.72,1464 1110.72,1458.7 1084.71,1458.7 1084.71,1458.7 
+<polygon clip-path="url(#clip8502)" points="
+1131.74,1460.06 1131.74,1464 1159.17,1464 1159.17,1460.06 1131.74,1460.06 1131.74,1460.06 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1084.71,1458.7 1084.71,1464 1110.72,1464 1110.72,1458.7 1084.71,1458.7 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1131.74,1460.06 1131.74,1464 1159.17,1464 1159.17,1460.06 1131.74,1460.06 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1110.72,1461.55 1110.72,1464 1136.73,1464 1136.73,1461.55 1110.72,1461.55 1110.72,1461.55 
+<polygon clip-path="url(#clip8502)" points="
+1159.17,1460.06 1159.17,1464 1186.6,1464 1186.6,1460.06 1159.17,1460.06 1159.17,1460.06 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1110.72,1461.55 1110.72,1464 1136.73,1464 1136.73,1461.55 1110.72,1461.55 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1159.17,1460.06 1159.17,1464 1186.6,1464 1186.6,1460.06 1159.17,1460.06 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1136.73,1459.11 1136.73,1464 1162.73,1464 1162.73,1459.11 1136.73,1459.11 1136.73,1459.11 
+<polygon clip-path="url(#clip8502)" points="
+1186.6,1460.85 1186.6,1464 1214.03,1464 1214.03,1460.85 1186.6,1460.85 1186.6,1460.85 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1136.73,1459.11 1136.73,1464 1162.73,1464 1162.73,1459.11 1136.73,1459.11 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1186.6,1460.85 1186.6,1464 1214.03,1464 1214.03,1460.85 1186.6,1460.85 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1162.73,1461.55 1162.73,1464 1188.74,1464 1188.74,1461.55 1162.73,1461.55 1162.73,1461.55 
+<polygon clip-path="url(#clip8502)" points="
+1214.03,1460.85 1214.03,1464 1241.46,1464 1241.46,1460.85 1214.03,1460.85 1214.03,1460.85 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1162.73,1461.55 1162.73,1464 1188.74,1464 1188.74,1461.55 1162.73,1461.55 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1214.03,1460.85 1214.03,1464 1241.46,1464 1241.46,1460.85 1214.03,1460.85 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1188.74,1461.55 1188.74,1464 1214.74,1464 1214.74,1461.55 1188.74,1461.55 1188.74,1461.55 
+<polygon clip-path="url(#clip8502)" points="
+1241.46,1460.85 1241.46,1464 1268.9,1464 1268.9,1460.85 1241.46,1460.85 1241.46,1460.85 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1188.74,1461.55 1188.74,1464 1214.74,1464 1214.74,1461.55 1188.74,1461.55 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1241.46,1460.85 1241.46,1464 1268.9,1464 1268.9,1460.85 1241.46,1460.85 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1214.74,1461.14 1214.74,1464 1240.75,1464 1240.75,1461.14 1214.74,1461.14 1214.74,1461.14 
+<polygon clip-path="url(#clip8502)" points="
+1268.9,1462.03 1268.9,1464 1296.33,1464 1296.33,1462.03 1268.9,1462.03 1268.9,1462.03 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1214.74,1461.14 1214.74,1464 1240.75,1464 1240.75,1461.14 1214.74,1461.14 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1268.9,1462.03 1268.9,1464 1296.33,1464 1296.33,1462.03 1268.9,1462.03 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1240.75,1461.55 1240.75,1464 1266.76,1464 1266.76,1461.55 1240.75,1461.55 1240.75,1461.55 
+<polygon clip-path="url(#clip8502)" points="
+1296.33,1459.67 1296.33,1464 1323.76,1464 1323.76,1459.67 1296.33,1459.67 1296.33,1459.67 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1240.75,1461.55 1240.75,1464 1266.76,1464 1266.76,1461.55 1240.75,1461.55 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1296.33,1459.67 1296.33,1464 1323.76,1464 1323.76,1459.67 1296.33,1459.67 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1266.76,1462.37 1266.76,1464 1292.76,1464 1292.76,1462.37 1266.76,1462.37 1266.76,1462.37 
+<polygon clip-path="url(#clip8502)" points="
+1323.76,1462.42 1323.76,1464 1351.19,1464 1351.19,1462.42 1323.76,1462.42 1323.76,1462.42 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1266.76,1462.37 1266.76,1464 1292.76,1464 1292.76,1462.37 1266.76,1462.37 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1323.76,1462.42 1323.76,1464 1351.19,1464 1351.19,1462.42 1323.76,1462.42 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1292.76,1460.74 1292.76,1464 1318.77,1464 1318.77,1460.74 1292.76,1460.74 1292.76,1460.74 
+<polygon clip-path="url(#clip8502)" points="
+1351.19,1461.24 1351.19,1464 1378.62,1464 1378.62,1461.24 1351.19,1461.24 1351.19,1461.24 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1292.76,1460.74 1292.76,1464 1318.77,1464 1318.77,1460.74 1292.76,1460.74 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1351.19,1461.24 1351.19,1464 1378.62,1464 1378.62,1461.24 1351.19,1461.24 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1318.77,1462.77 1318.77,1464 1344.78,1464 1344.78,1462.77 1318.77,1462.77 1318.77,1462.77 
+<polygon clip-path="url(#clip8502)" points="
+1378.62,1461.64 1378.62,1464 1406.05,1464 1406.05,1461.64 1378.62,1461.64 1378.62,1461.64 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1318.77,1462.77 1318.77,1464 1344.78,1464 1344.78,1462.77 1318.77,1462.77 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1378.62,1461.64 1378.62,1464 1406.05,1464 1406.05,1461.64 1378.62,1461.64 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1344.78,1463.59 1344.78,1464 1370.78,1464 1370.78,1463.59 1344.78,1463.59 1344.78,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1406.05,1462.42 1406.05,1464 1433.48,1464 1433.48,1462.42 1406.05,1462.42 1406.05,1462.42 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1344.78,1463.59 1344.78,1464 1370.78,1464 1370.78,1463.59 1344.78,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1406.05,1462.42 1406.05,1464 1433.48,1464 1433.48,1462.42 1406.05,1462.42 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1370.78,1463.18 1370.78,1464 1396.79,1464 1396.79,1463.18 1370.78,1463.18 1370.78,1463.18 
+<polygon clip-path="url(#clip8502)" points="
+1433.48,1463.6 1433.48,1464 1460.92,1464 1460.92,1463.6 1433.48,1463.6 1433.48,1463.6 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1370.78,1463.18 1370.78,1464 1396.79,1464 1396.79,1463.18 1370.78,1463.18 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1433.48,1463.6 1433.48,1464 1460.92,1464 1460.92,1463.6 1433.48,1463.6 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1396.79,1464 1396.79,1464 1422.8,1464 1422.8,1464 1396.79,1464 1396.79,1464 
+<polygon clip-path="url(#clip8502)" points="
+1460.92,1462.42 1460.92,1464 1488.35,1464 1488.35,1462.42 1460.92,1462.42 1460.92,1462.42 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1396.79,1464 1396.79,1464 1422.8,1464 1396.79,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1460.92,1462.42 1460.92,1464 1488.35,1464 1488.35,1462.42 1460.92,1462.42 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1422.8,1462.37 1422.8,1464 1448.8,1464 1448.8,1462.37 1422.8,1462.37 1422.8,1462.37 
+<polygon clip-path="url(#clip8502)" points="
+1488.35,1464 1488.35,1464 1515.78,1464 1515.78,1464 1488.35,1464 1488.35,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1422.8,1462.37 1422.8,1464 1448.8,1464 1448.8,1462.37 1422.8,1462.37 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1488.35,1464 1488.35,1464 1515.78,1464 1488.35,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1448.8,1463.59 1448.8,1464 1474.81,1464 1474.81,1463.59 1448.8,1463.59 1448.8,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1515.78,1462.42 1515.78,1464 1543.21,1464 1543.21,1462.42 1515.78,1462.42 1515.78,1462.42 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1448.8,1463.59 1448.8,1464 1474.81,1464 1474.81,1463.59 1448.8,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1515.78,1462.42 1515.78,1464 1543.21,1464 1543.21,1462.42 1515.78,1462.42 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1474.81,1463.59 1474.81,1464 1500.82,1464 1500.82,1463.59 1474.81,1463.59 1474.81,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1543.21,1464 1543.21,1464 1570.64,1464 1570.64,1464 1543.21,1464 1543.21,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1474.81,1463.59 1474.81,1464 1500.82,1464 1500.82,1463.59 1474.81,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1543.21,1464 1543.21,1464 1570.64,1464 1543.21,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1500.82,1463.18 1500.82,1464 1526.82,1464 1526.82,1463.18 1500.82,1463.18 1500.82,1463.18 
+<polygon clip-path="url(#clip8502)" points="
+1570.64,1463.6 1570.64,1464 1598.07,1464 1598.07,1463.6 1570.64,1463.6 1570.64,1463.6 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1500.82,1463.18 1500.82,1464 1526.82,1464 1526.82,1463.18 1500.82,1463.18 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1570.64,1463.6 1570.64,1464 1598.07,1464 1598.07,1463.6 1570.64,1463.6 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1526.82,1463.18 1526.82,1464 1552.83,1464 1552.83,1463.18 1526.82,1463.18 1526.82,1463.18 
+<polygon clip-path="url(#clip8502)" points="
+1598.07,1464 1598.07,1464 1625.51,1464 1625.51,1464 1598.07,1464 1598.07,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1526.82,1463.18 1526.82,1464 1552.83,1464 1552.83,1463.18 1526.82,1463.18 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1598.07,1464 1598.07,1464 1625.51,1464 1598.07,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1552.83,1463.18 1552.83,1464 1578.84,1464 1578.84,1463.18 1552.83,1463.18 1552.83,1463.18 
+<polygon clip-path="url(#clip8502)" points="
+1625.51,1463.21 1625.51,1464 1652.94,1464 1652.94,1463.21 1625.51,1463.21 1625.51,1463.21 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1552.83,1463.18 1552.83,1464 1578.84,1464 1578.84,1463.18 1552.83,1463.18 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1625.51,1463.21 1625.51,1464 1652.94,1464 1652.94,1463.21 1625.51,1463.21 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1578.84,1463.18 1578.84,1464 1604.84,1464 1604.84,1463.18 1578.84,1463.18 1578.84,1463.18 
+<polygon clip-path="url(#clip8502)" points="
+1652.94,1463.21 1652.94,1464 1680.37,1464 1680.37,1463.21 1652.94,1463.21 1652.94,1463.21 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1578.84,1463.18 1578.84,1464 1604.84,1464 1604.84,1463.18 1578.84,1463.18 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1652.94,1463.21 1652.94,1464 1680.37,1464 1680.37,1463.21 1652.94,1463.21 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1604.84,1463.59 1604.84,1464 1630.85,1464 1630.85,1463.59 1604.84,1463.59 1604.84,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1680.37,1462.82 1680.37,1464 1707.8,1464 1707.8,1462.82 1680.37,1462.82 1680.37,1462.82 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1604.84,1463.59 1604.84,1464 1630.85,1464 1630.85,1463.59 1604.84,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1680.37,1462.82 1680.37,1464 1707.8,1464 1707.8,1462.82 1680.37,1462.82 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1630.85,1463.59 1630.85,1464 1656.86,1464 1656.86,1463.59 1630.85,1463.59 1630.85,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1707.8,1464 1707.8,1464 1735.23,1464 1735.23,1464 1707.8,1464 1707.8,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1630.85,1463.59 1630.85,1464 1656.86,1464 1656.86,1463.59 1630.85,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1707.8,1464 1707.8,1464 1735.23,1464 1707.8,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1656.86,1464 1656.86,1464 1682.86,1464 1682.86,1464 1656.86,1464 1656.86,1464 
+<polygon clip-path="url(#clip8502)" points="
+1735.23,1464 1735.23,1464 1762.66,1464 1762.66,1464 1735.23,1464 1735.23,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1656.86,1464 1656.86,1464 1682.86,1464 1656.86,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1735.23,1464 1735.23,1464 1762.66,1464 1735.23,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1682.86,1463.59 1682.86,1464 1708.87,1464 1708.87,1463.59 1682.86,1463.59 1682.86,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1762.66,1463.6 1762.66,1464 1790.1,1464 1790.1,1463.6 1762.66,1463.6 1762.66,1463.6 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1682.86,1463.59 1682.86,1464 1708.87,1464 1708.87,1463.59 1682.86,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1762.66,1463.6 1762.66,1464 1790.1,1464 1790.1,1463.6 1762.66,1463.6 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1708.87,1464 1708.87,1464 1734.88,1464 1734.88,1464 1708.87,1464 1708.87,1464 
+<polygon clip-path="url(#clip8502)" points="
+1790.1,1464 1790.1,1464 1817.53,1464 1817.53,1464 1790.1,1464 1790.1,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1708.87,1464 1708.87,1464 1734.88,1464 1708.87,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1790.1,1464 1790.1,1464 1817.53,1464 1790.1,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1734.88,1464 1734.88,1464 1760.88,1464 1760.88,1464 1734.88,1464 1734.88,1464 
+<polygon clip-path="url(#clip8502)" points="
+1817.53,1464 1817.53,1464 1844.96,1464 1844.96,1464 1817.53,1464 1817.53,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1734.88,1464 1734.88,1464 1760.88,1464 1734.88,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1817.53,1464 1817.53,1464 1844.96,1464 1817.53,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1760.88,1464 1760.88,1464 1786.89,1464 1786.89,1464 1760.88,1464 1760.88,1464 
+<polygon clip-path="url(#clip8502)" points="
+1844.96,1464 1844.96,1464 1872.39,1464 1872.39,1464 1844.96,1464 1844.96,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1760.88,1464 1760.88,1464 1786.89,1464 1760.88,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1844.96,1464 1844.96,1464 1872.39,1464 1844.96,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1786.89,1463.59 1786.89,1464 1812.9,1464 1812.9,1463.59 1786.89,1463.59 1786.89,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1872.39,1463.21 1872.39,1464 1899.82,1464 1899.82,1463.21 1872.39,1463.21 1872.39,1463.21 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1786.89,1463.59 1786.89,1464 1812.9,1464 1812.9,1463.59 1786.89,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1872.39,1463.21 1872.39,1464 1899.82,1464 1899.82,1463.21 1872.39,1463.21 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1812.9,1464 1812.9,1464 1838.9,1464 1838.9,1464 1812.9,1464 1812.9,1464 
+<polygon clip-path="url(#clip8502)" points="
+1899.82,1464 1899.82,1464 1927.25,1464 1927.25,1464 1899.82,1464 1899.82,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1812.9,1464 1812.9,1464 1838.9,1464 1812.9,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1899.82,1464 1899.82,1464 1927.25,1464 1899.82,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1838.9,1463.59 1838.9,1464 1864.91,1464 1864.91,1463.59 1838.9,1463.59 1838.9,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1927.25,1463.6 1927.25,1464 1954.69,1464 1954.69,1463.6 1927.25,1463.6 1927.25,1463.6 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1838.9,1463.59 1838.9,1464 1864.91,1464 1864.91,1463.59 1838.9,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1927.25,1463.6 1927.25,1464 1954.69,1464 1954.69,1463.6 1927.25,1463.6 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1864.91,1463.59 1864.91,1464 1890.92,1464 1890.92,1463.59 1864.91,1463.59 1864.91,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+1954.69,1464 1954.69,1464 1982.12,1464 1982.12,1464 1954.69,1464 1954.69,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1864.91,1463.59 1864.91,1464 1890.92,1464 1890.92,1463.59 1864.91,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1954.69,1464 1954.69,1464 1982.12,1464 1954.69,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1890.92,1464 1890.92,1464 1916.92,1464 1916.92,1464 1890.92,1464 1890.92,1464 
+<polygon clip-path="url(#clip8502)" points="
+1982.12,1463.6 1982.12,1464 2009.55,1464 2009.55,1463.6 1982.12,1463.6 1982.12,1463.6 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1890.92,1464 1890.92,1464 1916.92,1464 1890.92,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1982.12,1463.6 1982.12,1464 2009.55,1464 2009.55,1463.6 1982.12,1463.6 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1916.92,1464 1916.92,1464 1942.93,1464 1942.93,1464 1916.92,1464 1916.92,1464 
+<polygon clip-path="url(#clip8502)" points="
+2009.55,1464 2009.55,1464 2036.98,1464 2036.98,1464 2009.55,1464 2009.55,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1916.92,1464 1916.92,1464 1942.93,1464 1916.92,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2009.55,1464 2009.55,1464 2036.98,1464 2009.55,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1942.93,1464 1942.93,1464 1968.94,1464 1968.94,1464 1942.93,1464 1942.93,1464 
+<polygon clip-path="url(#clip8502)" points="
+2036.98,1464 2036.98,1464 2064.41,1464 2064.41,1464 2036.98,1464 2036.98,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1942.93,1464 1942.93,1464 1968.94,1464 1942.93,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2036.98,1464 2036.98,1464 2064.41,1464 2036.98,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1968.94,1464 1968.94,1464 1994.94,1464 1994.94,1464 1968.94,1464 1968.94,1464 
+<polygon clip-path="url(#clip8502)" points="
+2064.41,1463.6 2064.41,1464 2091.84,1464 2091.84,1463.6 2064.41,1463.6 2064.41,1463.6 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1968.94,1464 1968.94,1464 1994.94,1464 1968.94,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2064.41,1463.6 2064.41,1464 2091.84,1464 2091.84,1463.6 2064.41,1463.6 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-1994.94,1464 1994.94,1464 2020.95,1464 2020.95,1464 1994.94,1464 1994.94,1464 
+<polygon clip-path="url(#clip8502)" points="
+2091.84,1464 2091.84,1464 2119.27,1464 2119.27,1464 2091.84,1464 2091.84,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1994.94,1464 1994.94,1464 2020.95,1464 1994.94,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2091.84,1464 2091.84,1464 2119.27,1464 2091.84,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-2020.95,1464 2020.95,1464 2046.96,1464 2046.96,1464 2020.95,1464 2020.95,1464 
+<polygon clip-path="url(#clip8502)" points="
+2119.27,1464 2119.27,1464 2146.71,1464 2146.71,1464 2119.27,1464 2119.27,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2020.95,1464 2020.95,1464 2046.96,1464 2020.95,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2119.27,1464 2119.27,1464 2146.71,1464 2119.27,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-2046.96,1463.59 2046.96,1464 2072.96,1464 2072.96,1463.59 2046.96,1463.59 2046.96,1463.59 
+<polygon clip-path="url(#clip8502)" points="
+2146.71,1464 2146.71,1464 2174.14,1464 2174.14,1464 2146.71,1464 2146.71,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2046.96,1463.59 2046.96,1464 2072.96,1464 2072.96,1463.59 2046.96,1463.59 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2146.71,1464 2146.71,1464 2174.14,1464 2146.71,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-2072.96,1464 2072.96,1464 2098.97,1464 2098.97,1464 2072.96,1464 2072.96,1464 
+<polygon clip-path="url(#clip8502)" points="
+2174.14,1464 2174.14,1464 2201.57,1464 2201.57,1464 2174.14,1464 2174.14,1464 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2072.96,1464 2072.96,1464 2098.97,1464 2072.96,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2174.14,1464 2174.14,1464 2201.57,1464 2174.14,1464 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-2098.97,1464 2098.97,1464 2124.97,1464 2124.97,1464 2098.97,1464 2098.97,1464 
+<polygon clip-path="url(#clip8502)" points="
+2201.57,1463.21 2201.57,1464 2229,1464 2229,1463.21 2201.57,1463.21 2201.57,1463.21 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2098.97,1464 2098.97,1464 2124.97,1464 2098.97,1464 
+<polyline clip-path="url(#clip8502)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2201.57,1463.21 2201.57,1464 2229,1464 2229,1463.21 2201.57,1463.21 
   "/>
-<polygon clip-path="url(#clip7102)" points="
-2124.97,1464 2124.97,1464 2150.98,1464 2150.98,1464 2124.97,1464 2124.97,1464 
-  " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2124.97,1464 2124.97,1464 2150.98,1464 2124.97,1464 
-  "/>
-<polygon clip-path="url(#clip7102)" points="
-2150.98,1464 2150.98,1464 2176.99,1464 2176.99,1464 2150.98,1464 2150.98,1464 
-  " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2150.98,1464 2150.98,1464 2176.99,1464 2150.98,1464 
-  "/>
-<polygon clip-path="url(#clip7102)" points="
-2176.99,1463.59 2176.99,1464 2202.99,1464 2202.99,1463.59 2176.99,1463.59 2176.99,1463.59 
-  " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2176.99,1463.59 2176.99,1464 2202.99,1464 2202.99,1463.59 2176.99,1463.59 
-  "/>
-<polygon clip-path="url(#clip7102)" points="
-2202.99,1463.59 2202.99,1464 2229,1464 2229,1463.59 2202.99,1463.59 2202.99,1463.59 
-  " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7102)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2202.99,1463.59 2202.99,1464 2229,1464 2229,1463.59 2202.99,1463.59 
-  "/>
-<polyline clip-path="url(#clip7102)" style="stroke:#e26f46; stroke-width:16; stroke-opacity:1; fill:none" points="
-  239.498,486.129 259.429,894.879 279.36,1047.93 299.29,1135.59 319.221,1194.49 339.151,1237.52 359.082,1270.64 379.013,1297.01 398.943,1318.55 418.874,1336.45 
-  438.804,1351.54 458.735,1364.4 478.666,1375.47 498.596,1385.06 518.527,1393.42 538.458,1400.75 558.388,1407.2 578.319,1412.91 598.249,1417.96 618.18,1422.46 
-  638.111,1426.46 658.041,1430.04 677.972,1433.25 697.902,1436.13 717.833,1438.71 737.764,1441.04 757.694,1443.13 777.625,1445.03 797.556,1446.74 817.486,1448.28 
-  837.417,1449.68 857.347,1450.95 877.278,1452.1 897.209,1453.14 917.139,1454.09 937.07,1454.95 957,1455.73 976.931,1456.44 996.862,1457.09 1016.79,1457.68 
-  1036.72,1458.22 1056.65,1458.71 1076.58,1459.16 1096.51,1459.57 1116.45,1459.94 1136.38,1460.28 1156.31,1460.59 1176.24,1460.87 1196.17,1461.13 1216.1,1461.37 
-  1236.03,1461.59 1255.96,1461.79 1275.89,1461.97 1295.82,1462.14 1315.75,1462.29 1335.68,1462.43 1355.61,1462.56 1375.54,1462.68 1395.47,1462.78 1415.4,1462.88 
-  1435.34,1462.97 1455.27,1463.06 1475.2,1463.13 1495.13,1463.2 1515.06,1463.27 1534.99,1463.33 1554.92,1463.38 1574.85,1463.43 1594.78,1463.48 1614.71,1463.52 
-  1634.64,1463.56 1654.57,1463.59 1674.5,1463.62 1694.43,1463.65 1714.36,1463.68 1734.29,1463.71 1754.23,1463.73 1774.16,1463.75 1794.09,1463.77 1814.02,1463.79 
-  1833.95,1463.8 1853.88,1463.82 1873.81,1463.83 1893.74,1463.85 1913.67,1463.86 1933.6,1463.87 1953.53,1463.88 1973.46,1463.89 1993.39,1463.9 2013.32,1463.9 
-  2033.25,1463.91 2053.18,1463.92 2073.11,1463.92 2093.05,1463.93 2112.98,1463.93 2132.91,1463.94 2152.84,1463.94 2172.77,1463.95 2192.7,1463.95 2212.63,1463.96 
+<polyline clip-path="url(#clip8502)" style="stroke:#e26f46; stroke-width:16; stroke-opacity:1; fill:none" points="
+  240.211,519.965 260.137,903.452 280.063,1050.9 299.989,1136.03 319.915,1193.48 339.842,1235.62 359.768,1268.14 379.694,1294.12 399.62,1315.39 419.546,1333.13 
+  439.472,1348.13 459.398,1360.96 479.325,1372.03 499.251,1381.66 519.177,1390.08 539.103,1397.48 559.029,1404.03 578.955,1409.83 598.882,1414.99 618.808,1419.59 
+  638.734,1423.72 658.66,1427.41 678.586,1430.73 698.512,1433.72 718.438,1436.42 738.365,1438.86 758.291,1441.06 778.217,1443.06 798.143,1444.87 818.069,1446.51 
+  837.995,1448 857.922,1449.36 877.848,1450.59 897.774,1451.72 917.7,1452.74 937.626,1453.68 957.552,1454.53 977.478,1455.31 997.405,1456.03 1017.33,1456.68 
+  1037.26,1457.28 1057.18,1457.82 1077.11,1458.32 1097.04,1458.78 1116.96,1459.2 1136.89,1459.59 1156.81,1459.94 1176.74,1460.26 1196.67,1460.56 1216.59,1460.83 
+  1236.52,1461.08 1256.44,1461.31 1276.37,1461.53 1296.3,1461.72 1316.22,1461.9 1336.15,1462.06 1356.08,1462.21 1376,1462.35 1395.93,1462.48 1415.85,1462.6 
+  1435.78,1462.71 1455.71,1462.81 1475.63,1462.9 1495.56,1462.99 1515.48,1463.06 1535.41,1463.14 1555.34,1463.2 1575.26,1463.26 1595.19,1463.32 1615.12,1463.37 
+  1635.04,1463.42 1654.97,1463.46 1674.89,1463.5 1694.82,1463.54 1714.75,1463.58 1734.67,1463.61 1754.6,1463.64 1774.52,1463.66 1794.45,1463.69 1814.38,1463.71 
+  1834.3,1463.73 1854.23,1463.75 1874.16,1463.77 1894.08,1463.79 1914.01,1463.8 1933.93,1463.82 1953.86,1463.83 1973.79,1463.84 1993.71,1463.86 2013.64,1463.87 
+  2033.56,1463.88 2053.49,1463.89 2073.42,1463.89 2093.34,1463.9 2113.27,1463.91 2133.2,1463.91 2153.12,1463.92 2173.05,1463.93 2192.97,1463.93 2212.9,1463.94 
   
   "/>
-<polygon clip-path="url(#clip7100)" points="
+<polygon clip-path="url(#clip8500)" points="
 1989.93,312.204 2280.76,312.204 2280.76,130.764 1989.93,130.764 
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1989.93,312.204 2280.76,312.204 2280.76,130.764 1989.93,130.764 1989.93,312.204 
   "/>
-<polygon clip-path="url(#clip7100)" points="
+<polygon clip-path="url(#clip8500)" points="
 2013.93,215.436 2157.93,215.436 2157.93,167.052 2013.93,167.052 2013.93,215.436 
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip7100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip8500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   2013.93,215.436 2157.93,215.436 2157.93,167.052 2013.93,167.052 2013.93,215.436 
   "/>
-<g clip-path="url(#clip7100)">
+<g clip-path="url(#clip8500)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2181.93, 208.744)" x="2181.93" y="208.744">y1</text>
 </g>
-<polyline clip-path="url(#clip7100)" style="stroke:#e26f46; stroke-width:16; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip8500)" style="stroke:#e26f46; stroke-width:16; stroke-opacity:1; fill:none" points="
   2013.93,251.724 2157.93,251.724 
   "/>
-<g clip-path="url(#clip7100)">
+<g clip-path="url(#clip8500)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2181.93, 269.224)" x="2181.93" y="269.224">y2</text>
 </g>
 </svg>
