@@ -5,11 +5,11 @@
 Nl, N = size(A,1), size(A,2)
 Bbr = diagm(0 =&gt; -( 2 .+ 10*rand(Nl) )) # line parameters
 Ψ = [ zeros(Nl)  -Bbr*A[:,2:end]*inv(A[:,2:end]&#39;*Bbr*A[:,2:end]) ] # PTDF matrix</code></pre><pre><code class="language-none">5×4 Array{Float64,2}:
- 0.0  -0.675418  -0.35987   -0.144712
- 0.0  -0.198882  -0.392228  -0.157724
- 0.0  -0.1257    -0.247902  -0.697564
- 0.0  -0.324582   0.35987    0.144712
- 0.0   0.1257     0.247902  -0.302436</code></pre><p>Now we can continue the remaining ingredients that specify our systems:</p><pre><code class="language-julia">Cp, Cd = [1 0; 0 0; 0 0; 0 1], [0 0; 1 0; 0 1; 0 0 ] # book-keeping
+ 0.0  -0.511961   -0.258244  -0.176598
+ 0.0  -0.407235   -0.618945  -0.42326 
+ 0.0  -0.0808038  -0.122811  -0.400142
+ 0.0  -0.488039    0.258244   0.176598
+ 0.0   0.0808038   0.122811  -0.599858</code></pre><p>Now we can continue the remaining ingredients that specify our systems:</p><pre><code class="language-julia">Cp, Cd = [1 0; 0 0; 0 0; 0 1], [0 0; 1 0; 0 1; 0 0 ] # book-keeping
 Ng, Nd = size(Cp,2), size(Cd,2)
 c = 4 .+ 10*rand(Ng) # cost function parameters
 λp, λl = 1.6*ones(Ng), 1.6*ones(Nl) # lambdas for chance constraint reformulations
