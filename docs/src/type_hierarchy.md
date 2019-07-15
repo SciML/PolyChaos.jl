@@ -24,7 +24,7 @@ What are the fields of such a type `measure`?
 | `w::Function` | Weight function $w: \Omega \rightarrow \mathbb{R}$ |
 | `dom::Tuple{Float64,Float64}` | Domain $ \Omega$|
 | `symmetric::Bool` | Is $w$ symmetric relative to some $m \in \Omega$, hence $w(m-x) = w(m+x)$ for all $x \in \Omega$? |
-| `pars::Dict` | Additional parameters (e.g. shape parameters for Beta distribution |
+| `pars::Dict` | Additional parameters (e.g. shape parameters for Beta distribution) |
 
 
 They are a `name`, a weight function $w: \Omega \rightarrow \mathbb{R}$ with domain $\Omega$ (`dom`).
@@ -128,7 +128,7 @@ The type `MultiMeasure` serves this purpose, with its fields
 | `w_uni::Vector{Function}` | Weight functions of underlying univariate measures |
 | `dom::Vector{Tuple{Float64,Float64}}` | Domain |
 | `symmetric::Vector{Bool}` | Symmetry properties |
-| `pars::Vector{Dict}` | Additioanl parameters |
+| `pars::Vector{Dict}` | Additional parameters |
 
 All fields from `Measure` appear in vectorized versions (except for the weight $w$, which is the weight of the product measure)
 The only *new* field is `w_uni`, which stacks the univariate weight functions.
