@@ -47,7 +47,7 @@ We consider the following 4-bus system that has a total of two generators (buses
 
 We formalize the numbering of the generators (superscript $g$), loads (superscript $d$ for demand), and branches (superscript $br$) as follows
 ```math
-\mathcal{N}^g = \{ 1, 3\}, \, \mathcal{N}^d = \{ 2, 4\}, \, \mathcal{N}^br = \{ 1, 2, 3, 4, 5 \}.
+\mathcal{N}^g = \{ 1, 3\}, \, \mathcal{N}^d = \{ 2, 4\}, \, \mathcal{N}^{br} = \{ 1, 2, 3, 4, 5 \}.
 ```
 With each generator we associate a linear cost with cost coefficient $c_i$ for all $i \in \mathcal{N}^g$.
 Each generator must adhere to its engineering limits given by $(\underline{p}_i^g , \overline{p}_i^g )$ for all $i \in \mathcal{N}^g$.
