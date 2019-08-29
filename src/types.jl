@@ -3,7 +3,13 @@ export  OrthoPoly,
         Quad,
         Measure,
         MultiMeasure,
-        Tensor
+        Tensor,
+        LegendreMeasure,
+        JacobiMeasure,
+        LaguerreMeasure,
+        genLaguerreMeasure,
+        HermiteMeasure,
+        genHermiteMeasure
 
 abstract type AbstractMeasure end
 abstract type AbstractCanonicalMeasure <: AbstractMeasure end
@@ -69,7 +75,7 @@ struct genLaguerreMeasure <: AbstractCanonicalMeasure
     symmetric::Bool
     pars::Dict
     function genLaguerreMeasure(d::Dict)
-        new(build_w_genlaguerre(d[:shape]), d[:shape_b]),(0,Inf),false,d)
+        new(build_w_genlaguerre(d[:shape]),(0,Inf),false,d)
     end
 end
 
@@ -93,8 +99,17 @@ struct genHermiteMeasure <: AbstractCanonicalMeasure
     end
 end
 
+struct MeixnerpollaczekMeasure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Tuple{Real,Real}
+    symmetric::Bool
+    pars::Dict
+    function MeixnerpollaczekMeasure(d::Dict)
+        new(build_w_meixner_pollaczek(d[:lambda], d[:phi]),(-Inf,Inf),false,d)
+    end
+end
+
 """
-    name == "meixnerpollaczek" &&  return Measure(name,build_w_meixner_pollaczek(d[:lambda], d[:phi]),(-Inf,Inf),false,d)
     # measures corresponding to probability density functions:
     name == "gaussian"  &&  return Measure(name,w_gaussian,(-Inf,Inf),true,d)
     name == "uniform01" &&  return Measure(name,w_uniform01,(0,1),true,d)
