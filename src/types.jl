@@ -1,12 +1,17 @@
 export  OrthoPoly,
         MultiOrthoPoly,
         Quad,
-        OrthoPolyQ,
         Measure,
         MultiMeasure,
         Tensor
 
-struct Measure
+abstract type AbstractMeasure end
+abstract type AbstractCanonicalMeasure <: AbstractMeasure end
+abstract type AbstractQuad end
+abstract type AbstractOrthoPoly end
+abstract type AbstractCanonicalOrthoPoly <: AbstractOrthoPoly end
+
+struct Measure <: AbstractMeasure
     name::String
     w::Function
     dom::Tuple{Float64,Float64}
@@ -28,14 +33,67 @@ struct MultiMeasure
 end
 
 # constructor for classic distributions
-function Measure(name::String,d::Dict=Dict())
-    name = lowercase(name)
-    name == "legendre"         &&  return Measure(name,w_legendre,(-1,1),true,d)
-    name == "jacobi"           &&  d[:shape_a] > -1 && d[:shape_b] > -1 && return Measure(name,build_w_jacobi(d[:shape_a], d[:shape_b]),(-1,1),d[:shape_a] == d[:shape_b],d)
-    name == "laguerre"         &&  return Measure(name,w_laguerre,(0,Inf),false,d)
-    name == "genlaguerre"      &&  return Measure(name,build_w_genlaguerre(d[:shape]),(0,Inf),false,d)
-    name == "hermite"          &&  return Measure(name,w_hermite,(-Inf,Inf),true,d)
-    name == "genhermite"       &&  return Measure(name,build_w_genhermite(Float64(d[:mu])),(-Inf,Inf),true,d)
+struct LegendreMeasure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Tuple{Real,Real}
+    symmetric::Bool
+    function LegendreMeasure()
+        new(w_legendre,(-1.,1.),true)
+    end
+end
+
+struct JacobiMeasure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Tuple{Real,Real}
+    symmetric::Bool
+    pars::Dict
+    function JacobiMeasure(d::Dict)
+        @assert d[:shape_a] > -1 && d[:shape_b] > -1 "Invalid shape parameters."
+        new(build_w_jacobi(d[:shape_a], d[:shape_b]),(-1,1),d[:shape_a] == d[:shape_b],d)
+    end
+end
+
+struct LaguerreMeasure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Tuple{Real,Real}
+    symmetric::Bool
+
+    function LaguerreMeasure()
+        new(w_laguerre,(0,Inf),false)
+    end
+end
+
+struct genLaguerreMeasure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Tuple{Real,Real}
+    symmetric::Bool
+    pars::Dict
+    function genLaguerreMeasure(d::Dict)
+        new(build_w_genlaguerre(d[:shape]), d[:shape_b]),(0,Inf),false,d)
+    end
+end
+
+struct HermiteMeasure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Tuple{Real,Real}
+    symmetric::Bool
+
+    function HermiteMeasure()
+        new(w_hermite,(-Inf,Inf),true)
+    end
+end
+
+struct genHermiteMeasure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Tuple{Real,Real}
+    symmetric::Bool
+    pars::Dict
+    function genHermiteMeasure(d::Dict)
+        new(build_w_genhermite(Float64(d[:mu])),(-Inf,Inf),true,d)
+    end
+end
+
+"""
     name == "meixnerpollaczek" &&  return Measure(name,build_w_meixner_pollaczek(d[:lambda], d[:phi]),(-Inf,Inf),false,d)
     # measures corresponding to probability density functions:
     name == "gaussian"  &&  return Measure(name,w_gaussian,(-Inf,Inf),true,d)
@@ -47,15 +105,14 @@ function Measure(name::String,d::Dict=Dict())
     name == "jacobi" && !(d[:shape_a] > -1 && d[:shape_b] > -1) &&  throw(AssertionError("Invalid shape parameters."))
     name == "beta01" && !(d[:shape_a] >  0 && d[:shape_b] >  0) &&  throw(AssertionError("Invalid shape parameters."))
     name == "gamma"  && !(d[:rate] == 1.) &&  error("Rates different from one not supported currently.")
-    throw(error("A measure of name $name is not implemented."))
-end
+"""
 
-struct OrthoPoly
+struct OrthoPoly <: AbstractOrthoPoly
     name::String
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
-    meas::Measure
+
     # inner constructor
     function OrthoPoly(name::String,deg::Int64,α::Vector{Float64},β::Vector{Float64},m::Measure)
         @assert deg >= 0 "Degree has to be non-negative."
@@ -63,6 +120,7 @@ struct OrthoPoly
         new(lowercase(name),deg,α,β,m)
     end
 end
+
 
 # constructor for classic distributions
 function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
@@ -110,6 +168,12 @@ struct Quad
         @assert N >= 1 "Number of qudrature points has to be positive"
         @assert length(nodes) == length(weights) "Inconsistent number of nodes and weights inconsistent."
         new(lowercase(name),N,nodes,weights,m)
+    end
+end
+
+struct EmptyQuad <: AbstractQuad
+    function EmptyQuad()
+        new()
     end
 end
 
