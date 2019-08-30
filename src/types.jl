@@ -191,11 +191,11 @@ struct OrthoPoly <: AbstractOrthoPoly
     function OrthoPoly(name::String,deg::Int64,α::Vector{Float64},β::Vector{Float64},m::Measure)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert length(α) == length(β) "Different number of recursion coefficients α and β supplied."
-        new(lowercase(name),deg,α,β,m)
+        new(lowercase(name),deg,α,β,m,EmptyQuad())
     end
 end
 
-struct LegendreOrthoPoly <: AbstractOrthoPoly
+struct LegendreOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -205,11 +205,11 @@ struct LegendreOrthoPoly <: AbstractOrthoPoly
     function LegendreOrthoPoly(deg::Int64;Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_legendre(Nrec)...)
+        new(deg,rm_legendre(Nrec)...,EmptyQuad())
     end
 end
 
-struct JacobiOrthoPoly <: AbstractOrthoPoly
+struct JacobiOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -219,11 +219,11 @@ struct JacobiOrthoPoly <: AbstractOrthoPoly
     function JacobiOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_jacobi(Nrec,Float64(d[:shape_a]), Float64(d[:shape_b]))...)
+        new(deg,rm_jacobi(Nrec,Float64(d[:shape_a]), Float64(d[:shape_b]))...,EmptyQuad())
     end
 end
 
-struct LaguerreOrthoPoly <: AbstractOrthoPoly
+struct LaguerreOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -233,11 +233,11 @@ struct LaguerreOrthoPoly <: AbstractOrthoPoly
     function LaguerreOrthoPoly(deg::Int64,;Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_laguerre(Nrec)...)
+        new(deg,rm_laguerre(Nrec)...,EmptyQuad())
     end
 end
 
-struct genLaguerreOrthoPoly <: AbstractOrthoPoly
+struct genLaguerreOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -247,11 +247,11 @@ struct genLaguerreOrthoPoly <: AbstractOrthoPoly
     function genLaguerreOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_laguerre(Nrec,Float64(d[:shape]))...)
+        new(deg,rm_laguerre(Nrec,Float64(d[:shape]))...,EmptyQuad())
     end
 end
 
-struct HermiteOrthoPoly <: AbstractOrthoPoly
+struct HermiteOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -261,11 +261,11 @@ struct HermiteOrthoPoly <: AbstractOrthoPoly
     function HermiteOrthoPoly(deg::Int64;Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_hermite(Nrec)...)
+        new(deg,rm_hermite(Nrec)...,EmptyQuad())
     end
 end
 
-struct genHermiteOrthoPoly <: AbstractOrthoPoly
+struct genHermiteOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -275,11 +275,11 @@ struct genHermiteOrthoPoly <: AbstractOrthoPoly
     function genHermiteOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_hermite(Nrec,Float64(d[:mu]))...)
+        new(deg,rm_hermite(Nrec,Float64(d[:mu]))...,EmptyQuad())
     end
 end
 
-struct MeixnerpollaczekOrthoPoly <: AbstractOrthoPoly
+struct MeixnerpollaczekOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -289,11 +289,11 @@ struct MeixnerpollaczekOrthoPoly <: AbstractOrthoPoly
     function MeixnerpollaczekOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_meixner_pollaczek(Nrec,Float64(d[:lambda]),Float64(d[:phi]))...)
+        new(deg,rm_meixner_pollaczek(Nrec,Float64(d[:lambda]),Float64(d[:phi]))...,EmptyQuad())
     end
 end
 
-struct GaussianOrthoPoly <: AbstractOrthoPoly
+struct GaussianOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -303,11 +303,11 @@ struct GaussianOrthoPoly <: AbstractOrthoPoly
     function GaussianOrthoPoly(deg::Int64;Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1/sqrt(2pi),rm_hermite_prob(Nrec)...)...)
+        new(deg,r_scale(1/sqrt(2pi),rm_hermite_prob(Nrec)...)...,EmptyQuad())
     end
 end
 
-struct Uniform01OrthoPoly <: AbstractOrthoPoly
+struct Uniform01OrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -317,11 +317,11 @@ struct Uniform01OrthoPoly <: AbstractOrthoPoly
     function Uniform01OrthoPoly(deg::Int64;Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1.,rm_legendre01(Nrec)...)...)
+        new(deg,r_scale(1.,rm_legendre01(Nrec)...)...,EmptyQuad())
     end
 end
 
-struct Beta01OrthoPoly <: AbstractOrthoPoly
+struct Beta01OrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -331,11 +331,11 @@ struct Beta01OrthoPoly <: AbstractOrthoPoly
     function Beta01OrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1/beta(d[:shape_a],d[:shape_b]),rm_jacobi01(Nrec,Float64(d[:shape_b])-1,Float64(d[:shape_a])-1)...)...)
+        new(deg,r_scale(1/beta(d[:shape_a],d[:shape_b]),rm_jacobi01(Nrec,Float64(d[:shape_b])-1,Float64(d[:shape_a])-1)...)...,EmptyQuad())
     end
 end
 
-struct GammaOrthoPoly <: AbstractOrthoPoly
+struct GammaOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -345,11 +345,11 @@ struct GammaOrthoPoly <: AbstractOrthoPoly
     function GammaOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale((d[:rate]^d[:shape])/gamma(d[:shape]),rm_laguerre(Nrec,Float64(d[:shape]-1.))...)...)
+        new(deg,r_scale((d[:rate]^d[:shape])/gamma(d[:shape]),rm_laguerre(Nrec,Float64(d[:shape]-1.))...)...,EmptyQuad())
     end
 end
 
-struct LogisticOrthoPoly <: AbstractOrthoPoly
+struct LogisticOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int64          # maximum degree
     α::Vector{Float64}  # recurrence coefficients
     β::Vector{Float64}  # recurrence coefficients
@@ -359,7 +359,7 @@ struct LogisticOrthoPoly <: AbstractOrthoPoly
     function LogisticOrthoPoly(deg::Int64;Nrec::Int64=deg+1)
         @assert deg >= 0 "Degree has to be non-negative."
         @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1.,rm_logistic(Nrec)...)...)
+        new(deg,r_scale(1.,rm_logistic(Nrec)...)...,EmptyQuad())
     end
 end
 
