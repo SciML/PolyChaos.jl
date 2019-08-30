@@ -1,7 +1,7 @@
 using PolyChaos, Test
 
 deg = 5
-op = OrthoPoly("genlaguerre",deg,Dict(:shape=>1.23))
+op = genLaguerreOrthoPoly(deg,Dict(:shape=>1.23))
 opq = OrthoPolyQ(op)
 
 n = 10
@@ -16,10 +16,10 @@ X = [ exp(3 + rand()), exp.(3 .+ rand(n)) ]
     end
 end
 
-ops = [  OrthoPoly("genlaguerre",deg,Dict(:shape=>1.23)),
-        OrthoPoly("genhermite",deg,Dict(:mu=>3.4)),
-        OrthoPoly("legendre",deg),
-        OrthoPoly("jacobi",deg,Dict(:shape_a=>4.3,:shape_b=>10.))
+ops = [  genLaguerreOrthoPoly(deg,Dict(:shape=>1.23)),
+        genHermiteOrthoPoly(,deg,Dict(:mu=>3.4)),
+        LegendreOrthoPoly(deg),
+        JacobiOrthoPoly(,deg,Dict(:shape_a=>4.3,:shape_b=>10.))
      ]
 opqs = map(OrthoPolyQ, ops)
 mop = MultiOrthoPoly(ops,deg)
