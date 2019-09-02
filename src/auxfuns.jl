@@ -42,20 +42,17 @@ nw(mOP::MultiOrthoPoly) = nw(mOP.uni)
 
 """
 ```
-coeffs(op::OrthoPoly)
-coeffs(opq::OrthoPolyQ)
-coeffs(op::Vector{OrthoPoly})
-coeffs(opq::Vector{OrthoPolyQ})
+coeffs(op::AbstractOrthoPoly)
+coeffs(op::Vector{<:AbstractOrthoPoly})
 coeffs(mop::MultiOrthoPoly)
 ```
 returns recurrence coefficients of in matrix form
 """
-function coeffs(op::OrthoPoly)
+function coeffs(op::AbstractOrthoPoly)
     [op.α op.β]
 end
-coeffs(opq::OrthoPolyQ) = coeffs(opq.op)
 
-function coeffs(op::Vector{OrthoPoly})
+function coeffs(op::Vector{<:AbstractOrthoPoly})
     a = [ p.α for p in op]
     b = [ p.β for p in op]
     return a,b
