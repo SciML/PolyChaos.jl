@@ -45,7 +45,7 @@ function rm_compute(weight::Function,lb::Float64,ub::Float64,Npoly::Int64=4,Nqua
     return a,b
 end
 
-rm_compute(m::Measure,Npoly::Int64=4,Nquad::Int64=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2],Npoly,Nquad,quadrature=quadrature,discretization=discretization)
+rm_compute(m::AbstractMeasure,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2],Npoly,Nquad,quadrature=quadrature,discretization=discretization)
 
 ##
 function rm_logisticsum(n::Int,p1::Vector{Float64},p2::Vector{Float64};Mmax::Int=100,eps0::Real=1e-9)
@@ -119,7 +119,7 @@ that are orthogonal on ``(0,\\infty)`` relative to ``w(t) = t^a \\mathrm{e}^{-t}
 
 The call `rm_laguerre(N)` is the same as `rm_laguerre(N,0)`.
 """
-function rm_laguerre(N::Int,a::Float64)
+function rm_laguerre(N::Int,a::Real)
     @assert N >= 0 && a > -1. "parameter(s) out of range"
     N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     N==1 && return [a+1.], [gamma(a+1)]
@@ -140,7 +140,7 @@ that are orthogonal on ``(-1,1)`` relative to ``w(t) = (1-t)^a (1+t)^b``.
 The call `rm_jacobi(N,a)` is the same as `rm_jacobi(N,a,a)` and `rm_jacobi(N)` the same as
 `rm_jacobi(N,0,0)`.
 """
-function rm_jacobi(N::Int,a::Float64,b::Float64)
+function rm_jacobi(N::Int,a::Real,b::Real)
     @assert N >= 0 && a >- 1. && b >- 1. "parameter(s) out of range"
     N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     nu = (b - a) / ( a+ b + 2.);

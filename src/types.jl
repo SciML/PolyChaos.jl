@@ -31,7 +31,8 @@ export  AbstractMeasure,
         Beta01OrthoPoly,
         GammaOrthoPoly,
         LogisticOrthoPoly,
-        Uniform01OrthoPoly
+        Uniform01OrthoPoly,
+        InconsistencyError
 
 abstract type AbstractMeasure end
 abstract type AbstractCanonicalMeasure <: AbstractMeasure end
@@ -42,12 +43,12 @@ abstract type AbstractCanonicalOrthoPoly <: AbstractOrthoPoly end
 struct Measure <: AbstractMeasure
     name::String
     w::Function
-    dom::Tuple{Float64,Float64}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     pars::Dict
-    function Measure(name::String,w::Function,dom::Tuple{Real,Real},symm::Bool,d::Dict=Dict())
-        @assert dom[1] < dom[2] "Invalid support."
-        new(lowercase(name),w,Float64.(dom),symm,d)
+    function Measure(name::String, w::Function, dom::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
+        !(dom[1] < dom[2]) && throw(DomainError(dom), "invalid domain bounds specified")
+        new(lowercase(name),w, dom, symm, d)
     end
 end
 
@@ -63,7 +64,7 @@ end
 # constructor for classic distributions
 struct LegendreMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     function LegendreMeasure()
         new(w_legendre,(-1.,1.),true)
@@ -72,7 +73,7 @@ end
 
 struct JacobiMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     ashapeParameter::Real
     bshapeParameter::Real
@@ -87,7 +88,7 @@ end
 
 struct LaguerreMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
 
     function LaguerreMeasure()
@@ -97,7 +98,7 @@ end
 
 struct genLaguerreMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     shapeParameter::Real
 
@@ -109,7 +110,7 @@ end
 
 struct HermiteMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
 
     function HermiteMeasure()
@@ -119,7 +120,7 @@ end
 
 struct genHermiteMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     muParameter::Real
 
@@ -131,7 +132,7 @@ end
 
 struct MeixnerPollaczekMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     λParameter::Real
     ϕParameter::Real
@@ -145,7 +146,7 @@ end
 
 struct GaussianMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
 
     function GaussianMeasure()
@@ -155,7 +156,7 @@ end
 
 struct Uniform01Measure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
 
     function Uniform01Measure()
@@ -165,7 +166,7 @@ end
 
 struct Beta01Measure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     ashapeParameter::Real
     bshapeParameter::Real
@@ -179,7 +180,7 @@ end
 
 struct GammaMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
     shapeParameter::Real
     rateParameter::Real
@@ -193,7 +194,7 @@ end
 
 struct LogisticMeasure <: AbstractCanonicalMeasure
     w::Function
-    dom::Tuple{Real,Real}
+    dom::Tuple{<:Real,<:Real}
     symmetric::Bool
 
     function LogisticMeasure()
@@ -201,237 +202,239 @@ struct LogisticMeasure <: AbstractCanonicalMeasure
     end
 end
 
+#######################################################################
+#######################################################################
+#######################################################################
+
+struct InconsistencyError <: Exception
+    var::String
+end
+
+Base.showerror(io::IO, err::InconsistencyError) = print(io, err.var)
+
 
 function _checkConsistency(deg::Int, Nrec::Int)
     deg < 0 && throw(DomainError(deg, "degree has to be non-negative"))
     Nrec < deg + 1 && throw(DomainError(Nrec, "not enough recurrence coefficients specified (need >= $(deg + 1))"))
 end
 
-struct OrthoPoly <: AbstractOrthoPoly
-    name::String
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
-    quad::AbstractQuad
-    # inner constructor
-    function OrthoPoly(name::String,deg::Int64,α::Vector{Float64},β::Vector{Float64},m::Measure)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert length(α) == length(β) "Different number of recursion coefficients α and β supplied."
-        new(lowercase(name),deg,α,β,m,EmptyQuad())
-    end
-end
-
 struct LegendreOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int            # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::LegendreMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function LegendreOrthoPoly(deg::Int;Nrec::Int=deg+1)
+    function LegendreOrthoPoly(deg::Int; Nrec::Int=deg+1)
         _checkConsistency(deg, Nrec)
         a, b = rm_legendre(Nrec)
-        new(deg, a, b, EmptyQuad())
+        new(deg, a, b, LegendreMeasure(), EmptyQuad())
     end
 end
 
 struct JacobiOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
-    shapeParameters::Dict{Symbol, Real}
+    deg::Int            # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::JacobiMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function JacobiOrthoPoly(deg::Int, shapeParameters::Dict{Symbol, Real}; Nrec::Int=deg+1)
+    function JacobiOrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int=deg+1)
         _checkConsistency(deg, Nrec)
-        a, b = rm_jacobi(Nrec, shapeParameters[:shape_a], shapeParameters[:shape_b])
-        new(deg, a, b, shapeParameters, EmptyQuad())
+        α, β = rm_jacobi(Nrec, shape_a, shape_b)
+        new(deg, α, β, JacobiMeasure(shape_a, shape_b), EmptyQuad())
     end
 end
 
 struct LaguerreOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::LaguerreMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function LaguerreOrthoPoly(deg::Int64,;Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_laguerre(Nrec),EmptyQuad())
+    function LaguerreOrthoPoly(deg::Int;Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = rm_laguerre(Nrec)
+        new(deg, α, β, LaguerreMeasure(), EmptyQuad())
     end
 end
 
 struct genLaguerreOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::genLaguerreMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function genLaguerreOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_laguerre(Nrec,Float64(d[:shape])),EmptyQuad())
+    function genLaguerreOrthoPoly(deg::Int, shape::Real ;Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = rm_laguerre(Nrec, shape)
+        new(deg, α, β, genLaguerreMeasure(shape), EmptyQuad())
     end
 end
 
 struct HermiteOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::HermiteMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function HermiteOrthoPoly(deg::Int64;Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_hermite(Nrec),EmptyQuad())
+    function HermiteOrthoPoly(deg::Int; Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = rm_hermite(Nrec)
+        new(deg, α, β, HermiteMeasure(), EmptyQuad())
     end
 end
 
 struct genHermiteOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::genHermiteMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function genHermiteOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_hermite(Nrec,Float64(d[:mu])),EmptyQuad())
+    function genHermiteOrthoPoly(deg::Int, mu::Real;Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = rm_hermite(Nrec, mu)
+        new(deg, α, β, genHermiteMeasure(mu), EmptyQuad())
     end
 end
 
-struct MeixnerpollaczekOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+struct MeixnerPollaczekOrthoPoly <: AbstractCanonicalOrthoPoly
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::MeixnerPollaczekMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function MeixnerpollaczekOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,rm_meixner_pollaczek(Nrec,Float64(d[:lambda]),Float64(d[:phi])),EmptyQuad())
+    function MeixnerPollaczekOrthoPoly(deg::Int, λ::Real, ϕ::Real; Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = rm_meixner_pollaczek(Nrec, λ, ϕ)
+        new(deg, α, β, MeixnerPollaczekMeasure(λ,ϕ), EmptyQuad())
     end
 end
 
 struct GaussianOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::GaussianMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function GaussianOrthoPoly(deg::Int64;Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1/sqrt(2pi),rm_hermite_prob(Nrec)),EmptyQuad())
+    function GaussianOrthoPoly(deg::Int;Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = r_scale(1/sqrt(2pi), rm_hermite_prob(Nrec)...)
+        new(deg, α, β, GaussianMeasure(), EmptyQuad())
     end
 end
 
 struct Uniform01OrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::Uniform01Measure
     quad::AbstractQuad
 
     # inner constructor
-    function Uniform01OrthoPoly(deg::Int64;Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1.,rm_legendre01(Nrec)),EmptyQuad())
+    function Uniform01OrthoPoly(deg::Int;Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = r_scale(1., rm_legendre01(Nrec)...)
+        new(deg, α, β, Uniform01Measure(), EmptyQuad())
     end
 end
 
 struct Beta01OrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::Beta01Measure
     quad::AbstractQuad
 
     # inner constructor
-    function Beta01OrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1/beta(d[:shape_a],d[:shape_b]),rm_jacobi01(Nrec,Float64(d[:shape_b])-1,Float64(d[:shape_a])-1)),EmptyQuad())
+    function Beta01OrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = r_scale(1/beta(shape_a, shape_b), rm_jacobi01(Nrec, shape_b-1., shape_a-1.)...)
+        new(deg, α, β, Beta01Measure(shape_a, shape_b), EmptyQuad())
     end
 end
 
 struct GammaOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::GammaMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function GammaOrthoPoly(deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale((d[:rate]^d[:shape])/gamma(d[:shape]),rm_laguerre(Nrec,Float64(d[:shape]-1.))),EmptyQuad())
+    function GammaOrthoPoly(deg::Int, shape::Real, rate::Real; Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = r_scale((rate^shape)/gamma(shape), rm_laguerre(Nrec, shape-1.)...)
+        new(deg, α, β, GammaMeasure(shape, rate), EmptyQuad())
     end
 end
 
 struct LogisticOrthoPoly <: AbstractCanonicalOrthoPoly
-    deg::Int64          # maximum degree
-    α::Vector{Float64}  # recurrence coefficients
-    β::Vector{Float64}  # recurrence coefficients
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::LogisticMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function LogisticOrthoPoly(deg::Int64;Nrec::Int64=deg+1)
-        @assert deg >= 0 "Degree has to be non-negative."
-        @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-        new(deg,r_scale(1.,rm_logistic(Nrec)),EmptyQuad())
+    function LogisticOrthoPoly(deg::Int; Nrec::Int=deg+1)
+        _checkConsistency(deg, Nrec)
+        α, β = r_scale(1., rm_logistic(Nrec)...)
+        new(deg, α, β, LogisticMeasure(), EmptyQuad())
     end
 end
 
-"""
-# constructor for classic distributions
-function OrthoPoly(name::String,deg::Int64,d::Dict=Dict();Nrec::Int64=deg+1)
-  @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-  name = lowercase(name)
-  name == "legendre"         && return OrthoPoly(name,deg,rm_legendre(Nrec)...,Measure(name,Dict()))
-  name == "jacobi"           && return OrthoPoly(name,deg,rm_jacobi(Nrec,Float64(d[:shape_a]), Float64(d[:shape_b]))...,Measure(name,d))
-  name == "laguerre"         && return OrthoPoly(name,deg,rm_laguerre(Nrec)...,Measure(name,Dict()))
-  name == "genlaguerre"      && return OrthoPoly(name,deg,rm_laguerre(Nrec,Float64(d[:shape]))...,Measure(name,d))
-  name == "hermite"          && return OrthoPoly(name,deg,rm_hermite(Nrec)...,Measure(name,Dict()))
-  name == "genhermite"       && return OrthoPoly(name,deg,rm_hermite(Nrec,Float64(d[:mu]))...,Measure(name,d))
-  name == "meixnerpollaczek" && return OrthoPoly(name,deg,rm_meixner_pollaczek(Nrec,Float64(d[:lambda]),Float64(d[:phi]))...,Measure(name,d))
-  # measures corresponding to probability density functions:
-  name == "gaussian"  && return OrthoPoly(name,deg,r_scale(1/sqrt(2pi),rm_hermite_prob(Nrec)...)...,Measure(name,Dict()))
-  name == "uniform01" && return OrthoPoly(name,deg,r_scale(1.,rm_legendre01(Nrec)...)...,Measure(name,Dict()))
-  name == "beta01"    && return OrthoPoly(name,deg,r_scale(1/beta(d[:shape_a],d[:shape_b]),rm_jacobi01(Nrec,Float64(d[:shape_b])-1,Float64(d[:shape_a])-1)...)...,Measure(name,d))
-  name == "gamma"     && return OrthoPoly(name,deg,r_scale((d[:rate]^d[:shape])/gamma(d[:shape]),rm_laguerre(Nrec,Float64(d[:shape]-1.))...)...,Measure(name,d))
-  name == "logistic"  && return OrthoPoly(name,deg,r_scale(1.,rm_logistic(Nrec)...)...,Measure(name,Dict()))
+struct OrthoPoly <: AbstractOrthoPoly
+    name::String
+    deg::Int          # maximum degree
+    α::Vector{<:Real}  # recurrence coefficients
+    β::Vector{<:Real}  # recurrence coefficients
+    measure::AbstractMeasure
+    quad::AbstractQuad
+    # inner constructor
+    function OrthoPoly(name::String, deg::Int, α::Vector{<:Real}, β::Vector{<:Real}, measure::AbstractMeasure)
+        deg < 0 && throw(DomainError(deg, "degree has to be non-negative"))
+        !(length(α) == length(β)) && throw(InconsistencyError("Inconsistent lengths"))
+        new(lowercase(name), deg, α, β, measure, EmptyQuad())
+    end
 end
-"""
+
 # constructor for known Measure
-function OrthoPoly(name::String,deg::Int64,m::Measure;Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
-  @assert Nrec >= deg + 1 "Not enough recurrence coefficients specified"
-  name = lowercase(name)
-  a,b = rm_compute(m,Nrec,Nquad,quadrature=quadrature,discretization=discretization)
-  return OrthoPoly(name,deg,a,b,m)
+function OrthoPoly(name::String, deg::Int, measure::AbstractMeasure; Nrec=deg+1, Nquad=10*Nrec, quadrature::Function=clenshaw_curtis, discretization::Function=stieltjes)
+    _checkConsistency(deg, Nrec)
+    name = lowercase(name)
+    α, β = rm_compute(measure, Nrec, Nquad, quadrature=quadrature, discretization=discretization)
+    return OrthoPoly(name, deg, α, β, measure)
 end
 
 # general constructor
-function OrthoPoly(name::String,deg::Int64,w::Function,s::Tuple{Real,Real},symm::Bool,d::Dict=Dict();Nrec=deg+1,Nquad=10*Nrec,quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
+function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict(); Nrec=deg+1, Nquad=10*Nrec, quadrature::Function=clenshaw_curtis, discretization::Function=stieltjes)
   name = lowercase(name)
-  m = Measure(name,w,s,symm,d)
-  OrthoPoly(name,deg,m;Nrec=Nrec,Nquad=Nquad,quadrature=quadrature,discretization=discretization)
+  measure = Measure(name, w, s, symm, d)
+  OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization)
 end
 
 struct Quad
     name::String              # name of quadrature
-    Nquad::Int64              # number of qudrature points
-    nodes::Vector{Float64}
-    weights::Vector{Float64}
+    Nquad::Int              # number of qudrature points
+    nodes::Vector{<:Real}
+    weights::Vector{<:Real}
     meas::Measure
-    function Quad(name::String,N::Int64,nodes::Vector{Float64},weights::Vector{Float64},m::Measure)
+    function Quad(name::String,N::Int,nodes::Vector{<:Real},weights::Vector{<:Real},m::Measure)
         @assert N >= 1 "Number of qudrature points has to be positive"
         @assert length(nodes) == length(weights) "Inconsistent number of nodes and weights inconsistent."
         new(lowercase(name),N,nodes,weights,m)
@@ -445,7 +448,7 @@ struct EmptyQuad <: AbstractQuad
 end
 
 # general constructor
-function Quad(N::Int,α::Vector{Float64},β::Vector{Float64},m::Measure)
+function Quad(N::Int,α::Vector{<:Real},β::Vector{<:Real},m::Measure)
     @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
     @assert N <= length(α) - 1 "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
     n,w = gauss(N,α,β)
@@ -453,18 +456,18 @@ function Quad(N::Int,α::Vector{Float64},β::Vector{Float64},m::Measure)
 end
 Quad(N::Int,op::OrthoPoly) = Quad(N,op.α,op.β,op.meas)
 
-function Quad(N::Int64,weight::Function,α::Vector{Float64},β::Vector{Float64},supp::Tuple{Float64,Float64},symm::Bool,d::Dict=Dict())
+function Quad(N::Int,weight::Function,α::Vector{<:Real},β::Vector{<:Real},supp::Tuple{Float64,Float64},symm::Bool,d::Dict=Dict())
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
     Quad(N,α,β,m)
 end
 
 # all-purpose constructor (last resort!)
-function Quad(N::Int64,m::Measure;quadrature::Function=clenshaw_curtis)
+function Quad(N::Int,m::Measure;quadrature::Function=clenshaw_curtis)
   n, w = quadgp(m.w,m.dom[1],m.dom[2],N;quadrature=quadrature)
   Quad("quadgp",N,n,w,m)
 end
 
-function Quad(N::Int64,weight::Function,supp::Tuple{Real,Real},symm::Bool,d::Dict=Dict();quadrature::Function=clenshaw_curtis)
+function Quad(N::Int,weight::Function,supp::Tuple{<:Real,<:Real},symm::Bool,d::Dict=Dict();quadrature::Function=clenshaw_curtis)
     @assert N >= 1 "Number of qudrature points has to be positive"
     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
     Quad(N,m;quadrature=quadrature)
@@ -476,13 +479,13 @@ struct OrthoPolyQ
     quad::Quad
 end
 
-function OrthoPolyQ(op::OrthoPoly,N::Int64)
+function OrthoPolyQ(op::OrthoPoly,N::Int)
     q = Quad(N,op.α,op.β,op.meas)
     return OrthoPolyQ(op,q)
 end
 OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α)-1)
 
-function OrthoPolyQ(name::String,N::Int64,d::Dict=Dict();Nrec::Int64=N+1)
+function OrthoPolyQ(name::String,N::Int,d::Dict=Dict();Nrec::Int=N+1)
     op = OrthoPoly(name,N,d;Nrec=Nrec)
     OrthoPolyQ(op)
 end
@@ -490,16 +493,16 @@ end
 
 struct MultiOrthoPoly
 name::Vector{String}
-deg::Int64
-dim::Int64
-ind::Matrix{Int64} # multi-index
+deg::Int
+dim::Int
+ind::Matrix{Int} # multi-index
 meas::MultiMeasure
 uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
-    function MultiOrthoPoly(uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}},deg::Int64)
+    function MultiOrthoPoly(uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}},deg::Int)
       t = typeof(uni) == Vector{OrthoPoly}
       degs = [ t ? u.deg : u.op.deg for u in uni ]
       @assert deg <= minimum(degs) "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."
-      Nuni::Int64 = length(uni)
+      Nuni::Int = length(uni)
 
       name_meas = [ t ? u.meas.name : u.op.meas.name for u in uni ]
       supp      = [ t ? u.meas.dom : u.op.meas.dom for u in uni       ]
@@ -518,16 +521,16 @@ uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
 end
 
 struct Tensor
-dim::Int64          # "dimension"
-T::SparseVector{Float64,Int64}
+dim::Int          # "dimension"
+T::SparseVector{Float64,Int}
 get::Function
 op::Union{OrthoPolyQ,MultiOrthoPoly}
-  function Tensor(dim::Int64,mop::MultiOrthoPoly)
+  function Tensor(dim::Int,mop::MultiOrthoPoly)
     T = computeTensorizedSP(dim,mop)
     g(a) = getentry(a,T,mop.ind,dim)
     new(dim,T,g,mop)
   end
-  function Tensor(dim::Int64,opq::OrthoPolyQ)
+  function Tensor(dim::Int,opq::OrthoPolyQ)
     T = computeTensorizedSP(dim,opq)
     g(a) = getentry(a,T,calculateMultiIndices(1,opq.op.deg),dim)
     new(dim,T,g,opq)
