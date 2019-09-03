@@ -1,207 +1,25 @@
-export  AbstractMeasure,
-        AbstractCanonicalMeasure,
-        AbstractOrthoPoly,
-        AbstractCanonicalOrthoPoly,
-        AbstractQuad,
-        EmptyQuad,
-        OrthoPoly,
-        MultiOrthoPoly,
-        Quad,
-        Measure,
-        ProductMeasure,
-        Tensor,
-        LegendreMeasure,
-        JacobiMeasure,
-        LaguerreMeasure,
-        genLaguerreMeasure,
-        HermiteMeasure,
-        genHermiteMeasure,
-        GaussMeasure,
-        Beta01Measure,
-        GammaMeasure,
-        Uniform01Measure,
-        LogisticMeasure,
-        MeixnerPollaczekMeasure,
-        LegendreOrthoPoly,
-        JacobiOrthoPoly,
-        LaguerreOrthoPoly,
-        genLaguerreOrthoPoly,
-        HermiteOrthoPoly,
-        genHermiteOrthoPoly,
-        GaussOrthoPoly,
-        Beta01OrthoPoly,
-        GammaOrthoPoly,
-        LogisticOrthoPoly,
-        Uniform01OrthoPoly,
-        InconsistencyError
+export          AbstractOrthoPoly,
+                AbstractCanonicalOrthoPoly,
+                OrthoPoly,
+                MultiOrthoPoly,
+                LegendreOrthoPoly,
+                JacobiOrthoPoly,
+                LaguerreOrthoPoly,
+                genLaguerreOrthoPoly,
+                HermiteOrthoPoly,
+                genHermiteOrthoPoly,
+                GaussOrthoPoly,
+                Beta01OrthoPoly,
+                GammaOrthoPoly,
+                LogisticOrthoPoly,
+                Uniform01OrthoPoly,
+                InconsistencyError,
+                Quad,
+                Tensor,
+                OrthoPolyQ
 
-abstract type AbstractMeasure end
-abstract type AbstractCanonicalMeasure <: AbstractMeasure end
-abstract type AbstractQuad end
 abstract type AbstractOrthoPoly end
 abstract type AbstractCanonicalOrthoPoly <: AbstractOrthoPoly end
-
-struct Measure <: AbstractMeasure
-    name::String
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    pars::Dict
-    function Measure(name::String, w::Function, dom::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
-        !(dom[1] < dom[2]) && throw(DomainError(dom), "invalid domain bounds specified")
-        new(lowercase(name),w, dom, symm, d)
-    end
-end
-
-struct ProductMeasure <: AbstractMeasure
-    w::Function
-    measures::Vector{<:AbstractMeasure}
-end
-
-# constructor for classic distributions
-struct LegendreMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    function LegendreMeasure()
-        new(w_legendre,(-1.,1.),true)
-    end
-end
-
-struct JacobiMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    ashapeParameter::Real
-    bshapeParameter::Real
-
-    function JacobiMeasure(shape_a::Real, shape_b::Real)
-        any
-        shape_a <= -1 && throw(DomainError(shape_a, "shape parameter a must be > -1"))
-        shape_b <= -1 && throw(DomainError(shape_b, "shape parameter b must be > -1"))
-        new(build_w_jacobi(shape_a,shape_b), (-1,1), isapprox(shape_a, shape_b), shape_a, shape_b)
-    end
-end
-
-struct LaguerreMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-
-    function LaguerreMeasure()
-        new(w_laguerre, (0,Inf), false)
-    end
-end
-
-struct genLaguerreMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    shapeParameter::Real
-
-    function genLaguerreMeasure(shape::Real)
-        shape <= -1 && throw(DomainError(shape, "invalid shape parameter"))
-        new(build_w_genlaguerre(shape), (0,Inf), false, shape)
-    end
-end
-
-struct HermiteMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-
-    function HermiteMeasure()
-        new(w_hermite, (-Inf,Inf), true)
-    end
-end
-
-struct genHermiteMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    muParameter::Real
-
-    function genHermiteMeasure(mu::Real)
-        mu <= -0.5 && throw(DomainError(mu, "invalid parameter value (must be > - 0.5)"))
-        new(build_w_genhermite(mu), (-Inf,Inf), true, mu)
-    end
-end
-
-struct MeixnerPollaczekMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    λParameter::Real
-    ϕParameter::Real
-
-    function MeixnerPollaczekMeasure(λ::Real, ϕ::Real)
-        λ <= 0 && throw(DomainError(λ, "λ has to be positive"))
-        !(0 < ϕ < pi) && throw(DomainError(ϕ, "ϕ has to be between 0 and pi"))
-        new(build_w_meixner_pollaczek(λ, ϕ), (-Inf,Inf), false, λ, ϕ)
-    end
-end
-
-struct GaussMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-
-    function GaussMeasure()
-        new(w_gaussian, (-Inf,Inf), true)
-    end
-end
-
-struct Uniform01Measure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-
-    function Uniform01Measure()
-        new(w_uniform01, (0,1), true)
-    end
-end
-
-struct Beta01Measure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    ashapeParameter::Real
-    bshapeParameter::Real
-
-    function Beta01Measure(a::Real, b::Real)
-        a <= 0 && throw(DomainError(a, "shape parameter a must be positive"))
-        b <= 0 && throw(DomainError(b, "shape parameter b must be positive"))
-        new(build_w_beta(a,b), (0,1), isapprox(a,b), a, b)
-    end
-end
-
-struct GammaMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    shapeParameter::Real
-    rateParameter::Real
-
-    function GammaMeasure(shape::Real, rate::Real)
-        shape <= 0 && throw(DomainError(shape, "shape parameter needs to be positive"))
-        rate != 1 && throw(DomainError(rate, "rate must be unity (currently!)"))
-        new(build_w_gamma(shape), (0,Inf), false, shape, rate)
-    end
-end
-
-struct LogisticMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-
-    function LogisticMeasure()
-        new(w_logistic, (-Inf,Inf), true)
-    end
-end
-
-#######################################################################
-#######################################################################
-#######################################################################
 
 struct InconsistencyError <: Exception
     var::String
@@ -425,86 +243,10 @@ function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real},
   OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization)
 end
 
-struct Quad <: AbstractQuad
-    name::String              # name of quadrature
-    Nquad::Int              # number of qudrature points
-    nodes::Vector{<:Real}
-    weights::Vector{<:Real}
-
-    function Quad(name::String, N::Int, nodes::Vector{<:Real}, weights::Vector{<:Real})
-        N <= 0 && throw(DomainError(N,"number of qudrature points has to be positive"))
-        !(length(nodes) == length(weights)) && throw(InconsistencyError("inconsistent numbers of nodes and weights"))
-        new(lowercase(name), N, nodes, weights)
-    end
-end
-
-struct EmptyQuad <: AbstractQuad
-    EmptyQuad() = new()
-end
-
-# general constructor
-function Quad(N::Int, α::Vector{<:Real}, β::Vector{<:Real})
-    !(length(α) == length(β)) && throw(InconsistencyError("inconsistent numbers of recurrence coefficients"))
-    !(N <= length(α) - 1) && throw(DomainError(N),"requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients")
-
-    nodes, weights = gauss(N,α,β)
-    Quad("golubwelsch", N, nodes, weights)
-end
-
+# quadrature rules for orthoPolys
 Quad(N::Int, op::AbstractOrthoPoly) = Quad(N, op.α, op.β)
 Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
 
-#####################################################
-#####################################################
-#####################################################
-# the constructor below is probably not relevant
-#####################################################
-#####################################################
-#####################################################
-# function Quad(N::Int, weight::Function, α::Vector{<:Real}, β::Vector{<:Real}, supp::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
-#     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
-#     Quad(N,α,β,m)
-# end
-#####################################################
-#####################################################
-#####################################################
-
-# all-purpose constructor (last resort!)
-function Quad(N::Int, w::Function, dom::Tuple{<:Real,<:Real}; quadrature::Function=clenshaw_curtis)
-    N <= 0 && throw(DomainError(N, "number of quadrature points has to be positive"))
-    nodes, weights = quadgp(w, dom[1], dom[2], N; quadrature=quadrature)
-    Quad("quadgp", N, nodes, weights)
-end
-
-function Quad(N::Int, measure::AbstractMeasure; quadrature::Function=clenshaw_curtis)
-    typeof(measure) != Measure && throw(ArgumentError("For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."))
-    Quad(N, measure.w, (measure.dom[1], measure.dom[2]); quadrature=quadrature)
-end
-
-
-#####################################################
-#####################################################
-#####################################################
-# legacy code that can be deleted eventually
-#####################################################
-#####################################################
-#####################################################
-# Struct that contains pre-computed nodes and weights
-struct OrthoPolyQ
-    op::OrthoPoly
-    quad::Quad
-end
-
-function OrthoPolyQ(op::OrthoPoly,N::Int)
-    q = Quad(N,op.α,op.β,op.meas)
-    return OrthoPolyQ(op,q)
-end
-OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α)-1)
-
-function OrthoPolyQ(name::String,N::Int,d::Dict=Dict();Nrec::Int=N+1)
-    op = OrthoPoly(name,N,d;Nrec=Nrec)
-    OrthoPolyQ(op)
-end
 #####################################################
 #####################################################
 #####################################################
@@ -531,6 +273,39 @@ uni::Vector{<:AbstractOrthoPoly}
       new(names, deg, dim, ind, measure, uniOrthoPolys)
     end
 end
+
+
+
+#####################################################
+#####################################################
+#####################################################
+# legacy code that can be deleted eventually
+#####################################################
+#####################################################
+#####################################################
+# Struct that contains pre-computed nodes and weights
+struct OrthoPolyQ
+    op::OrthoPoly
+    quad::Quad
+end
+
+function OrthoPolyQ(op::OrthoPoly,N::Int)
+    q = Quad(N,op.α,op.β,op.meas)
+    return OrthoPolyQ(op,q)
+end
+OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α)-1)
+
+function OrthoPolyQ(name::String,N::Int,d::Dict=Dict();Nrec::Int=N+1)
+    op = OrthoPoly(name,N,d;Nrec=Nrec)
+    OrthoPolyQ(op)
+end
+
+
+#####################################################
+#####################################################
+#####################################################
+
+
 
 struct Tensor
 dim::Int          # "dimension"
