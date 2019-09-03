@@ -3,6 +3,7 @@ export  AbstractMeasure,
         AbstractOrthoPoly,
         AbstractCanonicalOrthoPoly,
         AbstractQuad,
+        EmptyQuad,
         OrthoPoly,
         MultiOrthoPoly,
         Quad,
@@ -424,7 +425,7 @@ function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real},
   OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization)
 end
 
-struct Quad
+struct Quad <: AbstractQuad
     name::String              # name of quadrature
     Nquad::Int              # number of qudrature points
     nodes::Vector{<:Real}
@@ -508,7 +509,7 @@ end
 #####################################################
 #####################################################
 
-struct MultiOrthoPoly
+struct MultiOrthoPoly <: AbstractOrthoPoly
 name::Vector{String}
 deg::Int
 dim::Int
