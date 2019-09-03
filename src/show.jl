@@ -3,54 +3,22 @@ export rec2coeff, showpoly, showbasis
 title_color =   :underline
 name_color  =   :light_blue
 
-function show(m::Measure)
+function show(measure::AbstractMeasure)
     printstyled("Measure dλ(t)=w(t)dt\n";color=title_color)
-    print("name:\t\t")
-    printstyled("$(m.name)\n"; color=name_color)
-    println("w(t):\t\t$(m.w)")
-    println("dom:\t\t($(m.dom[1]), $(m.dom[2]))")
-    print("symmetric:\t")
-    m.symmetric ? col=:green : col=:red
-    printstyled("$(m.symmetric)\n";color=col)
-    if typeof(m.pars)!=Dict{Any,Any}
-        print("pars:")
-        for (i,d) in enumerate(m.pars)
-            printstyled("\t\t$d\n")
-        end
+    for name in fieldnames(typeof(measure))
+        println("$(string(name)):\t$(getfield(measure, name))")
     end
 end
 
-function show(m::ProductMeasure)
-    p = length(m.name)
-    printstyled("$p-variate measure dλ(t)= ∏_{i=1}^$p w_i(t)dt_i\n";color=title_color)
-    print("name:")
-    [ printstyled("\t\t$(m.name[i])\n"; color=name_color) for i = 1:p]
-    println("w(t):\t\t∏_{i=1}^$p w_i(t)")
-    print("dom:")
-    [ printstyled("\t\t($(m.dom[i][1]), $(m.dom[i][2]))\n") for i=1:p ]
-    print("symmetric:")
-    for i=1:p
-        m.symmetric[i] ? col=:green : col=:red
-        i==1 ? printstyled("\t$(m.symmetric[i])\n";color=col) : printstyled("\t\t$(m.symmetric[i])\n";color=col)
-    end
-    if length(findall(x -> typeof(x) != Dict{Any,Any},m.pars)) >= 1 print("pars:")
-        for i=1:p
-            print("\t\t")
-            if typeof(m.pars[i]) != Dict{Any,Any}
-                for (i,d) in enumerate(m.pars[i])
-                    i==1 ? print("$d") : print(", $d")
-                end
-                print("\n")
-            else
-                print("∅\n")
-            end
-        end
+function show(productmeasure::ProductMeasure)
+    for measure in productmeasure.measures
+        show(measure)
     end
 end
 
-function show(op::OrthoPoly; showmeasure::Bool=true)
+function show(op::AbstractOrthoPoly; showmeasure::Bool=true)
     printstyled("\nUnivariate orthogonal polynomials\n";color=title_color)
-    print("name:"); printstyled("\t\t$(op.name)\n";color=name_color)
+    # print("name:"); printstyled("\t\t$(op.name)\n";color=name_color)
     print("degree:"); printstyled("\t\t$(op.deg)\n")
     print("#coeffs:"); printstyled("\t$(length(op.α))\n")
     length(op.α)<=7 ? n=length(op.α) : n=7
@@ -60,28 +28,8 @@ function show(op::OrthoPoly; showmeasure::Bool=true)
     n<length(op.α) ? print("...\n") : print("\n")
     if showmeasure
         print("\n")
-        show(op.meas)
+        show(op.measure)
     end
-end
-
-function show(q::Quad; showmeasure::Bool=true)
-    printstyled("\nQuadrature rule\n";color=title_color)
-    print("name:"); printstyled("\t\t$(q.name)\n";color=name_color)
-    print("N:"); printstyled("\t\t$(q.Nquad)\n")
-    q.Nquad<=7 ? n=q.Nquad : n=7
-    print("nodes"); printstyled("\t\t$(q.nodes[1:n])")
-    n<q.Nquad ? print("...\n") : print("\n")
-    print("weights"); printstyled("\t\t$(q.weights[1:n])")
-    n<q.Nquad ? print("...\n") : print("\n")
-    if showmeasure
-        print("\n")
-        show(q.meas)
-    end
-end
-
-function show(opq::OrthoPolyQ; showmeasure::Bool=false)
-    show(opq.op)
-    show(opq.quad; showmeasure=showmeasure)
 end
 
 function show(mop::MultiOrthoPoly; showmeasure::Bool=false)
@@ -96,7 +44,7 @@ function show(mop::MultiOrthoPoly; showmeasure::Bool=false)
     [ printstyled("\t\t$(mop.ind[i,:])\n") for i = 1:n ]
     n < mop.dim ? print("\t\t...\n") : print("\n")
     print("\n")
-    showmeasure && show(mop.meas)
+    showmeasure && show(mop.measure)
 end
 
 function show(t::Tensor)
@@ -108,7 +56,7 @@ end
 
 """
 ```
-rec2coeff(deg::Int,a::Vector{Float64},b::Vector{Float64})
+rec2coeff(deg::Int,a::Vector{<:Real},b::Vector{<:Real})
 rec2coeff(a,b) = rec2coeff(length(a),a,b)
 ```
 Get the coefficients of the orthogonal polynomial of degree up to `deg` specified by its
@@ -120,10 +68,10 @@ where ``k`` runs from `1` to `deg`.
 
 The call `rec2coeff(a,b)` outputs all possible recurrence coefficients given `(a,b)`.
 """
-function rec2coeff(deg::Int,a::Vector{Float64},b::Vector{Float64})
-    @assert deg >= 1 "degree must be positive (you asked for degree = $deg)"
-    @assert length(a) == length(b) && length(a) >= deg "incorrect number of recurrence coefficients"
-    c = Vector{Vector{Float64}}(undef,deg)
+function rec2coeff(deg::Int,a::Vector{<:Real},b::Vector{<:Real})
+    deg <= 0 && throw(DomainError(deg, "degree must be positive (you asked for degree = $deg"))
+    !(length(a) == length(b) && length(a) >= deg) && throw(InconsistencyError("incorrect number of recurrence coefficients"))
+    c = Vector{Vector{<:Real}}(undef,deg)
     @inbounds c[1] = [ -a[1] ]
     deg == 1 && return c
     @inbounds c[2] = [ a[1]*a[2] - b[2], -a[1] - a[2] ]
@@ -142,7 +90,7 @@ rec2coeff(α,β) = rec2coeff(length(α),α,β)
 
 """
 ```
-showpoly(coeffs::Vector{Float64};sym::String,digits::Integer)
+showpoly(coeffs::Vector{<:Real};sym::String,digits::Integer)
 ```
 Show the monic polynomial with coefficients `coeffs` in a human readable way.
 They keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
@@ -156,8 +104,8 @@ t^3 + 3.45t^2 + 2.3t + 1.2
 ```
 
 ```
-showpoly(d::Integer,α::Vector{Float64},β::Vector{Float64}; sym::String,digits::Integer)
-showpoly(d::Range,α::Vector{Float64},β::Vector{Float64};sym::String,digits::Integer) where Range <: OrdinalRange
+showpoly(d::Integer,α::Vector{<:Real},β::Vector{<:Real}; sym::String,digits::Integer)
+showpoly(d::Range,α::Vector{<:Real},β::Vector{<:Real};sym::String,digits::Integer) where Range <: OrdinalRange
 ```
 Show the monic polynomial of degree/range `d` that has the recurrence coefficients `α`, `β`.
 ```jldoctest
@@ -179,14 +127,13 @@ x^10 - 22.5x^8 + 157.5x^6 - 393.75x^4 + 295.31x^2 - 29.53
 
 Tailored to types from `PolyChaos.jl`
 ```
-showpoly(d::Union{Integer,Range},op::OrthoPoly;sym::String,digits::Integer) where Range <: OrdinalRange
-showpoly(d::Union{Integer,Range},opq::OrthoPolyQ;sym::String,digits::Integer) where Range <: OrdinalRange
+showpoly(d::Union{Integer,Range},op::AbstractOrthoPoly;sym::String,digits::Integer) where Range <: OrdinalRange
 ```
-Show the monic polynomial of degree/range `d` of an `OrthoPoly`/`OrthoPolyQ`.
+Show the monic polynomial of degree/range `d` of an `AbstractOrthoPoly`.
 ```jldoctest
 julia> using PolyChaos
 
-julia> op = OrthoPoly("gaussian",5);
+julia> op = GaussOrthoPoly(5);
 
 julia> showpoly(3,op)
 x^3 - 3.0x
@@ -202,7 +149,7 @@ t^5 - 10.0t^3 + 15.0t
 [Thanks @pfitzseb for providing this functionality.](https://discourse.julialang.org/t/how-to-define-verbose-output-for-a-polynomial/21317/5)
 
 """
-function showpoly(coeffs::Vector{Float64};sym::String="x",digits::Integer=2)
+function showpoly(coeffs::Vector{<:Real};sym::String="x",digits::Integer=2)
     io = Base.stdout
     length(coeffs) > 1 ? print(io, sym*"^", length(coeffs)) : print(io, sym)
     for (i, c) in enumerate(reverse(coeffs))
@@ -216,24 +163,23 @@ function showpoly(coeffs::Vector{Float64};sym::String="x",digits::Integer=2)
     print(io, '\n')
 end
 
-function showpoly(d::Integer,α::Vector{Float64},β::Vector{Float64}; sym::String="x",digits::Integer=2)
+function showpoly(d::Integer,α::Vector{<:Real},β::Vector{<:Real}; sym::String="x",digits::Integer=2)
     @assert d >= 0 "degree has to be non-negative."
     d == 0 && return print("1\n")
     showpoly(rec2coeff(d,α,β)[end],sym=sym,digits=digits)
 end
 
-function showpoly(d::Range,α::Vector{Float64},β::Vector{Float64};sym::String="x",digits::Integer=2) where Range <: OrdinalRange
+function showpoly(d::Range,α::Vector{<:Real},β::Vector{<:Real};sym::String="x",digits::Integer=2) where Range <: OrdinalRange
     map(c->showpoly(c,α,β;sym=sym,digits=digits),d)
     print()
 end
 
-showpoly(d::Union{Integer,Range},op::OrthoPoly;sym::String="x",digits::Integer=2) where Range <: OrdinalRange = showpoly(d,op.α,op.β;sym=sym,digits=digits)
-showpoly(d::Union{Integer,Range},opq::OrthoPolyQ;sym::String="x",digits::Integer=2) where Range <: OrdinalRange = showpoly(d,opq.op;sym=sym,digits=digits)
+showpoly(d::Union{Integer,Range},op::AbstractOrthoPoly;sym::String="x",digits::Integer=2) where Range <: OrdinalRange = showpoly(d,op.α,op.β;sym=sym,digits=digits)
 
 
 """
 ```
-showbasis(α::Vector{Float64},β::Vector{Float64};sym::String,digits::Integer)
+showbasis(α::Vector{<:Real},β::Vector{<:Real};sym::String,digits::Integer)
 ```
 Show all basis polynomials given the recurrence coefficients `α`, `β`.
 They keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
@@ -253,14 +199,13 @@ x^5 - 5.0x^3 + 3.75x
 
 Tailored to types from `PolyChaos.jl`
 ```
-showbasis(op::OrthoPoly;sym::String,digits::Integer)
-showbasis(opq::OrthoPolyQ;sym::String,digits::Integer)
+showbasis(op::AbstractOrthoPoly;sym::String,digits::Integer)
 ```
-Show all basis polynomials of an `OrthoPoly`/`OrthoPolyQ`.
+Show all basis polynomials of an `AbstractOrthoPoly`.
 ```jldoctest
 julia> using PolyChaos
 
-julia> op = OrthoPoly("legendre",4);
+julia> op = LegendreOrthoPoly(4);
 
 julia> showbasis(op)
 1
@@ -270,8 +215,7 @@ x^3 - 0.6x
 x^4 - 0.86x^2 + 0.09
 ```
 """
-function showbasis(α::Vector{Float64},β::Vector{Float64};sym::String="x",digits::Integer=2)
+function showbasis(α::Vector{<:Real},β::Vector{<:Real};sym::String="x",digits::Integer=2)
     showpoly(0:length(α),α,β;sym=sym,digits=digits)
 end
-showbasis(op::OrthoPoly;sym::String="x",digits::Integer=2) = showbasis(op.α[1:op.deg],op.β[1:op.deg];sym=sym,digits=digits)
-showbasis(opq::OrthoPolyQ;sym::String="x",digits::Integer=2) = showbasis(opq.op;sym=sym,digits=digits)
+showbasis(op::AbstractOrthoPoly;sym::String="x",digits::Integer=2) = showbasis(op.α[1:op.deg],op.β[1:op.deg];sym=sym,digits=digits)
