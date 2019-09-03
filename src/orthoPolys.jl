@@ -1,6 +1,4 @@
-export          AbstractOrthoPoly,
-                AbstractCanonicalOrthoPoly,
-                OrthoPoly,
+export          OrthoPoly,
                 MultiOrthoPoly,
                 LegendreOrthoPoly,
                 JacobiOrthoPoly,
@@ -18,8 +16,7 @@ export          AbstractOrthoPoly,
                 Tensor,
                 OrthoPolyQ
 
-abstract type AbstractOrthoPoly end
-abstract type AbstractCanonicalOrthoPoly <: AbstractOrthoPoly end
+
 
 struct InconsistencyError <: Exception
     var::String
@@ -242,10 +239,6 @@ function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real},
   measure = Measure(name, w, s, symm, d)
   OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization)
 end
-
-# quadrature rules for orthoPolys
-Quad(N::Int, op::AbstractOrthoPoly) = Quad(N, op.α, op.β)
-Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
 
 #####################################################
 #####################################################

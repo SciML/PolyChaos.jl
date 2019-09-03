@@ -9,6 +9,7 @@ import AdaptiveRejectionSampling: RejectionSampler, run_sampler!
 import Statistics: mean, std, var
 import GaussQuadrature: special_eigenproblem!
 
+include("abstractTypes.jl")
 include("measure.jl")
 include("quad.jl")
 include("orthoPolys.jl")

@@ -1,6 +1,4 @@
-export  AbstractMeasure,
-        AbstractCanonicalMeasure,
-        Measure,
+export  Measure,
         ProductMeasure,
         LegendreMeasure,
         JacobiMeasure,
@@ -16,8 +14,7 @@ export  AbstractMeasure,
         MeixnerPollaczekMeasure
 
 
-abstract type AbstractMeasure end
-abstract type AbstractCanonicalMeasure <: AbstractMeasure end
+
 
 struct Measure <: AbstractMeasure
     name::String

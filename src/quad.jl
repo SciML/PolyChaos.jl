@@ -1,8 +1,7 @@
-export  AbstractQuad,
-        EmptyQuad,
+export  EmptyQuad,
         Quad
 
-abstract type AbstractQuad end
+
 
 struct Quad <: AbstractQuad
     name::String              # name of quadrature
@@ -30,7 +29,9 @@ function Quad(N::Int, α::Vector{<:Real}, β::Vector{<:Real})
     Quad("golubwelsch", N, nodes, weights)
 end
 
-
+# quadrature rules for orthoPolys
+Quad(N::Int, op::AbstractOrthoPoly) = Quad(N, op.α, op.β)
+Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
 
 #####################################################
 #####################################################
