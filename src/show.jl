@@ -20,7 +20,7 @@ function show(m::Measure)
     end
 end
 
-function show(m::MultiMeasure)
+function show(m::ProductMeasure)
     p = length(m.name)
     printstyled("$p-variate measure dλ(t)= ∏_{i=1}^$p w_i(t)dt_i\n";color=title_color)
     print("name:")

@@ -166,7 +166,7 @@ The function is multiply dispatched to accept `OrthoPoly` or `OrthoPolyQ`.
 
 __Multivariate__
 ```
-sampleMeasure(n::Int64,m::MultiMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
+sampleMeasure(n::Int64,m::ProductMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
 sampleMeasure(n::Int64,mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
 ```
 Multivariate extension which provides array of samples with `n` rows and
@@ -196,7 +196,7 @@ function sampleMeasure(n::Int64, name::Vector{String}, w::Vector{Function},
     end
     return ξ
 end
-function sampleMeasure(n::Int64,m::MultiMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
+function sampleMeasure(n::Int64,m::ProductMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
     s = falses(length(m.name))
     s[:] = m.symmetric[:]
     sampleMeasure(n,m.name,m.w_uni,m.dom,s,m.pars;method=method)

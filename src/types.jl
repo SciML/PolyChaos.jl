@@ -7,7 +7,7 @@ export  AbstractMeasure,
         MultiOrthoPoly,
         Quad,
         Measure,
-        MultiMeasure,
+        ProductMeasure,
         Tensor,
         LegendreMeasure,
         JacobiMeasure,
@@ -52,7 +52,7 @@ struct Measure <: AbstractMeasure
     end
 end
 
-struct MultiMeasure <: AbstractMeasure
+struct ProductMeasure <: AbstractMeasure
     w::Function
     measures::Vector{<:AbstractMeasure}
 end
@@ -480,10 +480,6 @@ function Quad(N::Int, measure::AbstractMeasure; quadrature::Function=clenshaw_cu
     Quad(N, measure.w, (measure.dom[1], measure.dom[2]); quadrature=quadrature)
 end
 
-# function Quad()
-
-
-
 
 #####################################################
 #####################################################
@@ -517,7 +513,7 @@ name::Vector{String}
 deg::Int
 dim::Int
 ind::Matrix{<:Int} # multi-index
-measure::MultiMeasure
+measure::ProductMeasure
 uni::Vector{<:AbstractOrthoPoly}
     function MultiOrthoPoly(uniOrthoPolys::Vector{<:AbstractOrthoPoly}, deg::Int)
       degs = [ op.deg for op in uniOrthoPolys ]
@@ -525,7 +521,7 @@ uni::Vector{<:AbstractOrthoPoly}
       
       w(t) = prod([op.measure.w(t) for op in uniOrthoPolys])
       measures = [ op.measure for op in uniOrthoPolys ]
-      measure = MultiMeasure(w, measures)
+      measure = ProductMeasure(w, measures)
 
       names = [ supertype(typeof(op)) == AbstractCanonicalOrthoPoly ? string(typeof(op)) : op.name for op in uniOrthoPolys ]
       ind = calculateMultiIndices(length(uniOrthoPolys), deg)
