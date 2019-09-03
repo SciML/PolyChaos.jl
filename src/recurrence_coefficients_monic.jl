@@ -14,25 +14,25 @@ export  r_scale,
         rm_chebyshev1,
         rm_compute
 """
-    r_scale(c::Float64,β::Vector{Float64},α::Vector{Float64})
+    r_scale(c::Real,β::Vector{<:Real},α::Vector{<:Real})
 Given the recursion coefficients `(α,β)` for a system of orthogonal polynomials that are orthogonal with respect to some positive weight ``m(t)``,
 this function returns the recursion coefficients `(α_,β_)` for the scaled measure ``c m(t)`` for some positive ``c``.
 """
-function r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})
-    @assert c>0 "Measure can only be scaled by positive number (provided c=$c)"
+function r_scale(c::Real,a::Vector{<:Real},b::Vector{<:Real})
+    c <= 0 && throw(DomainError(c,"Measure can only be scaled by positive number (provided c=$c)"))
     return a, [c*b[1]; b[2:end]]
 end
 
 """
-    rm_compute(weight::Function,lb::Float64,ub::Float64,Npoly::Int64=4,Nquad::Int64=10;quadrature::Function=clenshaw_curtis)
+    rm_compute(weight::Function,lb::Real,ub::Real,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis)
 Given a positive `weight` function with domain `(lb,ub)`, i.e. a function ``w: [lb, ub ] \\rightarrow \\mathbb{R}_{\\geq 0}``,
 this function creates `Npoly` recursion coefficients `(α,β)`.
 
 The keyword `quadrature` specifies what quadrature rule is being used.
 """
-function rm_compute(weight::Function,lb::Float64,ub::Float64,Npoly::Int64=4,Nquad::Int64=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
+function rm_compute(weight::Function,lb::Real,ub::Real,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
     @assert Npoly <= Nquad
-    Npoly == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    Npoly == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     n,w= quadgp(weight,lb,ub,Nquad;quadrature=quadrature)
     a,b = discretization(Npoly,n,w)
     # display((b,maximum(b)))
@@ -48,7 +48,7 @@ end
 rm_compute(m::AbstractMeasure,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2],Npoly,Nquad,quadrature=quadrature,discretization=discretization)
 
 ##
-function rm_logisticsum(n::Int,p1::Vector{Float64},p2::Vector{Float64};Mmax::Int=100,eps0::Real=1e-9)
+function rm_logisticsum(n::Int,p1::Vector{<:Real},p2::Vector{<:Real};Mmax::Int=100,eps0::Real=1e-9)
     M0 = n
     Mcap = 0
     Mi = M0
@@ -78,21 +78,21 @@ on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\m
 """
 function rm_logistic(N::Int)
     @assert N >= 0 "parameter(s) out of range."
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     zeros(N), pushfirst!(map(k->k^4*pi^2/(4*k^2-1),Base.OneTo(N-1)),1.)
 end
 
 """
-    rm_hermite(N::Int,mu::Float64)
+    rm_hermite(N::Int,mu::Real)
     rm_hermite(N::Int)
 Creates `N` recurrence coefficients for monic generalized Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = |t|^{2 \\mu} \\mathrm{e}^{-t^2}``
 
 The call `rm_hermite(N)` is the same as `rm_hermite(N,0)`.
 """
-function rm_hermite(N::Int,mu::Float64)
+function rm_hermite(N::Int,mu::Real)
     @assert N >= 0 && mu > -0.5 "parameter(s) out of range."
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     m0 = mu != 0. ? gamma(mu + 0.5) : sqrt(π)
     N == 1 && return [0.], [m0]
     return zeros(N), pushfirst!(map(x->isodd(x) ? 0.5*x+mu : 0.5*x,1:N-1), m0)
@@ -106,13 +106,13 @@ that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{
 """
 function rm_hermite_prob(N::Int)
     @assert N >= 0 "parameter(s) out of range."
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     # return zeros(N), [sqrt(2*pi); collect(1.:N-1) ]
     return zeros(N), pushfirst!( collect(1.:N-1), sqrt(2*pi))
 end
 
 """
-    rm_laguerre(N::Int,a::Float64)
+    rm_laguerre(N::Int,a::Real)
     rm_laguerre(N::Int)
 Creates `N` recurrence coefficients for monic generalized Laguerre polynomials
 that are orthogonal on ``(0,\\infty)`` relative to ``w(t) = t^a \\mathrm{e}^{-t}``.
@@ -121,18 +121,18 @@ The call `rm_laguerre(N)` is the same as `rm_laguerre(N,0)`.
 """
 function rm_laguerre(N::Int,a::Real)
     @assert N >= 0 && a > -1. "parameter(s) out of range"
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     N==1 && return [a+1.], [gamma(a+1)]
     n = 1.:N-1
-    return pushfirst!(map(x->2x+a+1.,n)::Vector{Float64},a+1.), pushfirst!(map(x->x^2+a*x,n)::Vector{Float64},gamma(a+1))
+    return pushfirst!(map(x->2x+a+1.,n)::Vector{<:Real},a+1.), pushfirst!(map(x->x^2+a*x,n)::Vector{<:Real},gamma(a+1))
 end
 function rm_laguerre(N::Int)
     rm_laguerre(N,0.)
 end
 
 """
-    rm_jacobi(N::Int,a::Float64,b::Float64)
-    rm_jacobi(N::Int,a::Float64)
+    rm_jacobi(N::Int,a::Real,b::Real)
+    rm_jacobi(N::Int,a::Real)
     rm_jacobi(N::Int)
 Creates `N` recurrence coefficients for monic Jacobi polynomials
 that are orthogonal on ``(-1,1)`` relative to ``w(t) = (1-t)^a (1+t)^b``.
@@ -142,9 +142,9 @@ The call `rm_jacobi(N,a)` is the same as `rm_jacobi(N,a,a)` and `rm_jacobi(N)` t
 """
 function rm_jacobi(N::Int,a::Real,b::Real)
     @assert N >= 0 && a >- 1. && b >- 1. "parameter(s) out of range"
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     nu = (b - a) / ( a+ b + 2.);
-    mu::Float64 = a + b + 2. <= 128. ? 2^(a+b+1)*((gamma(a+1)*gamma(b+1))/gamma(a+b+2)) : exp((a+b+1)*log(2)+((log(gamma(a+1))+log(gamma(b+1)))-log(gamma(a+b+2))))
+    mu::Real = a + b + 2. <= 128. ? 2^(a+b+1)*((gamma(a+1)*gamma(b+1))/gamma(a+b+2)) : exp((a+b+1)*log(2)+((log(gamma(a+1))+log(gamma(b+1)))-log(gamma(a+b+2))))
     N == 1 && return [nu], [mu]
     n = 1:N-1
     nab = map(x->2x+a+b,n)
@@ -152,14 +152,14 @@ function rm_jacobi(N::Int,a::Real,b::Real)
     B1 = map(x->4*(x+a)*(x+b)*x*(x+a+b),n[2:N-1])
     B2 = map(x->(x^2.)*(x+1.)*(x-1.),nab[2:N-1])
     B3 = 4. * (a + 1) * (b + 1) / ((a + b + 2)^2 * (a + b + 3));
-    A, pushfirst!(pushfirst!(B1./B2,B3),mu)::Vector{Float64}
+    A, pushfirst!(pushfirst!(B1./B2,B3),mu)::Vector{<:Real}
 end
 
-rm_jacobi(N::Int,a::Float64) = rm_jacobi(N,a,a)
+rm_jacobi(N::Int,a::Real) = rm_jacobi(N,a,a)
 rm_jacobi(N::Int) = rm_jacobi(N,0.,0.)
 """
-    rm_jacobi01(N::Int,a::Float64,b::Float64)
-    rm_jacobi01(N::Int,a::Float64)
+    rm_jacobi01(N::Int,a::Real,b::Real)
+    rm_jacobi01(N::Int,a::Real)
     rm_jacobi01(N::Int)
 
 Creates `N` recurrence coefficients for monic Jacobi polynomials
@@ -168,13 +168,13 @@ that are orthogonal on ``(0,1)`` relative to ``w(t) = (1-t)^a t^b``.
 The call `rm_jacobi01(N,a)` is the same as `rm_jacobi01(N,a,a)` and `rm_jacobi01(N)` the same as
 `rm_jacobi01(N,0,0)`.
 """
-function rm_jacobi01(N::Int,a::Float64,b::Float64)
+function rm_jacobi01(N::Int,a::Real,b::Real)
     @assert N>=0 && a>-1. && b>-1. "parameter(s) out of range"
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     c, d = rm_jacobi(N,a,b)
     map(x->(1+x)/2,c), pushfirst!(0.25*d[2:N], d[1]/2^(a+b+1.))
 end
-rm_jacobi01(N::Int,a::Float64) = rm_jacobi01(N,a,a)
+rm_jacobi01(N::Int,a::Real) = rm_jacobi01(N,a,a)
 rm_jacobi01(N::Int) = rm_jacobi01(N,0.,0.)
 
 """
@@ -194,9 +194,9 @@ that are orthogonal on ``(0,1)`` relative to ``w(t) = 1``.
 rm_legendre01(N::Int) = rm_jacobi01(N)
 
 
-function rm_chebyshev1(N::Int64)
+function rm_chebyshev1(N::Int)
     @assert N>=0 "N has to be non-negative"
-    α = zeros(Float64,N)
+    α = zeros(Real,N)
     if N == 1
         return α, [pi]
     elseif N == 2
@@ -205,8 +205,8 @@ function rm_chebyshev1(N::Int64)
         return α, pushfirst!(pushfirst!(0.25*ones(N-2),0.5),pi)
     end
 end
-#     rm_hahn(N::Int,a::Float64,b::Float64)
-#     rm_hahn(N::Int,a::Float64)
+#     rm_hahn(N::Int,a::Real,b::Real)
+#     rm_hahn(N::Int,a::Real)
 #     rm_hahn(N::Int)
 #
 #  Creates `N` recurrence coefficients for monic Hahn polynomials.
@@ -222,10 +222,10 @@ end
 #     which produces the recurrence coefficients of the discrete
 #     Chebyshev polynomials for the points 0,1,2,...,N.
 # """
-# function rm_hahn(N::Int,a::Float64,b::Float64)
+# function rm_hahn(N::Int,a::Real,b::Real)
 #     N-=1
 #     @assert N>=0 && a>=-1. && b>=-1. "parameter(s) out of range"
-#     N==0 ? (return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)) : ()
+#     N==0 ? (return Array{Real,1}(undef,0), Array{Real,1}(undef,0)) : ()
 #     ab = zeros(N+1,2)
 #     n=1:N; ab[1,2]=prod(1 .+ (a+b+1.)./n);
 #     if a+b == 0.
@@ -246,12 +246,12 @@ end
 #     end
 #     return ab[:,1], ab[:,2]
 # end
-# rm_hahn(N::Int,a::Float64) = rm_hahn(N,a,a)
+# rm_hahn(N::Int,a::Real) = rm_hahn(N,a,a)
 # rm_hahn(N::Int) = rm_hahn(N,0.,0.)
 
 """
-    rm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)
-    rm_meixner_pollaczek(N::Int,lambda::Float64)
+    rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
+    rm_meixner_pollaczek(N::Int,lambda::Real)
 
  Creates `N` recurrence coefficients for monic
  Meixner-Pollaczek polynomials with parameters λ and ϕ. These are orthogonal on
@@ -259,12 +259,12 @@ end
 
  The call `rm_meixner_pollaczek(n,lambda)` is the same as `rm_meixner_pollaczek(n,lambda,pi/2)`.
 """
-function rm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)
+function rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
     @assert N>=0 && lambda>0. && phi>0. "parameter(s) out of range"
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
     n=1:N;
     sinphi=sin(phi); lam2=2*lambda;
-    ab=zeros(Float64,N,2)
+    ab=zeros(Real,N,2)
     if sinphi==1
       ab[:,1]=zeros(N);
     else
@@ -274,4 +274,4 @@ function rm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)
     ab[1,2]=gamma(lam2)/(2*sinphi)^lam2;
     return ab[:,1], ab[:,2]
 end
-rm_meixner_pollaczek(N::Int,lambda::Float64) = rm_meixner_pollaczek(N,lambda,pi/2)
+rm_meixner_pollaczek(N::Int,lambda::Real) = rm_meixner_pollaczek(N,lambda,pi/2)
