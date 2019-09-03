@@ -3,6 +3,7 @@ export  AbstractMeasure,
         AbstractOrthoPoly,
         AbstractCanonicalOrthoPoly,
         AbstractQuad,
+        EmptyQuad,
         OrthoPoly,
         MultiOrthoPoly,
         Quad,
@@ -508,7 +509,7 @@ end
 #####################################################
 #####################################################
 
-struct MultiOrthoPoly
+struct MultiOrthoPoly <: AbstractOrthoPoly
 name::Vector{String}
 deg::Int
 dim::Int

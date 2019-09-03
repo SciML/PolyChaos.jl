@@ -7,38 +7,43 @@ export  coeffs,
         issymmetric,
         integrate
 
-dim(op::OrthoPoly)::Int64 = op.deg + 1
-dim(opq::OrthoPolyQ) = dim(opq.op)
+dim(op::AbstractOrthoPoly) = op.deg + 1
 dim(mop::MultiOrthoPoly) = mop.dim
 
-deg(op::OrthoPoly) = op.deg
-deg(opq::OrthoPolyQ) = deg(opq.op)
+deg(op::AbstractOrthoPoly) = op.deg
 deg(mop::MultiOrthoPoly) = mop.deg
 
 """
 ```
-nw(q::Quad)
-nw(opq::OrthoPolyQ)
-nw(opq::Vector{OrthoPolyQ})
-nw(mOP::MultiOrthoPoly)
+nw(q::EmptyQuad)
+nw(q::AbstractQuad)
+nw(opq::AbstractOrthoPoly)
+nw(opq::Vector{<:AbstractOrthoPoly})
+nw(mop::MultiOrthoPoly)
 ```
 returns nodes and weights in matrix form
 """
-function nw(q::Quad)
-    [q.nodes q.weights]
-end
-nw(opq::OrthoPolyQ) = nw(opq.quad)
-function nw(qq::Vector{Quad})
-    n = [ q.nodes for q in qq]
-    w = [ q.weights for q in qq]
-    return n,w
-end
-function nw(opq::Vector{OrthoPolyQ})
-    q = [ p.quad for p in opq ]
-    nw(q)
+
+nw(quad::EmptyQuad) = Array{Float64}(undef,0,2)
+
+function nw(quad::AbstractQuad)
+    [quad.nodes quad.weights]
 end
 
-nw(mOP::MultiOrthoPoly) = nw(mOP.uni)
+nw(op::AbstractOrthoPoly) = nw(op.quad)
+
+function nw(quads::Vector{<:AbstractQuad})
+    nodes = [ quad.nodes for quad in quads]
+    weights = [ quad.weights for quad in quads]
+    return nodes, weights
+end
+
+function nw(ops::Vector{<:AbstractOrthoPoly})
+    quad = [ op.quad for op in ops ]
+    nw(quad)
+end
+
+nw(mop::MultiOrthoPoly) = nw(mop.uni)
 
 """
 ```
@@ -57,18 +62,14 @@ function coeffs(op::Vector{<:AbstractOrthoPoly})
     b = [ p.β for p in op]
     return a,b
 end
-function coeffs(opq::Vector{OrthoPolyQ})
-    a = [ p.op.α for p in opq]
-    b = [ p.op.β for p in opq]
-    return a,b
-end
+
 coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
 
 
 """
 ```
-integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})
-integrate(f::Function,q::Quad)
+integrate(f::Function,nodes::Vector{<:Real},weights::Vector{<:Real})
+integrate(f::Function,q::AbstractQuad)
 integrate(f::Function,opq::OrthogonalPolyQ)
 ```
 integrate function `f` using quadrature rule specified via `nodes`, `weights`.
@@ -84,52 +85,49 @@ julia> integrate(x->6x^5,opq)
 - function ``f`` is assumed to return a scalar.
 - interval of integration is "hidden" in `nodes`.
 """
-function integrate(f::Function,nodes::Vector{Float64},weights::Vector{Float64})::Float64
-    dot(weights,f.(nodes))
+function integrate(f::Function, nodes::Vector{<:Real}, weights::Vector{<:Real})
+    dot(weights, f.(nodes))
 end
-integrate(f::Function,q::Quad)::Float64 = integrate(f,q.nodes,q.weights)
-integrate(f::Function,opq::OrthoPolyQ)::Float64 = integrate(f,opq.quad)
+
+function integrate(f::Function, quad::AbstractQuad)
+    typeof(quad) == EmptyQuad && throw(DomainError(quad, "supplied an empty quadrature"))
+    integrate(f, quad.nodes, quad.weights)
+end
+
+integrate(f::Function, op::AbstractOrthoPoly) = integrate(f, op.quad)
 
 """
 ```
-issymmetric(m::Measure)::Bool
-issymmetric(op::OrthoPoly)::Bool
-issymmetric(q::Quad)::Bool
-issymmetric(opq::OrthoPolyQ)::Bool
+issymmetric(m::AbstractMeasure)
+issymmetric(op::AbstractOrthoPoly)
 ```
 Is the measure symmetric (around any point in the domain)?
 """
-function issymmetric(m::Measure)::Bool
-    m.symmetric
-end
-issymmetric(op::OrthoPoly)::Bool = issymmetric(op.meas)
-issymmetric(q::Quad)::Bool = issymmetric(q.meas)
-function issymmetric(opq::OrthoPolyQ)::Bool
-    @assert issymmetric(opq.op)==issymmetric(opq.quad) "inconsistent symmetries"
-    issymmetric(opq.op)
-end
+issymmetric(m::AbstractMeasure) = m.symmetric
+issymmetric(op::AbstractOrthoPoly) = issymmetric(op.measure)
 
-function multi2uni(a::Vector{Int64},ind::Matrix{Int64})
-    @assert minimum(a)>=0 "no negative degrees allowed"
-    l,p = size(ind) # p-variate basis
+function multi2uni(a::Vector{<:Int}, ind::Matrix{<:Int})
+    minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
+    l, p = size(ind) # p-variate basis
     m = length(a) # dimension of scalar product
-    l=l-1 # (l+1)-dimensional basis
-    @assert maximum(a)<=l "not enough elements in multi-index"
+    l -= 1 # (l+1)-dimensional basis
+    maximum(a) > l && throw(DomainError(a, "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
     A = zeros(Int64,p,m)
-    for (i,a_) in enumerate(a)
+    for (i, a_) in enumerate(a)
         A[:,i] = ind[a_+1,:]
     end
     return A
 end
 
-function getentry(a::Vector{Int64},T::SparseVector{Float64,Int64},ind::Matrix{Int64},dim::Int64)
-    m::Int64 = length(a)
-    l::Int64 = size(ind,1)-1
-    @assert minimum(a)>=0 "no negative degrees allowed"
-    @assert maximum(a)<=l "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"
-    @assert m==dim "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index "
+function getentry(a::Vector{<:Int}, T::SparseVector{<:Real,<:Int}, ind::Matrix{<:Int}, dim::Int)
+    m = length(a)
+    l = size(ind,1)-1
+    minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
+    maximum(a) > l && throw(DomainError(a, "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+    m != dim && throw(DomainError(m, "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
     # a .+= 1
     sort!(a)
-    sp_ind::Int64 = 1 + reduce(+,[idx*l^(m-i) for (i,idx) in enumerate(a)])
-    return T[sp_ind]::Float64
+
+    sp_ind = 1 + reduce(+,[idx*l^(m-i) for (i,idx) in enumerate(a)])
+    return T[sp_ind]
 end
