@@ -73,7 +73,7 @@ struct JacobiMeasure <: AbstractCanonicalMeasure
     symmetric::Bool
     ashapeParameter::Real
     bshapeParameter::Real
-    
+
     function JacobiMeasure(shape_a::Real, shape_b::Real)
         any
         shape_a <= -1 && throw(DomainError(shape_a, "shape parameter a must be > -1"))
@@ -132,7 +132,7 @@ struct MeixnerPollaczekMeasure <: AbstractCanonicalMeasure
     symmetric::Bool
     λParameter::Real
     ϕParameter::Real
-    
+
     function MeixnerPollaczekMeasure(λ::Real, ϕ::Real)
         λ <= 0 && throw(DomainError(λ, "λ has to be positive"))
         !(0 < ϕ < pi) && throw(DomainError(ϕ, "ϕ has to be between 0 and pi"))
@@ -166,7 +166,7 @@ struct Beta01Measure <: AbstractCanonicalMeasure
     symmetric::Bool
     ashapeParameter::Real
     bshapeParameter::Real
-    
+
     function Beta01Measure(a::Real, b::Real)
         a <= 0 && throw(DomainError(a, "shape parameter a must be positive"))
         b <= 0 && throw(DomainError(b, "shape parameter b must be positive"))
@@ -222,10 +222,10 @@ struct LegendreOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function LegendreOrthoPoly(deg::Int; Nrec::Int=deg+1)
+    function LegendreOrthoPoly(deg::Int; Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
-        a, b = rm_legendre(Nrec)
-        new(deg, a, b, LegendreMeasure(), EmptyQuad())
+        α, β = rm_legendre(Nrec)
+        new(deg, α, β, LegendreMeasure(), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -237,10 +237,10 @@ struct JacobiOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function JacobiOrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int=deg+1)
+    function JacobiOrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = rm_jacobi(Nrec, shape_a, shape_b)
-        new(deg, α, β, JacobiMeasure(shape_a, shape_b), EmptyQuad())
+        new(deg, α, β, JacobiMeasure(shape_a, shape_b), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -252,10 +252,10 @@ struct LaguerreOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function LaguerreOrthoPoly(deg::Int;Nrec::Int=deg+1)
+    function LaguerreOrthoPoly(deg::Int;Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = rm_laguerre(Nrec)
-        new(deg, α, β, LaguerreMeasure(), EmptyQuad())
+        new(deg, α, β, LaguerreMeasure(), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -267,10 +267,10 @@ struct genLaguerreOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function genLaguerreOrthoPoly(deg::Int, shape::Real ;Nrec::Int=deg+1)
+    function genLaguerreOrthoPoly(deg::Int, shape::Real ;Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = rm_laguerre(Nrec, shape)
-        new(deg, α, β, genLaguerreMeasure(shape), EmptyQuad())
+        new(deg, α, β, genLaguerreMeasure(shape), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -282,10 +282,10 @@ struct HermiteOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function HermiteOrthoPoly(deg::Int; Nrec::Int=deg+1)
+    function HermiteOrthoPoly(deg::Int; Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = rm_hermite(Nrec)
-        new(deg, α, β, HermiteMeasure(), EmptyQuad())
+        new(deg, α, β, HermiteMeasure(), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -297,10 +297,10 @@ struct genHermiteOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function genHermiteOrthoPoly(deg::Int, mu::Real;Nrec::Int=deg+1)
+    function genHermiteOrthoPoly(deg::Int, mu::Real;Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = rm_hermite(Nrec, mu)
-        new(deg, α, β, genHermiteMeasure(mu), EmptyQuad())
+        new(deg, α, β, genHermiteMeasure(mu), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -312,10 +312,10 @@ struct MeixnerPollaczekOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function MeixnerPollaczekOrthoPoly(deg::Int, λ::Real, ϕ::Real; Nrec::Int=deg+1)
+    function MeixnerPollaczekOrthoPoly(deg::Int, λ::Real, ϕ::Real; Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = rm_meixner_pollaczek(Nrec, λ, ϕ)
-        new(deg, α, β, MeixnerPollaczekMeasure(λ,ϕ), EmptyQuad())
+        new(deg, α, β, MeixnerPollaczekMeasure(λ,ϕ), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -327,10 +327,10 @@ struct GaussOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function GaussOrthoPoly(deg::Int;Nrec::Int=deg+1)
+    function GaussOrthoPoly(deg::Int;Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = r_scale(1/sqrt(2pi), rm_hermite_prob(Nrec)...)
-        new(deg, α, β, GaussMeasure(), EmptyQuad())
+        new(deg, α, β, GaussMeasure(), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -342,10 +342,10 @@ struct Uniform01OrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function Uniform01OrthoPoly(deg::Int;Nrec::Int=deg+1)
+    function Uniform01OrthoPoly(deg::Int;Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = r_scale(1., rm_legendre01(Nrec)...)
-        new(deg, α, β, Uniform01Measure(), EmptyQuad())
+        new(deg, α, β, Uniform01Measure(), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -357,10 +357,10 @@ struct Beta01OrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function Beta01OrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int=deg+1)
+    function Beta01OrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = r_scale(1/beta(shape_a, shape_b), rm_jacobi01(Nrec, shape_b-1., shape_a-1.)...)
-        new(deg, α, β, Beta01Measure(shape_a, shape_b), EmptyQuad())
+        new(deg, α, β, Beta01Measure(shape_a, shape_b), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -372,10 +372,10 @@ struct GammaOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function GammaOrthoPoly(deg::Int, shape::Real, rate::Real; Nrec::Int=deg+1)
+    function GammaOrthoPoly(deg::Int, shape::Real, rate::Real; Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = r_scale((rate^shape)/gamma(shape), rm_laguerre(Nrec, shape-1.)...)
-        new(deg, α, β, GammaMeasure(shape, rate), EmptyQuad())
+        new(deg, α, β, GammaMeasure(shape, rate), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -387,10 +387,10 @@ struct LogisticOrthoPoly <: AbstractCanonicalOrthoPoly
     quad::AbstractQuad
 
     # inner constructor
-    function LogisticOrthoPoly(deg::Int; Nrec::Int=deg+1)
+    function LogisticOrthoPoly(deg::Int; Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = r_scale(1., rm_logistic(Nrec)...)
-        new(deg, α, β, LogisticMeasure(), EmptyQuad())
+        new(deg, α, β, LogisticMeasure(), addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -402,10 +402,10 @@ struct OrthoPoly <: AbstractOrthoPoly
     measure::AbstractMeasure
     quad::AbstractQuad
     # inner constructor
-    function OrthoPoly(name::String, deg::Int, α::Vector{<:Real}, β::Vector{<:Real}, measure::AbstractMeasure)
+    function OrthoPoly(name::String, deg::Int, α::Vector{<:Real}, β::Vector{<:Real}, measure::AbstractMeasure; addQuadrature::Bool = true)
         deg < 0 && throw(DomainError(deg, "degree has to be non-negative"))
         !(length(α) == length(β)) && throw(InconsistencyError("Inconsistent lengths"))
-        new(lowercase(name), deg, α, β, measure, EmptyQuad())
+        new(lowercase(name), deg, α, β, measure, addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad())
     end
 end
 
@@ -424,7 +424,7 @@ function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real},
   OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization)
 end
 
-struct Quad
+struct Quad <: AbstractQuad
     name::String              # name of quadrature
     Nquad::Int              # number of qudrature points
     nodes::Vector{<:Real}
@@ -518,7 +518,7 @@ uni::Vector{<:AbstractOrthoPoly}
     function MultiOrthoPoly(uniOrthoPolys::Vector{<:AbstractOrthoPoly}, deg::Int)
       degs = [ op.deg for op in uniOrthoPolys ]
       deg > minimum(degs) && throw(DomainError(deg, "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."))
-      
+
       w(t) = prod([op.measure.w(t) for op in uniOrthoPolys])
       measures = [ op.measure for op in uniOrthoPolys ]
       measure = ProductMeasure(w, measures)
