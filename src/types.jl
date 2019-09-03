@@ -15,7 +15,7 @@ export  AbstractMeasure,
         genLaguerreMeasure,
         HermiteMeasure,
         genHermiteMeasure,
-        GaussianMeasure,
+        GaussMeasure,
         Beta01Measure,
         GammaMeasure,
         Uniform01Measure,
@@ -27,7 +27,7 @@ export  AbstractMeasure,
         genLaguerreOrthoPoly,
         HermiteOrthoPoly,
         genHermiteOrthoPoly,
-        GaussianOrthoPoly,
+        GaussOrthoPoly,
         Beta01OrthoPoly,
         GammaOrthoPoly,
         LogisticOrthoPoly,
@@ -52,13 +52,9 @@ struct Measure <: AbstractMeasure
     end
 end
 
-struct MultiMeasure
-    name::Vector{String}
+struct MultiMeasure <: AbstractMeasure
     w::Function
-    w_uni::Vector{Function}
-    dom::Vector{Tuple{Float64,Float64}}
-    symmetric::Vector{Bool}
-    pars::Vector{Dict}
+    measures::Vector{<:AbstractMeasure}
 end
 
 # constructor for classic distributions
@@ -144,12 +140,12 @@ struct MeixnerPollaczekMeasure <: AbstractCanonicalMeasure
     end
 end
 
-struct GaussianMeasure <: AbstractCanonicalMeasure
+struct GaussMeasure <: AbstractCanonicalMeasure
     w::Function
     dom::Tuple{<:Real,<:Real}
     symmetric::Bool
 
-    function GaussianMeasure()
+    function GaussMeasure()
         new(w_gaussian, (-Inf,Inf), true)
     end
 end
@@ -323,18 +319,18 @@ struct MeixnerPollaczekOrthoPoly <: AbstractCanonicalOrthoPoly
     end
 end
 
-struct GaussianOrthoPoly <: AbstractCanonicalOrthoPoly
+struct GaussOrthoPoly <: AbstractCanonicalOrthoPoly
     deg::Int          # maximum degree
     α::Vector{<:Real}  # recurrence coefficients
     β::Vector{<:Real}  # recurrence coefficients
-    measure::GaussianMeasure
+    measure::GaussMeasure
     quad::AbstractQuad
 
     # inner constructor
-    function GaussianOrthoPoly(deg::Int;Nrec::Int=deg+1)
+    function GaussOrthoPoly(deg::Int;Nrec::Int=deg+1)
         _checkConsistency(deg, Nrec)
         α, β = r_scale(1/sqrt(2pi), rm_hermite_prob(Nrec)...)
-        new(deg, α, β, GaussianMeasure(), EmptyQuad())
+        new(deg, α, β, GaussMeasure(), EmptyQuad())
     end
 end
 
@@ -433,46 +429,69 @@ struct Quad
     Nquad::Int              # number of qudrature points
     nodes::Vector{<:Real}
     weights::Vector{<:Real}
-    meas::Measure
-    function Quad(name::String,N::Int,nodes::Vector{<:Real},weights::Vector{<:Real},m::Measure)
-        @assert N >= 1 "Number of qudrature points has to be positive"
-        @assert length(nodes) == length(weights) "Inconsistent number of nodes and weights inconsistent."
-        new(lowercase(name),N,nodes,weights,m)
+
+    function Quad(name::String, N::Int, nodes::Vector{<:Real}, weights::Vector{<:Real})
+        N <= 0 && throw(DomainError(N,"number of qudrature points has to be positive"))
+        !(length(nodes) == length(weights)) && throw(InconsistencyError("inconsistent numbers of nodes and weights"))
+        new(lowercase(name), N, nodes, weights)
     end
 end
 
 struct EmptyQuad <: AbstractQuad
-    function EmptyQuad()
-        new()
-    end
+    EmptyQuad() = new()
 end
 
 # general constructor
-function Quad(N::Int,α::Vector{<:Real},β::Vector{<:Real},m::Measure)
-    @assert length(α) == length(β) "Inconsistent length of recurrence coefficients."
-    @assert N <= length(α) - 1 "Requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"
-    n,w = gauss(N,α,β)
-    Quad("golubwelsch",N,n,w,m)
-end
-Quad(N::Int,op::OrthoPoly) = Quad(N,op.α,op.β,op.meas)
+function Quad(N::Int, α::Vector{<:Real}, β::Vector{<:Real})
+    !(length(α) == length(β)) && throw(InconsistencyError("inconsistent numbers of recurrence coefficients"))
+    !(N <= length(α) - 1) && throw(DomainError(N),"requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients")
 
-function Quad(N::Int,weight::Function,α::Vector{<:Real},β::Vector{<:Real},supp::Tuple{Float64,Float64},symm::Bool,d::Dict=Dict())
-    m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
-    Quad(N,α,β,m)
+    nodes, weights = gauss(N,α,β)
+    Quad("golubwelsch", N, nodes, weights)
 end
+
+Quad(N::Int, op::AbstractOrthoPoly) = Quad(N, op.α, op.β)
+Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
+
+#####################################################
+#####################################################
+#####################################################
+# the constructor below is probably not relevant
+#####################################################
+#####################################################
+#####################################################
+# function Quad(N::Int, weight::Function, α::Vector{<:Real}, β::Vector{<:Real}, supp::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
+#     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
+#     Quad(N,α,β,m)
+# end
+#####################################################
+#####################################################
+#####################################################
 
 # all-purpose constructor (last resort!)
-function Quad(N::Int,m::Measure;quadrature::Function=clenshaw_curtis)
-  n, w = quadgp(m.w,m.dom[1],m.dom[2],N;quadrature=quadrature)
-  Quad("quadgp",N,n,w,m)
+function Quad(N::Int, w::Function, dom::Tuple{<:Real,<:Real}; quadrature::Function=clenshaw_curtis)
+    N <= 0 && throw(DomainError(N, "number of quadrature points has to be positive"))
+    nodes, weights = quadgp(w, dom[1], dom[2], N; quadrature=quadrature)
+    Quad("quadgp", N, nodes, weights)
 end
 
-function Quad(N::Int,weight::Function,supp::Tuple{<:Real,<:Real},symm::Bool,d::Dict=Dict();quadrature::Function=clenshaw_curtis)
-    @assert N >= 1 "Number of qudrature points has to be positive"
-    m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
-    Quad(N,m;quadrature=quadrature)
+function Quad(N::Int, measure::AbstractMeasure; quadrature::Function=clenshaw_curtis)
+    typeof(measure) != Measure && throw(ArgumentError("For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."))
+    Quad(N, measure.w, (measure.dom[1], measure.dom[2]); quadrature=quadrature)
 end
 
+# function Quad()
+
+
+
+
+#####################################################
+#####################################################
+#####################################################
+# legacy code that can be deleted eventually
+#####################################################
+#####################################################
+#####################################################
 # Struct that contains pre-computed nodes and weights
 struct OrthoPolyQ
     op::OrthoPoly
@@ -489,34 +508,30 @@ function OrthoPolyQ(name::String,N::Int,d::Dict=Dict();Nrec::Int=N+1)
     op = OrthoPoly(name,N,d;Nrec=Nrec)
     OrthoPolyQ(op)
 end
-
+#####################################################
+#####################################################
+#####################################################
 
 struct MultiOrthoPoly
 name::Vector{String}
 deg::Int
 dim::Int
-ind::Matrix{Int} # multi-index
-meas::MultiMeasure
-uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}}
-    function MultiOrthoPoly(uni::Union{Vector{OrthoPoly},Vector{OrthoPolyQ}},deg::Int)
-      t = typeof(uni) == Vector{OrthoPoly}
-      degs = [ t ? u.deg : u.op.deg for u in uni ]
-      @assert deg <= minimum(degs) "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."
-      Nuni::Int = length(uni)
+ind::Matrix{<:Int} # multi-index
+measure::MultiMeasure
+uni::Vector{<:AbstractOrthoPoly}
+    function MultiOrthoPoly(uniOrthoPolys::Vector{<:AbstractOrthoPoly}, deg::Int)
+      degs = [ op.deg for op in uniOrthoPolys ]
+      deg > minimum(degs) && throw(DomainError(deg, "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."))
+      
+      w(t) = prod([op.measure.w(t) for op in uniOrthoPolys])
+      measures = [ op.measure for op in uniOrthoPolys ]
+      measure = MultiMeasure(w, measures)
 
-      name_meas = [ t ? u.meas.name : u.op.meas.name for u in uni ]
-      supp      = [ t ? u.meas.dom : u.op.meas.dom for u in uni       ]
-      symm      = [ t ? u.meas.symmetric : u.op.meas.symmetric for u in uni ]
-      pars      = [ t ? u.meas.pars : u.op.meas.pars for u in uni      ]
-      w_uni     = [ t ? u.meas.w : u.op.meas.w for u in uni         ]
-      w(t) = t ? prod([uni[i].meas.w(t[i]) for i=1:Nuni]) : prod([uni[i].op.meas.w(t[i]) for i=1:Nuni])
-      m = MultiMeasure(name_meas,w,w_uni,supp,symm,pars)
-
-      name = [ t ? u.name : u.op.name for u in uni ]
-      ind = calculateMultiIndices(Nuni,deg)
+      names = [ supertype(typeof(op)) == AbstractCanonicalOrthoPoly ? string(typeof(op)) : op.name for op in uniOrthoPolys ]
+      ind = calculateMultiIndices(length(uniOrthoPolys), deg)
       dim = size(ind,1)
 
-      new(name,deg,dim,ind,m,uni)
+      new(names, deg, dim, ind, measure, uniOrthoPolys)
     end
 end
 
