@@ -1,34 +1,33 @@
 export  computeSP,
         computeSP2
 
-function computeSP(a_::Vector{Int64},
-                   α::Vector{Vector{Float64}},β::Vector{Vector{Float64}},
-                   nodes::Vector{Vector{Float64}},weights::Vector{Vector{Float64}},
-                   ind::Matrix{Int64};
+function computeSP(a_::Vector{<:Int},
+                   α::Vector{Vector{<:Real}},β::Vector{Vector{<:Real}},
+                   nodes::Vector{Vector{<:Real}},weights::Vector{Vector{<:Real}},
+                   ind::Matrix{<:Int};
                    issymmetric::BitArray=falses(length(α)),
                    zerotol::Float64=1e-10)
-                  # display("war hier")
-    @assert minimum(a_)>=0 "no negative degrees allowed"
-    l, p = size(ind); # p-variate basis
+    minimum(a_) < 0 && throw(DomainError(minimum(a_),"no negative degrees allowed"))
+    l, p = size(ind) # p-variate basis
     p == 1 && computeSP(a_,α[1],β[1],nodes[1],weights[1];issymmetric=issymmetric[1])
     l -= 1
-    # m = length(a_) # m-dimensional scalar product
-    @assert maximum(a_)<=l "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"
-    @assert length(α)==length(β)==length(nodes)==length(weights)==length(issymmetric)==p "inconsistent number of rec. coefficients and/or nodes/weights"
+    maximum(a_) > l && throw(DomainError(maximum(a_), "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+    !(length(α)==length(β)==length(nodes)==length(weights)==length(issymmetric)==p) && throm(InconsistencyError("inconsistent number of rec. coefficients and/or nodes/weights"))
 
     a = Vector{Int64}()
+
     for aa in a_
         !iszero(aa) && push!(a,aa)
     end
 
-    if  iszero(length(a))
-        return prod(β[i][1] for i=1:p)
+    if iszero(length(a))
+        return prod(β[i][1] for i in 1:p)
     elseif isone(length(a))
         return 0.
     else
         inds_uni = multi2uni(a,ind)
         val = 1.
-        for i=1:p
+        for i in 1:p
             # compute univariate scalar product
             @inbounds v = computeSP(inds_uni[i,:],α[i],β[i],nodes[i],weights[i];issymmetric=issymmetric[i])
             isapprox(v,0,atol=zerotol) ? (return 0.) : (val*=v)
@@ -37,37 +36,29 @@ function computeSP(a_::Vector{Int64},
     return val
 end
 
-function computeSP(a::Vector{Int64},op::Vector{OrthoPoly},q::Vector{Quad},ind::Matrix{Int64})
-    @assert length(op)==length(q) "Inconsistent lengh of polynomials and quadrature rules"
-    @assert issymmetric.(op)==issymmetric.(q)
-    α,β = coeffs(op)
-    n,w = nw(q)
-    computeSP(a,α,β,n,w,ind;issymmetric=issymmetric.(op))
+function computeSP(a::Vector{<:Int}, op::Vector{<:AbstractOrthoPoly}, ind::Matrix{<:Int})
+    α, β = coeffs(op)
+    nodes, weights = nw(op)
+    computeSP(a, α, β, nodes, weights, ind; issymmetric=issymmetric.(op))
 end
 
-function computeSP(a::Vector{Int64},mOP::MultiOrthoPoly)
-    @assert typeof(mOP.uni)==Vector{OrthoPolyQ} "no quadrature rules provided"
-    ops = [ mOP.uni[i].op for i=1:length(mOP.uni) ]
-    quads = [ mOP.uni[i].quad for i=1:length(mOP.uni) ]
-    computeSP(a,ops,quads,mOP.ind)
-end
+computeSP(a::Vector{<:Int},mop::MultiOrthoPoly) = computeSP(a, mop.uni, [ op.quad for op in mop.uni ], mop.ind)
 
 """
 __Univariate__
 ```
-computeSP(a::Vector{Int64},α::Vector{Float64},β::Vector{Float64},nodes::Vector{Float64},weights::Vector{Float64};issymmetric::Bool=false)
-computeSP(a::Vector{Int64},op::OrthoPoly,q::Quad;issymmetric=issymmetric(op))
-computeSP(a::Vector{Int64},opq::OrthoPolyQ)
+computeSP(a::Vector{<:Int},α::Vector{<:Real},β::Vector{<:Real},nodes::Vector{<:Real},weights::Vector{<:Real};issymmetric::Bool=false)
+computeSP(a::Vector{<:Int},op::AbstractOrthoPoly;issymmetric=issymmetric(op))
 ```
 __Multivariate__
 ```
-computeSP( a::Vector{Int64},
-           α::Vector{Vector{Float64}},β::Vector{Vector{Float64}},
-           nodes::Vector{Vector{Float64}},weights::Vector{Vector{Float64}},
-           ind::Matrix{Int64};
+computeSP( a::Vector{<:Int},
+           α::Vector{Vector{<:Real}},β::Vector{Vector{<:Real}},
+           nodes::Vector{Vector{<:Real}},weights::Vector{Vector{<:Real}},
+           ind::Matrix{<:Int};
            issymmetric::BitArray=falses(length(α)))
-computeSP(a::Vector{Int64},op::Vector{OrthoPoly},q::Vector{Quad},ind::Matrix{Int64})
-computeSP(a::Vector{Int64},mOP::MultiOrthoPoly)
+computeSP(a::Vector{<:Int},op::Vector{<:AbstractOrthoPoly},ind::Matrix{<:Int})
+computeSP(a::Vector{<:Int},mOP::MultiOrthoPoly)
 ```
 
 Computes the scalar product
@@ -93,50 +84,46 @@ suitable combination of `OrthoPoly` and its quadrature rule `Quad`.
     because `\\phi_0 = 1`.
     - It is checked whether enough quadrature points are supplied to solve the integral exactly.
 """
-function computeSP(a_::Vector{Int64},α::Vector{Float64},β::Vector{Float64},nodes::Vector{Float64},weights::Vector{Float64};issymmetric::Bool=false)
-    @assert minimum(a_) >= 0 "no negative degrees allowed"
-    # remove zero entries
+function computeSP(a_::Vector{<:Int},α::Vector{<:Real},β::Vector{<:Real},nodes::Vector{<:Real},weights::Vector{<:Real};issymmetric::Bool=false)
+    minimum(a_) < 0 && throw(DomainError(minimum(a_), "no negative degrees allowed"))
     # this works because ``<Φ_i,Φ_j,Φ_0,...,Φ_0> = <Φ_i,Φ_j>``
-    # hence, avoiding unnecessary operations that introduced numerical gibberish
-    a = Vector{Int64}()
-    for aa in a_
-        !iszero(aa) && push!(a,aa)
-    end
-    # a = filter(!iszero,a_)
+    # hence, avoiding unnecessary operations that introduce numerical gibberish
+    # a = Vector{Int64}()
+    # for aa in a_
+    #     !iszero(aa) && push!(a,aa)
+    # end
+    a = filter(x -> x > 0, a_)
     # simplification in case the measure is symmetric w.r.t t=0
     # exploit symmetry of the density, see Theorem 1.17 in W. Gautschi's book
     # and exploit the fact that
     (issymmetric && isodd(sum(a))) && return 0.
     # Gauss quadrature rules have exactness 2N-1
-    @assert Int(ceil(0.5*(sum(a)+1)))<=length(nodes) "not enough nodes to integrate exactly ($(length(nodes)) provided, where $(Int(ceil(0.5*(sum(a)+1)))) are needed)."
+    !(Int(ceil(0.5*(sum(a)+1)))<=length(nodes)) && throw(InconsistencyError("not enough nodes to integrate exactly ($(length(nodes)) provided, where $(Int(ceil(0.5*(sum(a)+1)))) are needed)")) 
+
+    res = 
     if iszero(length(a))
-        return first(β)
+        first(β)
     elseif isone(length(a))
-        return 0.
+        0.
     elseif length(a) == 2
-        @inbounds a[1] == a[2] ? (return computeSP2(first(a),β)[end]) : (return 0.)
+        @inbounds a[1] == a[2] ? computeSP2(first(a),β)[end] : 0.
     else
-        # display("war hier")
         f = ones(Float64,length(nodes))
         @simd for i = 1:length(a)
             @inbounds f = f.*evaluate(a[i],nodes,α,β)
         end
-        # f = reduce(*,hcat(map(i->evaluate(a[i],nodes,α,β),1:length(a))...),dims=2)
-        # display(f-f_)
-        return dot(weights,f)
+        dot(weights,f)
     end
 end
-function computeSP(a::Vector{Int64},op::OrthoPoly,q::Quad)
-    @assert issymmetric(op)==issymmetric(q) "inconsistent symmetries"
-    computeSP(a,op.α,op.β,q.nodes,q.weights;issymmetric=issymmetric(op))
+
+function computeSP(a::Vector{<:Int},op::AbstractOrthoPoly)
+    computeSP(a,op.α,op.β,op.quad.nodes,op.quad.weights;issymmetric=issymmetric(op))
 end
-computeSP(a::Vector{Int64},opq::OrthoPolyQ) = computeSP(a,opq.op,opq.quad)
 
 """
-    computeSP2(n::Int64,β::Vector{Float64})
-    computeSP2(n::Int64,op::OrthoPoly) = computeSP2(n,op.β)
-    computeSP2(op::OrthoPoly) = computeSP2(op.deg,op.β)
-    computeSP2(opq::OrthoPolyQ) = computeSP2(opq.op)
+    computeSP2(n::Int,β::Vector{<:Real})
+    computeSP2(n::Int,op::AbstractOrthoPoly) = computeSP2(n,op.β)
+    computeSP2(op::AbstractOrthoPoly) = computeSP2(op.deg,op.β)
 
 Computes the `n` *regular* scalar products aka 2-norms of the orthogonal polynomials, namely
 ```math
@@ -146,26 +133,24 @@ Notice that only the values of `β` of the recurrence coefficients `(α,β)` are
 The computation is based on equation (1.3.7) from Gautschi, W. "Orthogonal Polynomials: Computation and Approximation".
 Whenever there exists an analytic expressions for `β`, this function should be used.
 
-The function is multiply dispatched to facilitate its use with the composite types
-`OrthoPoly` and `OrthoPolyQ`.
+The function is multiply dispatched to facilitate its use with `AbstractOrthoPoly`.
 """
-function computeSP2(n::Int64,β::Vector{Float64})
-    @assert n>=0 "can only compute scalar products for non-negative degrees"
-    @assert length(β) >= n + 1
+function computeSP2(n::Int,β::Vector{<:Real})
+    n < 0 && throw(DomainError(n, "can only compute scalar products for non-negative degrees"))
+    length(β) < n + 1 && throw(InconsistencyError("inconsistent length of β"))
     n == 0 && return β[1]
     s = ones(Float64,n+1)
     @inbounds s[1] = β[1]  # order 0computeSP2
-    for i=2:n+1
+    for i in 2:n+1
         @inbounds s[i] = s[i-1]*β[i]
     end
     return s
 end
-computeSP2(n::Int64,op::OrthoPoly) = computeSP2(n,op.β)
-computeSP2(op::OrthoPoly) = computeSP2(op.deg,op.β)
-computeSP2(opq::OrthoPolyQ) = computeSP2(opq.op)
+computeSP2(n::Int,op::AbstractOrthoPoly) = computeSP2(n,op.β)
+computeSP2(op::AbstractOrthoPoly) = computeSP2(op.deg,op.β)
 
 
-# function computeSP2(n::Int64,α::Vector{Float64},β::Vector{Float64},nodes::Vector{Float64},weights::Vector{Float64})
+# function computeSP2(n::Int64,α::Vector{<:Real},β::Vector{<:Real},nodes::Vector{<:Real},weights::Vector{<:Real})
 #     @assert n>=0 "degree has to be non-negative"
 #     @assert n<=length(α) "not enough recurrence coefficients"
 #     Nquad, Nrec = length(nodes), length(α)
