@@ -73,8 +73,7 @@ All computations of the multivariate scalar products resort back to efficient co
 of the univariate scalar products.
 Mathematically, this follows from Fubini's theorem.
 
-The function is multiply dispatched to facilitate its use with `OrthoPolyQ` or a
-suitable combination of `OrthoPoly` and its quadrature rule `Quad`.
+The function is dispatched to facilitate its use with `AbstractOrthoPoly` and its quadrature rule `Quad`.
 
 !!! note
     - Zero entries of ``a`` are removed automatically to simplify computations, which follows from
@@ -148,12 +147,3 @@ function computeSP2(n::Int,β::Vector{<:Real})
 end
 computeSP2(n::Int,op::AbstractOrthoPoly) = computeSP2(n,op.β)
 computeSP2(op::AbstractOrthoPoly) = computeSP2(op.deg,op.β)
-
-
-# function computeSP2(n::Int64,α::Vector{<:Real},β::Vector{<:Real},nodes::Vector{<:Real},weights::Vector{<:Real})
-#     @assert n>=0 "degree has to be non-negative"
-#     @assert n<=length(α) "not enough recurrence coefficients"
-#     Nquad, Nrec = length(nodes), length(α)
-#     n==0 ? (return β[1]) : (dot(weights,evaluate(n,nodes,α,β).^2))
-# end
-# computeSP2(n::Int64,opq::OrthoPolyQ) = computeSP2(n,opq.op.α,opq.op.β,opq.quad.nodes,opq.quad.weights)

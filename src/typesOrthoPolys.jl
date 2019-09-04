@@ -14,10 +14,7 @@ export          OrthoPoly,
                 MeixnerPollaczekOrthoPoly,
                 InconsistencyError,
                 Quad,
-                Tensor,
-                OrthoPolyQ
-
-
+                Tensor
 
 struct InconsistencyError <: Exception
     var::String
@@ -267,39 +264,6 @@ uni::Vector{<:AbstractOrthoPoly}
       new(names, deg, dim, ind, measure, uniOrthoPolys)
     end
 end
-
-
-
-#####################################################
-#####################################################
-#####################################################
-# legacy code that can be deleted eventually
-#####################################################
-#####################################################
-#####################################################
-# Struct that contains pre-computed nodes and weights
-struct OrthoPolyQ
-    op::OrthoPoly
-    quad::Quad
-end
-
-function OrthoPolyQ(op::OrthoPoly,N::Int)
-    q = Quad(N,op.α,op.β,op.meas)
-    return OrthoPolyQ(op,q)
-end
-OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α)-1)
-
-function OrthoPolyQ(name::String,N::Int,d::Dict=Dict();Nrec::Int=N+1)
-    op = OrthoPoly(name,N,d;Nrec=Nrec)
-    OrthoPolyQ(op)
-end
-
-
-#####################################################
-#####################################################
-#####################################################
-
-
 
 struct Tensor
 dim::Int          # "dimension"

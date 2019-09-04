@@ -70,15 +70,15 @@ coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
 ```
 integrate(f::Function,nodes::Vector{<:Real},weights::Vector{<:Real})
 integrate(f::Function,q::AbstractQuad)
-integrate(f::Function,opq::OrthogonalPolyQ)
+integrate(f::Function,opq::AbstractOrthoPoly)
 ```
 integrate function `f` using quadrature rule specified via `nodes`, `weights`.
 For example ``\\int_0^1 6x^5 = 1`` can be solved as follows:
 
 ```@repl
-julia> opq = OrthoPolyQ("uniform01",3)
-julia> integrate(x->6x^5,opq)
-1.0000000000000002
+julia> opq = Uniform01OrthoPoly(3) # a quadrature rule is added by default
+julia> integrate(x -> 6x^5, opq)
+0.9999999999999993
 ```
 
 !!! note
