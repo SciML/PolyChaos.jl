@@ -1,122 +1,3 @@
-<<<<<<< HEAD:src/types.jl
-export  AbstractMeasure,
-        AbstractCanonicalMeasure,
-        AbstractOrthoPoly,
-        AbstractCanonicalOrthoPoly,
-        AbstractQuad,
-        EmptyQuad,
-        OrthoPoly,
-        MultiOrthoPoly,
-        Quad,
-        Measure,
-        ProductMeasure,
-        Tensor,
-        LegendreMeasure,
-        JacobiMeasure,
-        LaguerreMeasure,
-        genLaguerreMeasure,
-        HermiteMeasure,
-        genHermiteMeasure,
-        GaussMeasure,
-        Beta01Measure,
-        GammaMeasure,
-        Uniform01Measure,
-        LogisticMeasure,
-        MeixnerPollaczekMeasure,
-        LegendreOrthoPoly,
-        JacobiOrthoPoly,
-        LaguerreOrthoPoly,
-        genLaguerreOrthoPoly,
-        HermiteOrthoPoly,
-        genHermiteOrthoPoly,
-        GaussOrthoPoly,
-        Beta01OrthoPoly,
-        GammaOrthoPoly,
-        LogisticOrthoPoly,
-        Uniform01OrthoPoly,
-        MeixnerPollaczekOrthoPoly,
-        InconsistencyError
-
-abstract type AbstractMeasure end
-abstract type AbstractCanonicalMeasure <: AbstractMeasure end
-abstract type AbstractQuad end
-abstract type AbstractOrthoPoly end
-abstract type AbstractCanonicalOrthoPoly <: AbstractOrthoPoly end
-
-struct Measure <: AbstractMeasure
-    name::String
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    pars::Dict
-    function Measure(name::String, w::Function, dom::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
-        !(dom[1] < dom[2]) && throw(DomainError(dom, "invalid domain bounds specified"))
-        new(lowercase(name), w, dom, symm, d)
-    end
-end
-
-struct ProductMeasure <: AbstractMeasure
-    w::Function
-    measures::Vector{<:AbstractMeasure}
-end
-
-# constructor for classic distributions
-struct LegendreMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    function LegendreMeasure()
-        new(w_legendre,(-1.,1.),true)
-    end
-end
-
-struct JacobiMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    ashapeParameter::Real
-    bshapeParameter::Real
-
-    function JacobiMeasure(shape_a::Real, shape_b::Real)
-        any
-        shape_a <= -1 && throw(DomainError(shape_a, "shape parameter a must be > -1"))
-        shape_b <= -1 && throw(DomainError(shape_b, "shape parameter b must be > -1"))
-        new(build_w_jacobi(shape_a,shape_b), (-1,1), isapprox(shape_a, shape_b), shape_a, shape_b)
-    end
-end
-
-struct LaguerreMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-
-    function LaguerreMeasure()
-        new(w_laguerre, (0,Inf), false)
-    end
-end
-
-struct genLaguerreMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-    shapeParameter::Real
-
-    function genLaguerreMeasure(shape::Real)
-        shape <= -1 && throw(DomainError(shape, "invalid shape parameter"))
-        new(build_w_genlaguerre(shape), (0,Inf), false, shape)
-    end
-end
-
-struct HermiteMeasure <: AbstractCanonicalMeasure
-    w::Function
-    dom::Tuple{<:Real,<:Real}
-    symmetric::Bool
-
-    function HermiteMeasure()
-        new(w_hermite, (-Inf,Inf), true)
-    end
-end
-=======
 export          OrthoPoly,
                 MultiOrthoPoly,
                 LegendreOrthoPoly,
@@ -130,11 +11,11 @@ export          OrthoPoly,
                 GammaOrthoPoly,
                 LogisticOrthoPoly,
                 Uniform01OrthoPoly,
+                MeixnerPollaczekOrthoPoly,
                 InconsistencyError,
                 Quad,
                 Tensor,
                 OrthoPolyQ
->>>>>>> ReviseTypesRevolution:src/typesOrthoPolys.jl
 
 
 
@@ -360,41 +241,9 @@ function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real},
   OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization)
 end
 
-<<<<<<< HEAD:src/types.jl
-struct Quad <: AbstractQuad
-    name::String              # name of quadrature
-    Nquad::Int              # number of qudrature points
-    nodes::Vector{<:Real}
-    weights::Vector{<:Real}
-
-    function Quad(name::String, N::Int, nodes::Vector{<:Real}, weights::Vector{<:Real})
-        N <= 0 && throw(DomainError(N,"number of qudrature points has to be positive"))
-        !(length(nodes) == length(weights)) && throw(InconsistencyError("inconsistent numbers of nodes and weights"))
-        new(lowercase(name), N, nodes, weights)
-    end
-end
-
-struct EmptyQuad <: AbstractQuad
-    EmptyQuad() = new()
-end
-
-# general constructor
-function Quad(N::Int, α::Vector{<:Real}, β::Vector{<:Real})
-    !(length(α) == length(β)) && throw(InconsistencyError("inconsistent numbers of recurrence coefficients"))
-    !(N <= length(α) - 1) && throw(DomainError(N),"requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients")
-
-    nodes, weights = gauss(N,α,β)
-    Quad("golubwelsch", N, nodes, weights)
-end
-
-Quad(N::Int, op::AbstractOrthoPoly) = Quad(N, op.α, op.β)
-
-Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
-=======
 #####################################################
 #####################################################
 #####################################################
->>>>>>> ReviseTypesRevolution:src/typesOrthoPolys.jl
 
 struct MultiOrthoPoly <: AbstractOrthoPoly
 name::Vector{String}
@@ -415,23 +264,6 @@ uni::Vector{<:AbstractOrthoPoly}
       ind = calculateMultiIndices(length(uniOrthoPolys), deg)
       dim = size(ind,1)
 
-<<<<<<< HEAD:src/types.jl
-function Quad(N::Int, measure::AbstractMeasure; quadrature::Function=clenshaw_curtis)
-    typeof(measure) != Measure && @warn "For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."
-    Quad(N, measure.w, (measure.dom[1], measure.dom[2]); quadrature=quadrature)
-end
-
-struct MultiOrthoPoly <: AbstractOrthoPoly
-name::Vector{String}
-deg::Int
-dim::Int
-ind::Matrix{<:Int} # multi-index
-measure::ProductMeasure
-uni::Vector{<:AbstractOrthoPoly}
-    function MultiOrthoPoly(uniOrthoPolys::Vector{<:AbstractOrthoPoly}, deg::Int)
-      degs = [ op.deg for op in uniOrthoPolys ]
-      deg > minimum(degs) && throw(DomainError(deg, "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."))
-=======
       new(names, deg, dim, ind, measure, uniOrthoPolys)
     end
 end
@@ -467,7 +299,6 @@ end
 #####################################################
 #####################################################
 
->>>>>>> ReviseTypesRevolution:src/typesOrthoPolys.jl
 
 
 struct Tensor

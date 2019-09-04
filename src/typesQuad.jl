@@ -56,6 +56,6 @@ function Quad(N::Int, w::Function, dom::Tuple{<:Real,<:Real}; quadrature::Functi
 end
 
 function Quad(N::Int, measure::AbstractMeasure; quadrature::Function=clenshaw_curtis)
-    typeof(measure) != Measure && throw(ArgumentError("For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."))
+    typeof(measure) != Measure && @warn "For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."
     Quad(N, measure.w, (measure.dom[1], measure.dom[2]); quadrature=quadrature)
 end

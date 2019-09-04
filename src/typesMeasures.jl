@@ -23,7 +23,7 @@ struct Measure <: AbstractMeasure
     symmetric::Bool
     pars::Dict
     function Measure(name::String, w::Function, dom::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
-        !(dom[1] < dom[2]) && throw(DomainError(dom), "invalid domain bounds specified")
+        !(dom[1] < dom[2]) && throw(DomainError(dom, "invalid domain bounds specified"))
         new(lowercase(name),w, dom, symm, d)
     end
 end
