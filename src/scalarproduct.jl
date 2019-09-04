@@ -2,8 +2,8 @@ export  computeSP,
         computeSP2
 
 function computeSP(a_::Vector{<:Int},
-                   α::Vector{Vector{<:Real}},β::Vector{Vector{<:Real}},
-                   nodes::Vector{Vector{<:Real}},weights::Vector{Vector{<:Real}},
+                   α::Vector{<:Vector{<:Real}},β::Vector{<:Vector{<:Real}},
+                   nodes::Vector{<:Vector{<:Real}},weights::Vector{<:Vector{<:Real}},
                    ind::Matrix{<:Int};
                    issymmetric::BitArray=falses(length(α)),
                    zerotol::Float64=1e-10)
@@ -42,7 +42,7 @@ function computeSP(a::Vector{<:Int}, op::Vector{<:AbstractOrthoPoly}, ind::Matri
     computeSP(a, α, β, nodes, weights, ind; issymmetric=issymmetric.(op))
 end
 
-computeSP(a::Vector{<:Int},mop::MultiOrthoPoly) = computeSP(a, mop.uni, [ op.quad for op in mop.uni ], mop.ind)
+computeSP(a::Vector{<:Int},mop::MultiOrthoPoly) = computeSP(a, mop.uni, mop.ind)
 
 """
 __Univariate__
@@ -53,8 +53,8 @@ computeSP(a::Vector{<:Int},op::AbstractOrthoPoly;issymmetric=issymmetric(op))
 __Multivariate__
 ```
 computeSP( a::Vector{<:Int},
-           α::Vector{Vector{<:Real}},β::Vector{Vector{<:Real}},
-           nodes::Vector{Vector{<:Real}},weights::Vector{Vector{<:Real}},
+           α::Vector{<:Vector{<:Real}},β::Vector{<:Vector{<:Real}},
+           nodes::Vector{<:Vector{<:Real}},weights::Vector{<:Vector{<:Real}},
            ind::Matrix{<:Int};
            issymmetric::BitArray=falses(length(α)))
 computeSP(a::Vector{<:Int},op::Vector{<:AbstractOrthoPoly},ind::Matrix{<:Int})

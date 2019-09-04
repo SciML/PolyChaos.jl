@@ -49,8 +49,8 @@ struct Measure <: AbstractMeasure
     symmetric::Bool
     pars::Dict
     function Measure(name::String, w::Function, dom::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
-        !(dom[1] < dom[2]) && throw(DomainError(dom), "invalid domain bounds specified")
-        new(lowercase(name),w, dom, symm, d)
+        !(dom[1] < dom[2]) && throw(DomainError(dom, "invalid domain bounds specified"))
+        new(lowercase(name), w, dom, symm, d)
     end
 end
 
@@ -463,8 +463,8 @@ Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
 #####################################################
 #####################################################
 # function Quad(N::Int, weight::Function, α::Vector{<:Real}, β::Vector{<:Real}, supp::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
-#     m = Measure("fun_"*String(nameof(weight)),weight,supp,symm,d)
-#     Quad(N,α,β,m)
+#     m = Measure("fun_"*String(nameof(weight)), weight, supp, symm, d)
+#     Quad(N, α, β)
 # end
 #####################################################
 #####################################################
@@ -478,7 +478,7 @@ function Quad(N::Int, w::Function, dom::Tuple{<:Real,<:Real}; quadrature::Functi
 end
 
 function Quad(N::Int, measure::AbstractMeasure; quadrature::Function=clenshaw_curtis)
-    typeof(measure) != Measure && throw(ArgumentError("For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."))
+    typeof(measure) != Measure && @warn "For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."
     Quad(N, measure.w, (measure.dom[1], measure.dom[2]); quadrature=quadrature)
 end
 
@@ -537,15 +537,17 @@ struct Tensor
 dim::Int          # "dimension"
 T::SparseVector{Float64,Int}
 get::Function
-op::Union{OrthoPolyQ,MultiOrthoPoly}
-  function Tensor(dim::Int,mop::MultiOrthoPoly)
-    T = computeTensorizedSP(dim,mop)
-    g(a) = getentry(a,T,mop.ind,dim)
-    new(dim,T,g,mop)
-  end
-  function Tensor(dim::Int,opq::OrthoPolyQ)
-    T = computeTensorizedSP(dim,opq)
-    g(a) = getentry(a,T,calculateMultiIndices(1,opq.op.deg),dim)
-    new(dim,T,g,opq)
-  end
+op::AbstractOrthoPoly
+
+    # inner constructors
+    function Tensor(dim::Int,mop::MultiOrthoPoly)
+        tensorEntries = computeTensorizedSP(dim, mop)
+        getfun(ind) = getentry(ind, tensorEntries, mop.ind, dim)
+        new(dim, tensorEntries, getfun, mop)
+    end
+    function Tensor(dim::Int,opq::AbstractOrthoPoly)
+        tensorEntries = computeTensorizedSP(dim, opq)
+        getfun(ind) = getentry(ind, tensorEntries, calculateMultiIndices(1, opq.deg), dim)
+        new(dim, tensorEntries, getfun, opq)
+    end
 end
