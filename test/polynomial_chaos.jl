@@ -24,7 +24,7 @@ degs, Nsamples = 1:5, 10000
 		@test isapprox(mu, mu_ana; atol=1e-5)
 		@test isapprox(sigma, sigma_ana; atol=1e-5)
 
-		samples = sampleMeasure(N, op)
+		samples = sampleMeasure(Nsamples, op)
 		@test isapprox(mu, mean(samples); atol=1e-2)
 		@test isapprox(sigma, std(samples); atol=1e-2)
 
