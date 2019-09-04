@@ -453,22 +453,8 @@ function Quad(N::Int, α::Vector{<:Real}, β::Vector{<:Real})
 end
 
 Quad(N::Int, op::AbstractOrthoPoly) = Quad(N, op.α, op.β)
-Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
 
-#####################################################
-#####################################################
-#####################################################
-# the constructor below is probably not relevant
-#####################################################
-#####################################################
-#####################################################
-# function Quad(N::Int, weight::Function, α::Vector{<:Real}, β::Vector{<:Real}, supp::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict())
-#     m = Measure("fun_"*String(nameof(weight)), weight, supp, symm, d)
-#     Quad(N, α, β)
-# end
-#####################################################
-#####################################################
-#####################################################
+Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
 
 # all-purpose constructor (last resort!)
 function Quad(N::Int, w::Function, dom::Tuple{<:Real,<:Real}; quadrature::Function=clenshaw_curtis)
@@ -481,34 +467,6 @@ function Quad(N::Int, measure::AbstractMeasure; quadrature::Function=clenshaw_cu
     typeof(measure) != Measure && @warn "For measures of type $(typeof(measure)) the quadrature rule should be based on the recurrence coefficients."
     Quad(N, measure.w, (measure.dom[1], measure.dom[2]); quadrature=quadrature)
 end
-
-
-#####################################################
-#####################################################
-#####################################################
-# legacy code that can be deleted eventually
-#####################################################
-#####################################################
-#####################################################
-# Struct that contains pre-computed nodes and weights
-struct OrthoPolyQ
-    op::OrthoPoly
-    quad::Quad
-end
-
-function OrthoPolyQ(op::OrthoPoly,N::Int)
-    q = Quad(N,op.α,op.β,op.meas)
-    return OrthoPolyQ(op,q)
-end
-OrthoPolyQ(op::OrthoPoly) = OrthoPolyQ(op,length(op.α)-1)
-
-function OrthoPolyQ(name::String,N::Int,d::Dict=Dict();Nrec::Int=N+1)
-    op = OrthoPoly(name,N,d;Nrec=Nrec)
-    OrthoPolyQ(op)
-end
-#####################################################
-#####################################################
-#####################################################
 
 struct MultiOrthoPoly <: AbstractOrthoPoly
 name::Vector{String}
