@@ -33,6 +33,7 @@ export  AbstractMeasure,
         GammaOrthoPoly,
         LogisticOrthoPoly,
         Uniform01OrthoPoly,
+        MeixnerPollaczekOrthoPoly,
         InconsistencyError
 
 abstract type AbstractMeasure end
