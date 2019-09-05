@@ -13,8 +13,7 @@ export          OrthoPoly,
                 Uniform01OrthoPoly,
                 MeixnerPollaczekOrthoPoly,
                 InconsistencyError,
-                Quad,
-                Tensor
+                Quad
 
 struct InconsistencyError <: Exception
     var::String
@@ -262,24 +261,5 @@ uni::Vector{<:AbstractOrthoPoly}
       dim = size(ind,1)
 
       new(names, deg, dim, ind, measure, uniOrthoPolys)
-    end
-end
-
-struct Tensor
-dim::Int          # "dimension"
-T::SparseVector{Float64,Int}
-get::Function
-op::AbstractOrthoPoly
-
-    # inner constructors
-    function Tensor(dim::Int,mop::MultiOrthoPoly)
-        tensorEntries = computeTensorizedSP(dim, mop)
-        getfun(ind) = getentry(ind, tensorEntries, mop.ind, dim)
-        new(dim, tensorEntries, getfun, mop)
-    end
-    function Tensor(dim::Int,opq::AbstractOrthoPoly)
-        tensorEntries = computeTensorizedSP(dim, opq)
-        getfun(ind) = getentry(ind, tensorEntries, calculateMultiIndices(1, opq.deg), dim)
-        new(dim, tensorEntries, getfun, opq)
     end
 end
