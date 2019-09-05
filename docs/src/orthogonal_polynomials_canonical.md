@@ -24,9 +24,9 @@ These univariate monic orthogonal polynomials satisfy the paramount three-term r
 Hence, every system of $n$ univariate monic orthogonal polynomials $\{ \pi_k \}_{k=0}^n$ is isomorphic to its recurrence coefficients $\{ \alpha_k, \beta_k \}_{k=0}^n$.
 
 
-## Classical Orthogonal Polynomials
+## Canonical Orthogonal Polynomials
 
-The so-called *classical* orthogonal polynomials are polynomials named after famous mathematicians who each discovered a special family of orthogonal polynomials, for example [Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials) or [Jacobi polynomials](https://en.wikipedia.org/wiki/Jacobi_polynomials).
+The so-called *classical* or *canonical* orthogonal polynomials are polynomials named after famous mathematicians who each discovered a special family of orthogonal polynomials, for example [Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials) or [Jacobi polynomials](https://en.wikipedia.org/wiki/Jacobi_polynomials).
 For *classical* orthogonal polynomials there exist closed-form expressions of---among others---the recurrence coefficients.
 Also quadrature rules for *classical* orthogonal polynomials are well-studied (with dedicated packages such as [FastGaussQuadrature.jl](https://github.com/ajt60gaibb/FastGaussQuadrature.jl).
 However, more often than not these *classical* orthogonal polynomials are neither monic nor orthogonal, hence not normalized in any sense.
@@ -66,18 +66,42 @@ Additionally, the following weight functions that are equivalent to probability 
 To generate the orthogonal polynomials up to maximum degree `deg`, simply call
 
 
-```julia
-using PolyChaos
-deg = 4
-op = OrthoPoly("gaussian",deg)
+```jldoctest mylabel
+julia> using PolyChaos
+
+julia> deg = 4
+4
+
+julia> op = GaussOrthoPoly(deg)
+GaussOrthoPoly(4, [0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 3.0, 4.0], GaussMeasure(PolyChaos.w_gaussian, (-Inf, Inf), true), Quad("golubwelsch", 4, [-2.33441, -0.741964, 0.741964, 2.33441], [0.0458759, 0.454124, 0.454124, 0.0458759]))
+
+julia> show(op)
+
+Univariate orthogonal polynomials
+degree:     4
+#coeffs:    5
+α =     [0.0, 0.0, 0.0, 0.0, 0.0]
+β =     [1.0, 1.0, 2.0, 3.0, 4.0]
+
+Measure dλ(t)=w(t)dt
+w:  PolyChaos.w_gaussian
+dom:    (-Inf, Inf)
+symmetric:  true
+
 ```
 
-This generates `op`as an `OrthoPoly` type with the underlying Gaussian measure `op.meas`.
+This generates `op`as a `GaussOrthoPoly` type with the underlying Gaussian measure `op.measure`.
 The recurrence coefficients are accessible via `coeffs()`.
 
 
-```julia
-coeffs(op)
+```jldoctest mylabel
+julia> coeffs(op)
+5×2 Array{Float64,2}:
+ 0.0  1.0
+ 0.0  1.0
+ 0.0  2.0
+ 0.0  3.0
+ 0.0  4.0
 ```
 
 By default, the constructor for `OrthoPoly` generates `deg+1` recurrence coefficients.
@@ -85,16 +109,33 @@ Sometimes, some other number `Nrec` may be required.
 This is why `Nrec` is a keyword for the constructor `OrthoPoly`.
 
 
-```julia
-N = 100
-op_ = OrthoPoly("logistic",deg;Nrec=N)
+```jldoctest mylabel
+julia> N = 100
+100
+
+julia> opLogistic = LogisticOrthoPoly(deg; Nrec=N);
+
+julia> show(opLogistic)
+
+Univariate orthogonal polynomials
+degree:     4
+#coeffs:    100
+α =     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]...
+β =     [1.0, 3.28987, 10.5276, 22.8411, 40.1051, 62.3081, 89.4476]...
+
+Measure dλ(t)=w(t)dt
+w:  PolyChaos.w_logistic
+dom:    (-Inf, Inf)
+symmetric:  true
+
 ```
 
 Let's check whether we truly have more coefficients:
 
 
-```julia
-size(coeffs(op_),1)==N
+```jldoctest mylabel
+julia> size(coeffs(opLogistic),1)==N
+true
 ```
 
 ## Arbitrary Weights
@@ -102,22 +143,40 @@ If you are given a weight function $w$ that does not belong to the Table above, 
 First, we define the measure by specifying a name, the weight, the support, symmetry, and parameters
 
 
-```julia
-supp = (-1,1)
-function w(t)
-    supp[1]<=t<=supp[2] ? (1. + t) : error("$t not in support")
-end
-my_meas = Measure("my_meas",w,supp,false,Dict())
+```jldoctest mylabel
+julia> supp = (-1, 1)
+
+julia> w(t) = 1 + t
+w (generic function with 1 method)
+
+julia> my_meas = Measure("my_meas", w, supp, false, Dict())
+Measure("my_meas", w, (-1, 1), false, Dict{Any,Any}())
 ```
 
 Notice: it is advisable to define the weight such that an error is thrown for arguments outside of the support.
 
-Now, we want to construct the univariate monic orthogonal polynomials up to degree `deg` relative to `m`.
+Now, we want to construct the univariate monic orthogonal polynomials up to degree `deg` relative to `my_meas`.
 The constructor is
 
 
-```julia
-my_op = OrthoPoly("my_op",deg,my_meas;Nquad=200)
+```jldoctest mylabel
+julia> my_op = OrthoPoly("my_op", deg, my_meas; Nquad=200);
+
+julia> show(my_op)
+
+Univariate orthogonal polynomials
+degree:     4
+#coeffs:    5
+α =     [0.333333, 0.0666667, 0.0285714, 0.015873, 0.010101]
+β =     [2.0, 0.222222, 0.24, 0.244898, 0.246914]
+
+Measure dλ(t)=w(t)dt
+name:   my_meas
+w:  w
+dom:    (-1, 1)
+symmetric:  false
+pars:   Dict{Any,Any}()
+
 ```
 
 By default, the recurrence coefficients are computed using the [Stieltjes procuedure](https://warwick.ac.uk/fac/sci/maths/research/grants/equip/grouplunch/1985Gautschi.pdf) with [Clenshaw-Curtis](https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature) quadrature (with `Nquad` nodes and weights).
@@ -149,33 +208,64 @@ For this, there exists the composite struct `MultiOrthoPoly`.
 Let's consider an example where we mix *classical* orthogonal polynomials with an arbitrary weight.
 
 
-```julia
-deg = [3,5,6,4]
-d = minimum(deg)
+```jldoctest mylabel
+julia> deg = [3, 5, 6, 4]
+4-element Array{Int64,1}:
+ 3
+ 5
+ 6
+ 4
 
-op1 = OrthoPoly("gaussian",deg[1])
-op2 = OrthoPoly("uniform01",deg[2])
-op3 = OrthoPoly("beta01",deg[3],Dict(:shape_a=>2,:shape_b=>1.2))
-ops = [op1,op2,op3,my_op]
-mop = MultiOrthoPoly(ops,d)
+julia> d = minimum(deg)
+3
+
+julia> op1 = GaussOrthoPoly(deg[1]);
+
+julia> op2 = Uniform01OrthoPoly(deg[2]);
+
+julia> op3 = Beta01OrthoPoly(deg[3], 2, 1.2);
+
+julia> ops = [op1, op2, op3, my_op];
+
+julia> mop = MultiOrthoPoly(ops, d);
+
+julia> show(mop)
+
+4-variate orthogonal polynomials
+name:       GaussOrthoPoly
+        Uniform01OrthoPoly
+        Beta01OrthoPoly
+        my_op
+deg:        3
+dim:        35
+ind:        [0, 0, 0, 0]
+        [1, 0, 0, 0]
+        [0, 1, 0, 0]
+        [0, 0, 1, 0]
+        [0, 0, 0, 1]
+        [2, 0, 0, 0]
+        [1, 1, 0, 0]
+        ...
+
+false
+
 ```
 
 The total number of  basis polynomials is stored in the field `dim`.
 The univariate basis polynomials making up the multivariate basis are stored in the field `uni`.
-
-
-
-```julia
-mop.uni
-```
-
 The field `ind` contains the multi-index, i.e. row $i$ stores what combination of univariate polynomials makes up the $i$-th multivariate polynomial.
 For example,
 
 
-```julia
-i = 11
-mop.ind[i+1,:]
+```jldoctest mylabel
+julia> i = 11;
+
+julia> mop.ind[i+1, :]
+4-element Array{Int64,1}:
+ 0
+ 1
+ 0
+ 1
 ```
 
 translates mathematically to
@@ -184,16 +274,5 @@ translates mathematically to
 ```
 
 Notice that there is an offset by one, because the basis counting starts at 0, but Julia is 1-indexed.
-The underlying measure of `mop` is now of type `MultiMeasure`, and stored in the field `meas`
-
-
-```julia
-mop.meas
-```
-
-The weight $w$ can be evaluated as expected
-
-
-```julia
-mop.meas.w(0.5*ones(length(ops)))
-```
+The underlying measure of `mop` is now of type `ProductMeasure`, and stored in the field `measure`
+The weight $w$ can be evaluated as one would expect.

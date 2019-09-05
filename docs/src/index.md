@@ -46,9 +46,14 @@ We would like to solve the integral
 \int_0^1 6 x^5 \mathrm{d}x.
 ```
 Exploiting the underlying uniform measure, the integration can be done exactly with a 3-point quadrature rule.
-```@example mysetup
-opq = OrthoPolyQ("uniform01",3)
-integrate(x->6x^5,opq)
+```jldoctest
+julia> using PolyChaos
+
+julia> opq = Uniform01OrthoPoly(3, addQuadrature = true)
+Uniform01OrthoPoly(3, [0.5, 0.5, 0.5, 0.5], [1.0, 0.0833333, 0.0666667, 0.0642857], Uniform01Measure(PolyChaos.w_uniform01, (0, 1), true), Quad("golubwelsch", 3, [0.112702, 0.5, 0.887298], [0.277778, 0.444444, 0.277778]))
+
+julia> integrate(x -> 6x^5, opq)
+0.9999999999999993
 ```
 
 To get going with PolyChaos check out the tutorials such as the one on [numerical integration](@ref NumericalIntegration).
@@ -66,7 +71,7 @@ If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [d
 Or just fork and/or star the repository:
 
 Julia's package manager works nicely with Github: simply install the hosted package via `Pkg.clone` and the [repository's URL](https://help.github.com/articles/which-remote-url-should-i-use/).
-A so-called fork is created with
+A fork is created with
 
 ```julia
 Pkg.clone("https://github.com/timueh/PolyChaos.jl")
