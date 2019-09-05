@@ -32,7 +32,7 @@ The keyword `quadrature` specifies what quadrature rule is being used.
 """
 function rm_compute(weight::Function,lb::Real,ub::Real,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes)
     @assert Npoly <= Nquad
-    Npoly == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    Npoly == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     n,w= quadgp(weight,lb,ub,Nquad;quadrature=quadrature)
     a,b = discretization(Npoly,n,w)
     # display((b,maximum(b)))
@@ -78,7 +78,7 @@ on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\m
 """
 function rm_logistic(N::Int)
     @assert N >= 0 "parameter(s) out of range."
-    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     zeros(N), pushfirst!(map(k->k^4*pi^2/(4*k^2-1),Base.OneTo(N-1)),1.)
 end
 
@@ -92,7 +92,7 @@ The call `rm_hermite(N)` is the same as `rm_hermite(N,0)`.
 """
 function rm_hermite(N::Int,mu::Real)
     @assert N >= 0 && mu > -0.5 "parameter(s) out of range."
-    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     m0 = mu != 0. ? gamma(mu + 0.5) : sqrt(π)
     N == 1 && return [0.], [m0]
     return zeros(N), pushfirst!(map(x->isodd(x) ? 0.5*x+mu : 0.5*x,1:N-1), m0)
@@ -106,7 +106,7 @@ that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{
 """
 function rm_hermite_prob(N::Int)
     @assert N >= 0 "parameter(s) out of range."
-    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     # return zeros(N), [sqrt(2*pi); collect(1.:N-1) ]
     return zeros(N), pushfirst!( collect(1.:N-1), sqrt(2*pi))
 end
@@ -121,7 +121,7 @@ The call `rm_laguerre(N)` is the same as `rm_laguerre(N,0)`.
 """
 function rm_laguerre(N::Int,a::Real)
     @assert N >= 0 && a > -1. "parameter(s) out of range"
-    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     N==1 && return [a+1.], [gamma(a+1)]
     n = 1.:N-1
     return pushfirst!(map(x->2x+a+1.,n)::Vector{<:Real},a+1.), pushfirst!(map(x->x^2+a*x,n)::Vector{<:Real},gamma(a+1))
@@ -142,7 +142,7 @@ The call `rm_jacobi(N,a)` is the same as `rm_jacobi(N,a,a)` and `rm_jacobi(N)` t
 """
 function rm_jacobi(N::Int,a::Real,b::Real)
     @assert N >= 0 && a >- 1. && b >- 1. "parameter(s) out of range"
-    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     nu = (b - a) / ( a+ b + 2.);
     mu::Real = a + b + 2. <= 128. ? 2^(a+b+1)*((gamma(a+1)*gamma(b+1))/gamma(a+b+2)) : exp((a+b+1)*log(2)+((log(gamma(a+1))+log(gamma(b+1)))-log(gamma(a+b+2))))
     N == 1 && return [nu], [mu]
@@ -170,7 +170,7 @@ The call `rm_jacobi01(N,a)` is the same as `rm_jacobi01(N,a,a)` and `rm_jacobi01
 """
 function rm_jacobi01(N::Int,a::Real,b::Real)
     @assert N>=0 && a>-1. && b>-1. "parameter(s) out of range"
-    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     c, d = rm_jacobi(N,a,b)
     map(x->(1+x)/2,c), pushfirst!(0.25*d[2:N], d[1]/2^(a+b+1.))
 end
@@ -196,7 +196,7 @@ rm_legendre01(N::Int) = rm_jacobi01(N)
 
 function rm_chebyshev1(N::Int)
     @assert N>=0 "N has to be non-negative"
-    α = zeros(Real,N)
+    α = zeros(Float64,N)
     if N == 1
         return α, [pi]
     elseif N == 2
@@ -261,10 +261,10 @@ end
 """
 function rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
     @assert N>=0 && lambda>0. && phi>0. "parameter(s) out of range"
-    N == 0 && return Array{Real,1}(undef,0), Array{Real,1}(undef,0)
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     n=1:N;
     sinphi=sin(phi); lam2=2*lambda;
-    ab=zeros(Real,N,2)
+    ab=zeros(Float64,N,2)
     if sinphi==1
       ab[:,1]=zeros(N);
     else
