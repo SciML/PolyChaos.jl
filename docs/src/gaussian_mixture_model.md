@@ -31,19 +31,18 @@ Let's consider a simple example.
 
 
 ```@example mysetup
-using Plots
+using Plots, LaTeXStrings
 f(x,μ,σ) = 1 / sqrt(2*π*σ^2) * exp(-(x - μ)^2 / (2σ^2))
-μ, σ = [1., 1.7], [0.2, 0.3];
-ρ(x) = 0.5*f(x, μ[1], σ[1]) + 0.5*f(x, μ[2], σ[2]);
+μs, σs, ws = [1., 1.7], [0.2, 0.3], [0.5, 0.5]
+ρ(x) = sum(w*f(x, μ, σ) for (μ, σ, w) in zip(μs, σs, ws))
 x = 0:0.01:3;
 plot(x, ρ.(x))
-xlabel!("x"); ylabel!("\rho(x)");
+xlabel!(L"x"); ylabel!(L"\rho(x)");
 ```
 
 This looks nice!
 
 What are now the polynomials that are orthogonal relative to this specific density?
-
 
 ```@example mysetup
 using PolyChaos

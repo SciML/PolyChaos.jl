@@ -223,18 +223,18 @@ struct OrthoPoly <: AbstractOrthoPoly
 end
 
 # constructor for known Measure
-function OrthoPoly(name::String, deg::Int, measure::AbstractMeasure; Nrec=deg+1, Nquad=10*Nrec, quadrature::Function=clenshaw_curtis, discretization::Function=stieltjes)
+function OrthoPoly(name::String, deg::Int, measure::AbstractMeasure; Nrec=deg+1, Nquad=10*Nrec, quadrature::Function=clenshaw_curtis, discretization::Function=stieltjes, addQuadrature::Bool=true)
     _checkConsistency(deg, Nrec)
     name = lowercase(name)
     α, β = rm_compute(measure, Nrec, Nquad, quadrature=quadrature, discretization=discretization)
-    return OrthoPoly(name, deg, α, β, measure)
+    return OrthoPoly(name, deg, α, β, measure, addQuadrature=addQuadrature)
 end
 
 # general constructor
-function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict(); Nrec=deg+1, Nquad=10*Nrec, quadrature::Function=clenshaw_curtis, discretization::Function=stieltjes)
+function OrthoPoly(name::String, deg::Int, w::Function, s::Tuple{<:Real,<:Real}, symm::Bool, d::Dict=Dict(); Nrec=deg+1, Nquad=10*Nrec, quadrature::Function=clenshaw_curtis, discretization::Function=stieltjes, addQuadrature::Bool = true)
   name = lowercase(name)
   measure = Measure(name, w, s, symm, d)
-  OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization)
+  OrthoPoly(name, deg, measure; Nrec=Nrec, Nquad=Nquad, quadrature=quadrature, discretization=discretization, addQuadrature=addQuadrature)
 end
 
 #####################################################

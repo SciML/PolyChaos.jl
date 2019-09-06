@@ -2,15 +2,14 @@
 using PolyChaos
 k = 1
 deg, Nrec = 2, 20
-op = OrthoPoly("gaussian",deg;Nrec=Nrec);
-opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
+opq = GaussOrthoPoly(deg; Nrec=Nrec, addQuadrature=true);
 showbasis(opq; sym="ξ") # works for `op` too!
 showpoly(0:2:deg,opq)
 L = dim(opq)
 mu, sig = 0., 1.
-x = [ convert2affinePCE("gaussian",mu,sig); zeros(Float64,L-2) ]
-t2 = Tensor(2,opq);
-t3 = Tensor(3,opq)
+x = [ convert2affinePCE(mu, sig, opq); zeros(Float64,L-2) ]
+t2 = Tensor(2, opq);
+t3 = Tensor(3, opq)
 y = [ sum( x[i]*x[j]*t3.get([i-1,j-1,m-1])/t2.get([m-1,m-1])  for i=1:L, j=1:L ) for m=1:L ]
 moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]
 function myskew(y)
@@ -25,15 +24,14 @@ print("Standard deviation:\t$(moms_analytic(k)[2]) = $(std(y,opq))\n")
 print("\t\t\terror = $(moms_analytic(k)[2]-std(y,opq))\n")
 print("Skewness:\t\t$(moms_analytic(k)[3]) = $(myskew(y))\n")
 print("\t\t\terror = $(moms_analytic(k)[3]-myskew(y))\n")
-using Plots
-gr()
+using Plots, LaTeXStrings
 Nsmpl = 10000
-ysmpl = samplePCE(Nsmpl,y,opq)
+ysmpl = samplePCE(Nsmpl, y, opq)
 histogram(ysmpl;normalize=true,xlabel="t",ylabel="\rho(t)")
 import SpecialFunctions: gamma
 ρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
-plot!(t,ρ.(t),w=4)
+plot!(t, ρ.(t), w=4)
 ```
 
 # Chi-squared Distribution ($k=1$)
@@ -70,26 +68,23 @@ In other words, increasing the maximum degree to values greater than 2 introduce
 ## Practice
 First, we create a orthogonal basis relative to $f_X(x)$ of degree at most $d=2$ (`deg` below).
 
-Notice that we consider a total of `Nrec` recursion coefficients, and that we also add a quadrature rule by calling `OrthoPolyQ()`.
+Notice that we consider a total of `Nrec` recursion coefficients, and that we also add a quadrature rule by setting `addQuadrature = true`.
 
 
 ```@example mysetup
 using PolyChaos
 k = 1
 deg, Nrec = 2, 20
-op = OrthoPoly("gaussian",deg;Nrec=Nrec);
-opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
+opq = GaussOrthoPoly(deg; Nrec=Nrec, addQuadrature=true);
 ```
 
 What are the basis polynomials?
 
-
 ```@example mysetup
-showbasis(opq; sym="ξ") # works for `op` too!
+showbasis(opq; sym="ξ")
 ```
 
 Note that the command `showbasis` is based on the more general `showpoly`:
-
 
 ```@example mysetup
 showpoly(0:2:deg,opq)
@@ -101,15 +96,15 @@ Next, we define the PCE for $X$.
 ```@example mysetup
 L = dim(opq)
 mu, sig = 0., 1.
-x = [ convert2affinePCE("gaussian",mu,sig); zeros(Float64,L-2) ]
+x = [ convert2affinePCE(mu, sig, opq); zeros(Float64,L-2) ]
 ```
 
 With the orthogonal basis and the quadrature at hand, we can compute the tensors `t2` and `t3` that store the entries $\langle \phi_m, \phi_m \rangle$, and $\langle \phi_i \phi_j, \phi_m \rangle$, respectively.
 
 
 ```@example mysetup
-t2 = Tensor(2,opq);
-t3 = Tensor(3,opq)
+t2 = Tensor(2, opq);
+t3 = Tensor(3, opq)
 ```
 
 With the tensors at hand, we can compute the Galerkin projection.
@@ -121,11 +116,10 @@ y = [ sum( x[i]*x[j]*t3.get([i-1,j-1,m-1])/t2.get([m-1,m-1])  for i=1:L, j=1:L )
 
 Let's compare the moments via PCE to the closed-form expressions.
 
-
 ```@example mysetup
 moms_analytic(k) = [k, sqrt(2k), sqrt(8/k)]
 function myskew(y)
-   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L,j=1:L,k=1:L )
+   e3 = sum( y[i]*y[j]*y[k]*t3.get([i-1,j-1,k-1]) for i=1:L, j=1:L, k=1:L )
    μ = y[1]
    σ = std(y,opq)
    (e3-3*μ*σ^2-μ^3)/(σ^3)
@@ -147,17 +141,14 @@ Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{\mathr
 
 
 ```@example mysetup
-using Plots
-gr()
+using Plots, LaTeXStrings
 Nsmpl = 10000
-#ξ = sampleMeasure(Nsmpl,opq)
-#ysmpl = evaluatePCE(y,ξ,opq)
-ysmpl = samplePCE(Nsmpl,y,opq)
-histogram(ysmpl;normalize=true,xlabel="t",ylabel="\rho(t)")
-
+# long way: ξ = sampleMeasure(Nsmpl,opq), ysmpl = evaluatePCE(y,ξ,opq)
+ysmpl = samplePCE(Nsmpl, y, opq)
+histogram(ysmpl; normalize=true, xlabel=L"t", ylabel=L"\rho(t)")
 
 import SpecialFunctions: gamma
 ρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
-plot!(t,ρ.(t),w=4)
+plot!(t, ρ.(t), w=4)
 ```

@@ -11,12 +11,12 @@ c = 4 .+ 10*rand(Ng) # cost function parameters
 pmax, pmin = 10*ones(Ng), zeros(Ng) # engineering limits
 plmax, plmin = 10*ones(Nl), -10*ones(Nl) # engineering limits
 deg = 1
-opq = [OrthoPolyQ("uniform01",deg; Nrec=5*deg), OrthoPolyQ("uniform01",deg; Nrec=5*deg)]
+opq = [Uniform01OrthoPoly(deg; Nrec=5*deg), Uniform01OrthoPoly(deg; Nrec=5*deg)]
 mop = MultiOrthoPoly(opq, deg)
 Npce = mop.dim
 d = zeros(Nd,Npce) # PCE coefficients of load
-d[1,[1,2]] = convert2affinePCE(mop.uni[1].op.name, 1., 0.1, kind=:μσ)
-d[2,[1,3]] = convert2affinePCE(mop.uni[2].op.name, 2., 0.2, kind=:μσ)
+d[1,[1,2]] = convert2affinePCE(1., 0.1, mop.uni[1], kind="μσ")
+d[2,[1,3]] = convert2affinePCE(2., 0.2, mop.uni[2], kind="μσ")
 function buildSOC(x::Vector,mop::MultiOrthoPoly)
     t = [ sqrt(Tensor(2,mop).get([i,i])) for i in 0:mop.dim-1 ]
     (t.*x)[2:end]
@@ -115,7 +115,7 @@ We specify the uncertainty using `PolyChaos`:
 
 ```@example mysetup
 deg = 1
-opq = [OrthoPolyQ("uniform01",deg; Nrec=5*deg), OrthoPolyQ("uniform01",deg; Nrec=5*deg)]
+opq = [Uniform01OrthoPoly(deg; Nrec=5*deg), Uniform01OrthoPoly(deg; Nrec=5*deg)]
 mop = MultiOrthoPoly(opq, deg)
 Npce = mop.dim
 ```
@@ -125,8 +125,8 @@ It remains to specify the PCE coefficients, for which we will use `convert2affin
 
 ```@example mysetup
 d = zeros(Nd,Npce) # PCE coefficients of load
-d[1,[1,2]] = convert2affinePCE(mop.uni[1].op.name, 1., 0.1, kind=:μσ)
-d[2,[1,3]] = convert2affinePCE(mop.uni[2].op.name, 2., 0.2, kind=:μσ)
+d[1,[1,2]] = convert2affinePCE(1., 0.1, mop.uni[1], kind="μσ")
+d[2,[1,3]] = convert2affinePCE(2., 0.2, mop.uni[2], kind="μσ")
 ```
 
 Now, let's put it all into an optimization problem, specifically a second-order cone program.
@@ -141,6 +141,7 @@ end
 ```
 
 Finally, let's use `JuMP` to formulate and then solve the problem.
+We use `Mosek` to solve the problem; for academic use there are [free license](https://www.mosek.com/products/academic-licenses/).
 
 
 ```@example mysetup
@@ -158,7 +159,6 @@ optimize!(model) # here we go
 
 Let's extract the numerical values of the optimal solution.
 
-
 ```@example mysetup
 @assert termination_status(model) == MOI.OPTIMAL "Model not solved to optimality."
 psol, plsol, obj = value.(p), value.(pl), objective_value(model)
@@ -168,13 +168,11 @@ Great, we've solved the problem.
 How do we now make sense of the solution?
 For instance, we can look at the moments of the generated power:
 
-
 ```@example mysetup
 p_moments = [ [mean(psol[i,:],mop) var(psol[i,:],mop) ] for i in 1:Ng ]
 ```
 
 Simiarly, we can study the moments for the branch flows:
-
 
 ```@example mysetup
 pbr_moments = [ [mean(plsol[i,:],mop) var(plsol[i,:],mop) ] for i in 1:Nl ]

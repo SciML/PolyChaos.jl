@@ -12,6 +12,7 @@ op::AbstractOrthoPoly
         getfun(ind) = getentry(ind, tensorEntries, mop.ind, dim)
         new(dim, tensorEntries, getfun, mop)
     end
+    
     function Tensor(dim::Int,opq::AbstractOrthoPoly)
         tensorEntries = computeTensorizedSP(dim, opq)
         getfun(ind) = getentry(ind, tensorEntries, calculateMultiIndices(1, opq.deg), dim)

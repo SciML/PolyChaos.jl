@@ -23,7 +23,6 @@ nw(mop::MultiOrthoPoly)
 ```
 returns nodes and weights in matrix form
 """
-
 nw(quad::EmptyQuad) = Array{Float64}(undef,0,2)
 
 function nw(quad::AbstractQuad)

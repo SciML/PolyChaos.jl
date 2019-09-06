@@ -1,13 +1,12 @@
 ```@setup mysetup
 k = 12
-using PolyChaos
+using PolyChaos, LaTeXStrings
 degree, Nrec = 2, 20
-op = OrthoPoly("gaussian",degree;Nrec=Nrec);
-opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
-mop = MultiOrthoPoly([opq for i=1:k],degree)
+opq = GaussOrthoPoly(degree; Nrec=Nrec, addQuadrature = true);
+mop = MultiOrthoPoly([opq for i in 1:k], degree)
 L = dim(mop)
 mu, sig = 0., 1.
-x = [ assign2multi(convert2affinePCE("gaussian",mu,sig),i,mop.ind) for i=1:k ]
+x = [ assign2multi(convert2affinePCE(mu, sig, opq),i,mop.ind) for i in 1:k ]
 t2 = Tensor(2,mop)
 t3 = Tensor(3,mop)
 y = [ sum( x[i][j1]*x[i][j2]*t3.get([j1-1,j2-1,m-1])/t2.get([m-1,m-1])  for i=1:k, j1=1:L, j2=1:L ) for m=1:L ]
@@ -27,8 +26,8 @@ print("\t\t\terror = $(moms_analytic(k)[3]-myskew(y))\n")
 using Plots
 gr()
 Nsmpl = 10000
-ysmpl = samplePCE(Nsmpl,y,mop)
-histogram(ysmpl;normalize=true,xlabel="t",ylabel="rho(t)")
+ysmpl = samplePCE(Nsmpl, y, mop)
+histogram(ysmpl;normalize=true, xlabel=L"t",ylabel=L"\rho(t)")
 import SpecialFunctions: gamma
 ρ(t) = 1/(2^(0.5*k)*gamma(0.5*k))*t^(0.5*k-1)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
@@ -69,22 +68,20 @@ In other words, increasing the maximum degree to values greater than 2 introduce
 ## Practice
 First, we create a orthogonal basis relative to $f_X(x)$ of degree at most $d=2$ (`degree` below).
 
-Notice that we consider a total of `Nrec` recursion coefficients, and that we also add a quadrature rule by calling `OrthoPolyQ()`.
+Notice that we consider a total of `Nrec` recursion coefficients, and that we also add a quadrature rule by setting `addQuadrature = true`.
 
 
 ```@example mysetup
 k = 12
 using PolyChaos
 degree, Nrec = 2, 20
-op = OrthoPoly("gaussian",degree;Nrec=Nrec);
-opq = OrthoPolyQ(op) #OR: opq = OrthoPolyQ("gaussian",deg;Nrec=Nrec)
+opq = GaussOrthoPoly(degree; Nrec=Nrec, addQuadrature = true);
 ```
 
 Now let's define a multivariate basis
 
-
 ```@example mysetup
-mop = MultiOrthoPoly([opq for i=1:k],degree)
+mop = MultiOrthoPoly([opq for i in 1:k], degree)
 ```
 
 Next, we define the PCE for all $X_i$ with $i = 1, \dots, k$.
@@ -93,7 +90,7 @@ Next, we define the PCE for all $X_i$ with $i = 1, \dots, k$.
 ```@example mysetup
 L = dim(mop)
 mu, sig = 0., 1.
-x = [ assign2multi(convert2affinePCE("gaussian",mu,sig),i,mop.ind) for i=1:k ]
+x = [ assign2multi(convert2affinePCE(mu, sig, opq), i, mop.ind) for i in 1:k ]
 ```
 
 With the orthogonal basis and the quadrature at hand, we can compute the tensors `t2` and `t3` that store the entries $\langle \phi_m, \phi_m \rangle$, and $\langle \phi_{j_1} \phi_{j_2}, \phi_m \rangle$, respectively.
@@ -145,13 +142,12 @@ Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{t^{t/2
 using Plots
 gr()
 Nsmpl = 10000
-# ξ = sampleMeasure(Nsmpl,mop)
-# ysmpl = evaluatePCE(y,ξ,mop)
-ysmpl = samplePCE(Nsmpl,y,mop)
-histogram(ysmpl;normalize=true,xlabel="t",ylabel="rho(t)")
+# long way: ξ = sampleMeasure(Nsmpl,mop), ysmpl = evaluatePCE(y,ξ,mop)
+ysmpl = samplePCE(Nsmpl, y, mop)
+histogram(ysmpl;normalize=true, xlabel=L"t",ylabel=L"\rho(t)")
 
 import SpecialFunctions: gamma
 ρ(t) = 1/(2^(0.5*k)*gamma(0.5*k))*t^(0.5*k-1)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
-plot!(t,ρ.(t),w=4)
+plot!(t, ρ.(t), w=4)
 ```

@@ -55,8 +55,7 @@ end
 
 """
 ```
-convert2affinePCE(a::Vector{<:Real},α0::Real)
-convert2affinePCE(name::String,p1::Real,p2::Real,d::Dict=Dict();kind::Symbol=:lbub)
+convert2affinePCE(mu::Real, sigma::Real, op::AbstractCanonicalOrthoPoly; kind::String)
 ```
 Computes the affine PCE coefficients ``x_0`` and ``x_1`` from
 ```math
@@ -64,7 +63,7 @@ X = a_1 + a_2 \\Xi = x_0 + x_1 \\phi_1(\\Xi),
 ```
 where ``\\phi_1(t) = t-\\alpha_0`` is the first-order monic basis polynomial.
 
-For classical polynomials the `name` can be given directly. The keyword `kind in [:lbub, :μσ]`
+Works for subtypes of AbstractCanonicalOrthoPoly. The keyword `kind in ["lbub", "μσ"]`
 specifies whether `p1` and `p2` have the meaning of lower/upper bounds or mean/standard deviation.
 """
 function convert2affinePCE(a1::Real,a2::Real,α0::Real)
@@ -107,9 +106,9 @@ function convert2affinePCE(p1::Real, p2::Real, op::GammaOrthoPoly)
     throw(error("convert2affine not yet implemented for $(typeof(op))"))
 end
 
-function convert2affine(p1::Real, p2::Real, op::LogisticOrthoPoly)
+function convert2affinePCE(p1::Real, p2::Real, op::LogisticOrthoPoly)
     _checkStandardDevation(p2)
-    convert2affine(p1, p2, first(op.α))
+    convert2affinePCE(p1, p2, first(op.α))
 end
 
 
@@ -190,7 +189,7 @@ sampleMeasure(n::Int, meas::GammaMeasure) = sampleMeasure(n, Gamma(meas.shapePar
 sampleMeasure(n::Int, meas::LogisticMeasure) = sampleMeasure(n, Logistic())
 
 function sampleMeasure(n::Int, meas::AbstractCanonicalMeasure; method::String="adaptiverejection")
-    @warn "ignoring keyword method; using sampling from Distributions.jl instead"
+    @warn "ignoring keyword method; sampling from Distributions.jl instead"
     sampleMeasure(n, meas)
 end
 
