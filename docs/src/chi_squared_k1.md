@@ -24,10 +24,10 @@ print("Standard deviation:\t$(moms_analytic(k)[2]) = $(std(y,opq))\n")
 print("\t\t\terror = $(moms_analytic(k)[2]-std(y,opq))\n")
 print("Skewness:\t\t$(moms_analytic(k)[3]) = $(myskew(y))\n")
 print("\t\t\terror = $(moms_analytic(k)[3]-myskew(y))\n")
-using Plots, LaTeXStrings
+using Plots
 Nsmpl = 10000
 ysmpl = samplePCE(Nsmpl, y, opq)
-histogram(ysmpl;normalize=true,xlabel="t",ylabel="\rho(t)")
+histogram(ysmpl;normalize=true,xlabel="t",ylabel="rho(t)")
 import SpecialFunctions: gamma
 ρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
@@ -141,11 +141,11 @@ Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{\mathr
 
 
 ```@example mysetup
-using Plots, LaTeXStrings
+using Plots
 Nsmpl = 10000
 # long way: ξ = sampleMeasure(Nsmpl,opq), ysmpl = evaluatePCE(y,ξ,opq)
 ysmpl = samplePCE(Nsmpl, y, opq)
-histogram(ysmpl; normalize=true, xlabel=L"t", ylabel=L"\rho(t)")
+histogram(ysmpl; normalize=true, xlabel="t", ylabel="rho(t)")
 
 import SpecialFunctions: gamma
 ρ(t) = 1/(sqrt(2)*gamma(0.5))*1/sqrt(t)*exp(-0.5*t)

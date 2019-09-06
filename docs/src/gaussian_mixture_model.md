@@ -31,13 +31,13 @@ Let's consider a simple example.
 
 
 ```@example mysetup
-using Plots, LaTeXStrings
+using Plots
 f(x,μ,σ) = 1 / sqrt(2*π*σ^2) * exp(-(x - μ)^2 / (2σ^2))
 μs, σs, ws = [1., 1.7], [0.2, 0.3], [0.5, 0.5]
 ρ(x) = sum(w*f(x, μ, σ) for (μ, σ, w) in zip(μs, σs, ws))
 x = 0:0.01:3;
 plot(x, ρ.(x))
-xlabel!(L"x"); ylabel!(L"\rho(x)");
+xlabel!("x"); ylabel!("rho(x)");
 ```
 
 This looks nice!

@@ -1,6 +1,6 @@
 ```@setup mysetup
 k = 12
-using PolyChaos, LaTeXStrings
+using PolyChaos
 degree, Nrec = 2, 20
 opq = GaussOrthoPoly(degree; Nrec=Nrec, addQuadrature = true);
 mop = MultiOrthoPoly([opq for i in 1:k], degree)
@@ -24,10 +24,9 @@ print("\t\t\terror = $(moms_analytic(k)[2]-std(y,mop))\n")
 print("Skewness:\t\t$(moms_analytic(k)[3]) = $(myskew(y))\n")
 print("\t\t\terror = $(moms_analytic(k)[3]-myskew(y))\n")
 using Plots
-gr()
 Nsmpl = 10000
 ysmpl = samplePCE(Nsmpl, y, mop)
-histogram(ysmpl;normalize=true, xlabel=L"t",ylabel=L"\rho(t)")
+histogram(ysmpl;normalize=true, xlabel="t",ylabel="rho(t)")
 import SpecialFunctions: gamma
 ρ(t) = 1/(2^(0.5*k)*gamma(0.5*k))*t^(0.5*k-1)*exp(-0.5*t)
 t = range(0.1; stop=maximum(ysmpl), length=100)
@@ -140,11 +139,10 @@ Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{t^{t/2
 
 ```@example mysetup
 using Plots
-gr()
 Nsmpl = 10000
 # long way: ξ = sampleMeasure(Nsmpl,mop), ysmpl = evaluatePCE(y,ξ,mop)
 ysmpl = samplePCE(Nsmpl, y, mop)
-histogram(ysmpl;normalize=true, xlabel=L"t",ylabel=L"\rho(t)")
+histogram(ysmpl;normalize=true, xlabel="t",ylabel="rho(t)")
 
 import SpecialFunctions: gamma
 ρ(t) = 1/(2^(0.5*k)*gamma(0.5*k))*t^(0.5*k-1)*exp(-0.5*t)

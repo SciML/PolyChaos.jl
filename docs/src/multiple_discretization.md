@@ -1,5 +1,5 @@
 ```@setup mysetup
-using PolyChaos, LinearAlgebra, Plots, LaTeXStrings
+using PolyChaos, LinearAlgebra, Plots
 γ = 0.5;
 int_exact = 1+pi/2; # exact value of the integral
 function my_w(t, γ)
@@ -180,14 +180,14 @@ Let's plot these values to get a better feeling.
 
 
 ```@example mysetup
-using Plots, LaTeXStrings
+using Plots
 plot(Γ, bb', yaxis=:log10, w=3, legend=false)
 zs, os = zeros(N), ones(N)
 scatter!(zs, b_cheb, marker=:x)
 scatter!(os, b_leg, marker=:circle)
 
-xlabel!(L"\gamma")
-ylabel!(L"\beta")
+xlabel!("Gamma")
+ylabel!("Beta")
 ```
 
 The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials.
