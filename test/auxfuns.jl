@@ -1,8 +1,8 @@
 using Test, PolyChaos
 
 d, nunc = 5, 10
-op = OrthoPoly("genlaguerre",d,Dict(:shape=>1.23))
-opq = OrthoPolyQ(op)
+op = genLaguerreOrthoPoly(d,1.23,addQuadrature = false)
+opq = genLaguerreOrthoPoly(d,1.23)
 mop = MultiOrthoPoly([op for i in 1:nunc],d)
 mopq = MultiOrthoPoly([opq for i in 1:nunc],d)
 @testset "dimenions" begin
@@ -38,4 +38,4 @@ c = [ op.α op.β ]
     @test PolyChaos.coeffs(mop)[2] == [ c[:,2] for i in 1:nunc ]
 end
 
-@test issymmetric(op) == issymmetric(opq) == issymmetric(opq.quad)
+@test issymmetric(op) == issymmetric(opq) 

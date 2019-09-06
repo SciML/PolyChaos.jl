@@ -1,4 +1,41 @@
+```@setup mysetup
+using PolyChaos, DifferentialEquations
+x0 = 2.0
+μ, σ = -0.5, 0.05
+tend, Δt = 3.0, 0.01
+using PolyChaos
+L, Nrec = 6, 40
+opq = GaussOrthoPoly(L; Nrec=Nrec, addQuadrature=true)
+using DifferentialEquations
 
+a = [ convert2affinePCE(μ, σ, opq); zeros(Float64,L-1) ] # PCE coefficients of a
+xinit = [ x0; zeros(Float64,L) ] # PCE coefficients of initial condition
+
+t2 = Tensor(2, opq); # \langle \phi_i, \phi_j \rangle
+t3 = Tensor(3, opq); # \langle \phi_i \phi_j, \phi_k \rangle
+
+# Galerkin-projected random differential equation
+function ODEgalerkin(du,u,p,t)
+   du[:] = [ sum( p[j+1]*u[k+1]*t3.get([j,k,m])/t2.get([m,m]) for j=0:L for k=0:L) for m=0:L ]
+end
+
+probgalerkin = ODEProblem(ODEgalerkin,xinit,(0,tend),a)
+solgalerkin = solve(probgalerkin;saveat=0:Δt:tend)
+t, x = solgalerkin.t, solgalerkin.u;
+# an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
+mean_pce = [ mean(x_, opq) for x_ in x]  
+std_pce = [ std(x_, opq) for x_ in x]
+using Statistics
+Nsmpl = 5000
+ξ = sampleMeasure(Nsmpl,opq)     # sample from Gaussian measure; effectively randn() here    
+asmpl = evaluatePCE(a,ξ,opq)     # sample random variable with PCE coefficients a; effectively μ + σ*randn() here
+# or: asmpl = samplePCE(Nsmpl,a,opq)
+xmc = [ solve(ODEProblem((u,p,t)->aa*u,x0,(0,tend));saveat=0:Δt:tend).u for aa in asmpl]
+xmc = hcat(xmc...);
+[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]
+logx_pce = [ log.(evaluatePCE(x[i],ξ,opq)) for i=1:length(t)]
+[mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]
+```
 # Galerkin-based Solution of Random Differential Equation
 
 This tutorial demonstrates how random differential equations can be solved using polynomial chaos expansions (PCE).
@@ -55,7 +92,7 @@ If we can solve this enlarged system of ordinary random differential equations, 
 We begin by defining the random differential equation
 
 
-```julia
+```@example mysetup
 x0 = 2.0
 μ, σ = -0.5, 0.05
 tend, Δt = 3.0, 0.01
@@ -65,23 +102,23 @@ Next, we define an orthogonal basis (and its quadrature rule) relative to the Ga
 We choose a maximum degree of `L`.
 
 
-```julia
+```@example mysetup
 using PolyChaos
 L, Nrec = 6, 40
-opq = OrthoPolyQ("gaussian",L;Nrec=Nrec)
+opq = GaussOrthoPoly(L; Nrec=Nrec, addQuadrature=true)
 ```
 
 Now we can define the PCE for $\mathsf{a}$ and solve the Galerkin-projected ordinary differential equation using `DifferentialEquations.jl`.
 
 
-```julia
+```@example mysetup
 using DifferentialEquations
 
-a = [ convert2affinePCE("gaussian",μ,σ); zeros(Float64,L-1) ] # PCE coefficients of a
+a = [ convert2affinePCE(μ, σ, opq); zeros(Float64,L-1) ] # PCE coefficients of a
 xinit = [ x0; zeros(Float64,L) ] # PCE coefficients of initial condition
 
-t2 = Tensor(2,opq); # \langle \phi_i, \phi_j \rangle
-t3 = Tensor(3,opq); # \langle \phi_i \phi_j, \phi_k \rangle
+t2 = Tensor(2, opq); # \langle \phi_i, \phi_j \rangle
+t3 = Tensor(3, opq); # \langle \phi_i \phi_j, \phi_k \rangle
 
 # Galerkin-projected random differential equation
 function ODEgalerkin(du,u,p,t)
@@ -96,10 +133,10 @@ t, x = solgalerkin.t, solgalerkin.u;
 For later purposes we compute the expected value and the standard deviation at all time instants using PCE.
 
 
-```julia
+```@example mysetup
 # an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
-mean_pce = [ mean(x[i],opq) for i=1:length(x)]  
-std_pce = [ std(x[i],opq) for i=1:length(x) ]
+mean_pce = [ mean(x_, opq) for x_ in x]  
+std_pce = [ std(x_, opq) for x_ in x]
 ```
 
 We compare the solution from PCE to a Monte-Carlo-based solution.
@@ -108,11 +145,11 @@ We first sample from the measure using `sampleMeasure`, and then generate sample
 After that we solve the ODE and store the results in `xmc`.
 
 
-```julia
+```@example mysetup
 using Statistics
 Nsmpl = 5000
-ξ = sampleMeasure(Nsmpl,opq)     # sample from Gaussian measure; effectively randn() here    
-asmpl = evaluatePCE(a,ξ,opq)     # sample random variable with PCE coefficients a; effectively μ + σ*randn() here
+ξ = sampleMeasure(Nsmpl, opq)     # sample from Gaussian measure; effectively randn() here    
+asmpl = evaluatePCE(a, ξ, opq)     # sample random variable with PCE coefficients a; effectively μ + σ*randn() here
 # or: asmpl = samplePCE(Nsmpl,a,opq)
 xmc = [ solve(ODEProblem((u,p,t)->aa*u,x0,(0,tend));saveat=0:Δt:tend).u for aa in asmpl]
 xmc = hcat(xmc...);
@@ -121,7 +158,7 @@ xmc = hcat(xmc...);
 Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.
 
 
-```julia
+```@example mysetup
 [ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]
 ```
 
@@ -131,12 +168,8 @@ Possible remedies are to increase the dimension of PCE, and to tweak the toleran
 Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.
 
 
-```julia
-logx_pce = [ log.(evaluatePCE(x[i],ξ,opq)) for i=1:length(t)]
-[mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]
+```@example mysetup
+logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
+[ mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]
 ```
 
-
-```julia
-
-```

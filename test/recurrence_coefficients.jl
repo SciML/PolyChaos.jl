@@ -15,10 +15,11 @@ tol = 1e-9
         @testset "Hermite $n nodes" begin
             for m in mus
                 myfile = open("dataRecCoeffs/hermite$(n)mu$m.txt")
-                αβref = parse.(Float64,readlines(myfile))
-                αβcom = rm_hermite(n,m)
+                αβref = parse.(Float64, readlines(myfile))
+                αβcom = rm_hermite(n, m)
                 @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
-                αβcom = coeffs(OrthoPoly("genhermite",n-1,Dict(:mu=>m)))
+                αβcom = coeffs(genHermiteOrthoPoly(n-1, m; addQuadrature=false))
+                # αβcom = coeffs(OrthoPoly("genhermite",n-1,Dict(:mu=>m)))
                 @test isapprox(norm(αβref-[αβcom[:,1];αβcom[:,2]],Inf),0.;atol=tol)
                 close(myfile)
             end
@@ -31,7 +32,7 @@ end
             αβref = parse.(Float64,readlines(myfile))
             αβcom = rm_logistic(n)
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
-            αβcom = coeffs(OrthoPoly("logistic",n-1))
+            αβcom = coeffs(LogisticOrthoPoly(n-1, addQuadrature=false))
             @test isapprox(norm(αβref-[αβcom[:,1];αβcom[:,2]],Inf),0.;atol=tol)
             close(myfile)
     end
@@ -44,7 +45,7 @@ end
                     αβref = parse.(Float64,readlines(myfile))
                     αβcom = rm_jacobi(n,al,be)
                     @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
-                    αβcom = coeffs(OrthoPoly("jacobi",n-1,Dict(:shape_a=>al,:shape_b=>be)))
+                    αβcom = coeffs(JacobiOrthoPoly(n-1, al, be, addQuadrature=false))
                     @test isapprox(norm(αβref-[αβcom[:,1];αβcom[:,2]],Inf),0.;atol=tol)
                     close(myfile)
             end
@@ -70,7 +71,7 @@ end
             αβref = parse.(Float64,readlines(myfile))
             αβcom = rm_laguerre(n,m)
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
-            αβcom = coeffs(OrthoPoly("genlaguerre",n-1,Dict(:shape=>m)))
+            αβcom = coeffs(genLaguerreOrthoPoly(n-1, m, addQuadrature=false))
             @test isapprox(norm(αβref-[αβcom[:,1];αβcom[:,2]],Inf),0.;atol=tol)
             close(myfile)
         end
@@ -85,7 +86,7 @@ meipol = 0.1:0.2:2
                 αβref = parse.(Float64,readlines(myfile))
                 αβcom = rm_meixner_pollaczek(n,lambda,phi)
                 @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
-                αβcom = coeffs(OrthoPoly("meixnerpollaczek",n-1,Dict(:lambda=>lambda,:phi=>phi)))
+                αβcom = coeffs(MeixnerPollaczekOrthoPoly(n-1, lambda, phi, addQuadrature=false))
                 @test isapprox(norm(αβref-[αβcom[:,1];αβcom[:,2]],Inf),0.;atol=tol)
                 close(myfile)
             end

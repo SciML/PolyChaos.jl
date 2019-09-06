@@ -15,12 +15,12 @@ julia> n = 5;
 
 julia> f(t) = sin(t);
 
-julia> opq = OrthoPolyQ("uniform01",n);
+julia> op = Uniform01OrthoPoly(n, addQuadrature=true);
 
-julia> I0 = integrate(f,opq)
+julia> variant0 = integrate(f, op)
 0.4596976941320484
 
-julia> print("Numerical error: $(abs(1-cos(1)-I0))")
+julia> print("Numerical error: $(abs(1 - cos(1) - variant0))")
 Numerical error: 1.8818280267396403e-13
 ```
 with negligible numerical errors.
@@ -35,61 +35,64 @@ Now we define a measure, specifically the uniform measure $\mathrm{d}\lambda(t) 
 ```math
   w: \mathcal{W} = [0,1] \rightarrow \mathbb{R}, \quad w(t) = 1.
 ```
-This measure can be defined using the composite type `Measure`:
+This measure can be defined using the composite type `Uniform01Measure`:
 ```jldoctest mylabel
-julia> m = Measure("uniform01")
-Measure("uniform01", PolyChaos.w_uniform01, (0.0, 1.0), true, Dict{Any,Any}())
+julia> measure = Uniform01Measure()
+Uniform01Measure(PolyChaos.w_uniform01, (0, 1), true)
 ```
 Next, we need to compute the quadrature rule relative to the uniform measure.
 To do this we use the composite type `Quad`.
 
 ```jldoctest mylabel
-julia> q1 = Quad(n-1,m)
-Quad("quadgp", 4, [1.0, 0.853553, 0.5, 0.146447, 0.0], [0.0333333, 0.266667, 0.4, 0.266667, 0.0333333], Measure("uniform01", PolyChaos.w_uniform01, (0.0, 1.0), true, Dict{Any,Any}()))
+julia> quadRule1 = Quad(n-1, measure)
+Quad("quadgp", 4, [1.0, 0.853553, 0.5, 0.146447, 0.0], [0.0333333, 0.266667, 0.4, 0.266667, 0.0333333])
 
-julia> nw(q1)
+julia> nw(quadRule1)
 5×2 Array{Float64,2}:
  1.0       0.0333333
- 0.853553  0.266667
- 0.5       0.4
- 0.146447  0.266667
+ 0.853553  0.266667 
+ 0.5       0.4      
+ 0.146447  0.266667 
  0.0       0.0333333
 ```
-This creates a quadrature rule `q` named `"myq"` with `n-1` nodes and weights relative to the measure `m`.
+This creates a quadrature rule `quadRule_1` relative to the measure `measure`.
 The function `nw()` prints the nodes and weights.
 To solve the integral we call `integrate()`
 ```jldoctest mylabel
-julia> I1 = integrate(f,q1)
+julia> variant1 = integrate(f, quadRule1)
 0.4596977927043755
 
-julia> print("Numerical error: $(abs(1-cos(1)-I1))")
+julia> print("Numerical error: $(abs(1 - cos(1) - variant1))")
 Numerical error: 9.857251526135258e-8
 ```
 
-### Variant 2
-There is another variant to solve the integral, which computes the quadrature rule based on the recurrence coefficients of the polynomials that are orthogonal relative to the measure `m`.
-First, we compute the orthogonal polynomials using the composite type `OrthoPoly`.
+### Revisiting Variant 0
+Why is the error from variant 0 so much smaller?
+It's because the quadrature rule for variant 0 is based on the recurrence coefficients of the polynomials that are orthogonal relative to the measure `measure`.
+Let's take a closer look
+First, we compute the orthogonal polynomials using the composite type `OrthoPoly`, and we set the keyword `addQuadrature` to `false`.
 ```jldoctest mylabel
-julia> op = OrthoPoly("uniform01",n)
-OrthoPoly("uniform01", 5, [0.5, 0.5, 0.5, 0.5, 0.5, 0.5], [1.0, 0.0833333, 0.0666667, 0.0642857, 0.0634921, 0.0631313], Measure("uniform01", PolyChaos.w_uniform01, (0.0, 1.0), true, Dict{Any,Any}()))
-
+julia> op = Uniform01OrthoPoly(n, addQuadrature=false)
+Uniform01OrthoPoly(5, [0.5, 0.5, 0.5, 0.5, 0.5, 0.5], [1.0, 0.0833333, 0.0666667, 0.0642857, 0.0634921, 0.0631313], Uniform01Measure(PolyChaos.w_uniform01, (0, 1), true), EmptyQuad())
+```
+Note how `op` has a field `EmptyQuad`, i.e. we computed no quadrature rule.
+The resulting system of orthogonal polynomials is characterized by its recursion coefficients $(\alpha, \beta)$, which can be extracted with the function `coeffs()`.
+```jldoctest mylabel
 julia> coeffs(op)
 6×2 Array{Float64,2}:
- 0.5  1.0
+ 0.5  1.0      
  0.5  0.0833333
  0.5  0.0666667
  0.5  0.0642857
  0.5  0.0634921
  0.5  0.0631313
 ```
-The resulting system of orthogonal polynomials is characterized by its recursion coefficients $(\alpha, \beta)$, which can be extracted with the function `coeffs()`.
-
 Now, the quadrature rule can be constructed based on `op`, and the integral be solved.
 ```jldoctest mylabel
-julia> q2 = Quad(n,op)
-Quad("golubwelsch", 5, [0.0469101, 0.230765, 0.5, 0.769235, 0.95309], [0.118463, 0.239314, 0.284444, 0.239314, 0.118463], Measure("uniform01", PolyChaos.w_uniform01, (0.0, 1.0), true, Dict{Any,Any}()))
+julia> quadRule2 = Quad(n, op)
+Quad("golubwelsch", 5, [0.0469101, 0.230765, 0.5, 0.769235, 0.95309], [0.118463, 0.239314, 0.284444, 0.239314, 0.118463])
 
-julia> nw(q2)
+julia> nw(quadRule2)
 5×2 Array{Float64,2}:
  0.0469101  0.118463
  0.230765   0.239314
@@ -97,20 +100,20 @@ julia> nw(q2)
  0.769235   0.239314
  0.95309    0.118463
 
-julia> I2 = integrate(f,q2)
+julia> variant0_revisited = integrate(f, quadRule2)
 0.4596976941320484
 
-julia> print("Numerical error: $(abs(1-cos(1)-I2))")
+julia> print("Numerical error: $(abs(1 - cos(1) - variant0_revisited))")
 Numerical error: 1.8818280267396403e-13
 ```
 
 ### Comparison
 We see that the different variants provide slightly different results:
 ```jldoctest mylabel
-julia> 1-cos(1) .- [I0 I1 I2]
+julia> 1-cos(1) .- [variant0 variant1 variant0_revisited]
 1×3 Array{Float64,2}:
  -1.88183e-13  -9.85725e-8  -1.88183e-13
 ```
-with `I0` and `I2` being the same and more accurate than `I1`.
-The increased accuracy is based on the fact that for `I0` and `I2` the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials.
-The quadrature for `I1` is based on an general-purpose method that can be significantly less accurate, see also [the next tutorial](@ref QuadratureRules).
+with `variant0` and `variant0_revisited` being the same and more accurate than `variant1`.
+The increased accuracy is based on the fact that for `variant0` and `variant0_revisited` the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials.
+The quadrature for `variant1` is based on an general-purpose method that can be significantly less accurate, see also [the next tutorial](@ref QuadratureRules).

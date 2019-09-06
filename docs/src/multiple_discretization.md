@@ -1,26 +1,26 @@
 ```@setup mysetup
-using PolyChaos, LinearAlgebra
+using PolyChaos, LinearAlgebra, Plots
 γ = 0.5;
 int_exact = 1+pi/2; # exact value of the integral
-function my_w(t::Float64,γ::Float64)
-    γ + (1-γ)*1/sqrt(1-t^2)
+function my_w(t, γ)
+    γ + (1 - γ) * 1 / sqrt(1 - t^2)
 end
 N = 1000;
 n,w = fejer(N);
 int_fejer = dot(w,my_w.(n,γ))
 print("Fejer error:\t$(abs(int_exact-int_fejer))\twith $N nodes")
-function quad_gaussleg(N::Int,γ::Float64)
-    a,b=rm_legendre(N)
-    n,w=golubwelsch(a,b)
+function quad_gaussleg(N,γ)
+    a, b = rm_legendre(N)
+    n, w = golubwelsch(a,b)
 end
-n,w = quad_gaussleg(N+1,γ)
+n, w = quad_gaussleg(N+1, γ)
 int_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))
 print("Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes")
-function quad_gausscheb(N::Int64,γ::Float64)
-    a,b = rm_chebyshev1(N)
-    n,w = golubwelsch(a,b)
+function quad_gausscheb(N,γ)
+    a, b = rm_chebyshev1(N)
+    n, w = golubwelsch(a, b)
 end
-n,w = quad_gausscheb(N+1,γ)
+n, w = quad_gausscheb(N+1,γ)
 int_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))
 print("Gauss-Chebyshev error:\t$(abs(int_exact-int_gausscheb))\twith $(length(n)) nodes")
 function quad_gaussleg_mod(N::Int,γ::Float64)
@@ -44,16 +44,11 @@ b_cheb = rm_chebyshev1(N)[2]
 bb[:,1]-b_cheb
 bb[:,end]-b_leg
 using Plots
-gr()
 plot(Γ,bb',yaxis=:log10, w=3, legend=false)
 zs, os = zeros(N), ones(N)
 scatter!(zs,b_cheb,marker=:x)
 scatter!(os,b_leg,marker=:circle)
-xlabel!("gamma")
-ylabel!("beta")
-title!("N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre")
 ```
-
 # Multiple Discretization
 
 This tutorial shows how to compute recurrence coefficients for non-trivial weight functions, and how they are being used for quadrature.
@@ -69,23 +64,23 @@ and we would like to solve
 ```
 by some quadrature rule.
 We will see that ad-hoc quadrature rules will fail to solve the integral even for the simplest choice $f \equiv 1$.
-However, finding the recurrence coefficients of the underlying orthogonal polynomials, and then finding the quadrature rule will be the way to go.
+However, finding the recurrence coefficients of the underlying orthogonal polynomials, and then finding the quadrature rule will do just fine.
 
-Let us first try to solve the integral for $f \equiv 1$ by Fejer's rule.
+Let us first try to solve the integral for $f \equiv 1$ by Féjer's rule.
 
 
 ```@example mysetup
 using PolyChaos, LinearAlgebra
 γ = 0.5;
-int_exact = 1+pi/2; # exact value of the integral
-function my_w(t::Float64,γ::Float64)
-    γ + (1-γ)*1/sqrt(1-t^2)
+int_exact = 1 + pi / 2; # exact value of the integral
+function my_w(t, γ)
+    γ + (1 - γ) * 1 / sqrt(1 - t^2)
 end
 
 N = 1000;
-n,w = fejer(N);
-int_fejer = dot(w,my_w.(n,γ))
-print("Fejer error:\t$(abs(int_exact-int_fejer))\twith $N nodes")
+nodes, weights = fejer(N);
+int_fejer = dot(weights, my_w.(nodes, γ))
+print("Fejer error:\t$(abs(int_exact - int_fejer))\twith $N nodes")
 ```
 
 Clearly, that is not satisfying.
@@ -93,12 +88,12 @@ Well, the term $\gamma$ of the weight $w$ makes us think of Gauss-Legendre integ
 
 
 ```@example mysetup
-function quad_gaussleg(N::Int,γ::Float64)
-    a,b=rm_legendre(N)
-    n,w=golubwelsch(a,b)
+function quad_gaussleg(N, γ)
+    a, b = rm_legendre(N)
+    nodes, weights = golubwelsch(a, b)
 end
-n,w = quad_gaussleg(N+1,γ)
-int_gaussleg = dot(w,γ .+ (1-γ)/sqrt.(1 .- n.^2))
+nodes, weights = quad_gaussleg(N+1, γ)
+int_gaussleg = dot(weights, γ .+ (1-γ)/sqrt.(1 .- nodes.^2))
 print("Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes")
 ```
 
@@ -108,14 +103,14 @@ So, let's give it anothery try.
 
 
 ```@example mysetup
-function quad_gausscheb(N::Int64,γ::Float64)
-    a,b = rm_chebyshev1(N)
-    n,w = golubwelsch(a,b)
+function quad_gausscheb(N, γ)
+    a, b = rm_chebyshev1(N)
+    nodes, weights = golubwelsch(a, b)
 end
-n,w = quad_gausscheb(N+1,γ)
-int_gausscheb = dot(w,γ .+ (1-γ)*sqrt.(1 .- n.^2))
+nodes, weights = quad_gausscheb(N+1, γ)
+int_gausscheb = dot(weights, γ .+ (1-γ)*sqrt.(1 .- nodes.^2))
 # int=sum(xw(:,2).*(1+sqrt(1-xw(:,1).^2)))
-print("Gauss-Chebyshev error:\t$(abs(int_exact-int_gausscheb))\twith $(length(n)) nodes")
+print("Gauss-Chebyshev error:\t$(abs(int_exact - int_gausscheb))\twith $(length(n)) nodes")
 ```
 
 Okay, that's better, but it took us a lot of nodes to get this result.
@@ -139,18 +134,18 @@ The function `mcdiscretization()` takes the $m$ discretization rules as an input
 
 
 ```@example mysetup
-function quad_gaussleg_mod(N::Int,γ::Float64)
-    n,w = quad_gaussleg(N+1,γ)
-    return n,γ*w
+function quad_gaussleg_mod(N, γ)
+    nodes, weights = quad_gaussleg(N + 1, γ)
+    nodes, γ*weights
 end
-function quad_gausscheb_mod(N::Int,γ::Float64)
-            n,w = quad_gausscheb(N+1,γ)
-    return n,(1-γ)*w
+function quad_gausscheb_mod(N, γ)
+            nodes, weights = quad_gausscheb(N + 1,γ)
+    return nodes, (1-γ)*weights
 end
 
 N = 8
-a,b = mcdiscretization(N,[n->quad_gaussleg_mod(n,γ); n->quad_gausscheb_mod(n,γ)])
-n,w = golubwelsch(a,b)
+a, b = mcdiscretization(N, [n -> quad_gaussleg_mod(n, γ); n -> quad_gausscheb_mod(n, γ)])
+nodes, weights = golubwelsch(a, b)
 int_mc = sum(w)
 print("Discretization error:\t$(abs(int_exact-int_mc))\twith $(length(n)) nodes")
 ```
@@ -169,8 +164,8 @@ Let's verify this by plotting the recurrence coefficients for several values of 
 
 ```@example mysetup
 Γ = 0:0.1:1;
-ab = [ mcdiscretization(N,[n->quad_gaussleg_mod(n,gam); n->quad_gausscheb_mod(n,gam)]) for gam in Γ ];
-bb = hcat([ ab[i][2] for i=1:length(Γ)]...);
+ab = [ mcdiscretization(N, [n -> quad_gaussleg_mod(n, gam); n -> quad_gausscheb_mod(n, gam)]) for gam in Γ ];
+bb = hcat([ab[i][2] for i in 1:length(Γ)]...);
 b_leg = rm_legendre(N)[2];
 b_cheb = rm_chebyshev1(N)[2]
 bb[:,1]-b_cheb
@@ -178,7 +173,7 @@ bb[:,1]-b_cheb
 
 
 ```@example mysetup
-bb[:,end]-b_leg
+bb[:,end] - b_leg
 ```
 
 Let's plot these values to get a better feeling.
@@ -186,16 +181,14 @@ Let's plot these values to get a better feeling.
 
 ```@example mysetup
 using Plots
-gr()
-plot(Γ,bb',yaxis=:log10, w=3, legend=false)
+plot(Γ, bb', yaxis=:log10, w=3, legend=false)
 zs, os = zeros(N), ones(N)
-scatter!(zs,b_cheb,marker=:x)
-scatter!(os,b_leg,marker=:circle)
+scatter!(zs, b_cheb, marker=:x)
+scatter!(os, b_leg, marker=:circle)
 
-xlabel!("gamma")
-ylabel!("beta")
-title!("N=$N Recurrence Coefficients Interpolating from Chebyshev to Legendre")
+xlabel!("Gamma")
+ylabel!("Beta")
 ```
 
 The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials.
-The interpolating line in between stands for the β recursion coefficients of $w(t;\gamma)$.
+The interpolating line in between stands for the β recursion coefficients of $w(t; \gamma)$.

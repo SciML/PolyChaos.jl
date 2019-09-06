@@ -1,24 +1,20 @@
 # Functions
 
 !!! note
-    The core interface of (so we hope) all essential functions are *not* dependent on specialized types such as `OrthoPoly`/`OrthoPolyQ`.
-    Having said that, for exactly those essential functions there exist overloaded functions that accept specialized types such as `OrthoPoly`/`OrthoPolyQ` as arguments.
+    The core interface of all essential functions are *not* dependent on specialized types such as `AbstractOrthoPoly`.
+    Having said that, for exactly those essential functions there exist overloaded functions that accept specialized types such as `AbstractOrthoPoly` as arguments.
 
     Too abstract?
     For example, the function `evaluate` that evaluates a polynomial of degree `n` at points `x` has the core interface
     ```
-        evaluate(n::Int64,x::Array{Float64},a::Vector{Float64},b::Vector{Float64})
+        evaluate(n::Int,x::Array{<:Real},a::Vector{<:Real},b::Vector{<:Real})
     ```
     where `a` and `b` are the vectors of recurrence coefficients.
     For simplicity, there also exists the interface
     ```
-        evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly)
+        evaluate(n::Int64,x::Vector{<:Real},op::AbstractOrthoPoly)
     ```
-    which is defined as
-    ```
-        evaluate(n::Int64,x::Vector{Float64},op::OrthoPoly) = evaluate(n,x,op.α,op.β)
-    ```
-    So fret not upon the encounter of multiply-dispatched versions of the same thing. It's there to simplify your life (so we hope).
+    So fret not upon the encounter of multiply-dispatched versions of the same thing. It's there to simplify your life.
 
     The idea of this approach is to make it simpler for others to copy and paste code snippets and use them in their own work.
 
@@ -35,17 +31,17 @@ All of these provide *monic orthogonal polynomials* relative to the weights.
     The number `N` of recurrence coefficients has to be positive for all functions below.
 
 ```@docs
-r_scale(c::Float64,a::Vector{Float64},b::Vector{Float64})
-rm_compute(weight::Function,lb::Float64,ub::Float64;Npoly::Int64=4,Nquad::Int64=10,quadrature::Function=clenshaw_curtis)
-rm_logistic(N::Int)
-rm_hermite(N::Int,mu::Float64)
-rm_hermite_prob(N::Int)
-rm_laguerre(N::Int,a::Float64)
-rm_legendre(N::Int)
-rm_legendre01(N::Int)
-rm_jacobi(N::Int,a::Float64,b::Float64)
-rm_jacobi01(N::Int,a::Float64,b::Float64)
-rm_meixner_pollaczek(N::Int,lambda::Float64,phi::Float64)
+r_scale
+rm_compute
+rm_logistic
+rm_hermite
+rm_hermite_prob
+rm_laguerre
+rm_legendre
+rm_legendre01
+rm_jacobi
+rm_jacobi01
+rm_meixner_pollaczek
 stieltjes
 lanczos
 mcdiscretization

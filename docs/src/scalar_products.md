@@ -1,3 +1,38 @@
+```@setup mysetup
+using PolyChaos, LinearAlgebra
+deg, n = 4, 20
+s_α, s_β = 2.1, 3.2
+opq = Beta01OrthoPoly(deg, s_α, s_β; Nrec=n, addQuadrature=true)
+normsq = computeSP2(opq)
+m = 3
+t = Tensor(3,opq)
+t.get([1,2,3])
+T = [ t.get([i1,i2,i3]) for i1=0:dim(opq)-1, i2=0:dim(opq)-1, i3=0:dim(opq)-1]
+#@show normsq == diag(T[:,:,1])
+#@show normsq == diag(T[:,1,:])
+#@show normsq == diag(T[1,:,:])
+t2 = Tensor(2, opq)
+@show normsq == [ t2.get([i, i]) for i in 0:dim(opq)-1]
+using SpecialFunctions
+supp = (0, 1)
+w(t) = (t^(s_α-1)*(1-t)^(s_β-1)/SpecialFunctions.beta(s_α,s_β))
+my_meas = Measure("my_meas", w, supp, false)
+my_opq = OrthoPoly("my_op", deg, my_meas; Nrec=n, addQuadrature = true)
+my_normsq = computeSP2(my_opq)
+my_t = Tensor(m, my_opq)
+my_T = [ my_t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]
+@show abs.(normsq-my_normsq)
+@show norm(T-my_T)
+mop = MultiOrthoPoly([opq, my_opq], deg)
+mt2 = Tensor(2,mop)
+mt3 = Tensor(3,mop)
+mT2 = [ mt2.get([i,i]) for i=0:dim(mop)-1 ]
+mop.ind
+ind_opq = findUnivariateIndices(1,mop.ind)
+ind_my_opq = findUnivariateIndices(2,mop.ind)
+@show mT2[ind_opq] - normsq
+@show mT2[ind_my_opq] - my_normsq;
+```
 # [Computation of Scalar Products](@id ComputationOfScalarProducts)
 By now, we are able to construct orthogonal polynomials, and to construct quadrature rules for a given nonnegative weight function, respectively.
 Now we combine both ideas to solve integrals involving the orthogonal polynomials
@@ -18,22 +53,14 @@ The integrand is a polynomial (possibly multivariate) that can be solved exactly
 Let's begin with a univariate basis for some *classical* orthogonal polynomial
 
 
-```julia
+```@example mysetup
 using PolyChaos
 deg, n = 4, 20
 s_α, s_β = 2.1, 3.2
-op = OrthoPoly("beta01",deg,Dict(:shape_a=>s_α,:shape_b=>s_β);Nrec=n)
+opq = Beta01OrthoPoly(deg, s_α, s_β; Nrec=n, addQuadrature=true)
 ```
 
-To add the corresponding quadrature rule there is the composite struct `OrthoPolyQ` whose simplest constructor reads
-
-
-```julia
-opq = OrthoPolyQ(op,n)
-```
-
-By default, an $n$-point Gauss quadrature rule is create relative to the underlying measure `op.meas`, where $n$ is the number of recurrence coefficients stored in `op.α` and `op.β`.
-The type `OrthoPolyQ` has just two fields: an `OrthoPoly`, and a `Quad`.
+By setting `addQuadrature = true` (which is default), an $n$-point Gauss quadrature rule is create relative to the underlying measure `opq.measure`, where $n$ is the number of recurrence coefficients stored in `opq.α` and `opq.β`.
 
 To compute the squared norms
 ```math
@@ -44,7 +71,7 @@ To compute the squared norms
 of the basis we call `computeSP2()`
 
 
-```julia
+```@example mysetup
 normsq = computeSP2(opq)
 ```
 
@@ -53,87 +80,83 @@ For the general case
 \langle \phi_{i_1} \phi_{i_2} \cdots \phi_{i_{m-1}}, \phi_{i_m} \rangle
 = \int \phi_{i_1}(t) \phi_{i_2}(t) \cdots \phi_{i_{m-1}}(t) \phi_{i_m}(t) w(t) \mathrm{d} t,
 ```
-there exists a type `Tensor` that requires only two arguments: the *dimension* $m \geq 1$, and an `OrthoPolyQ`
+there exists a type `Tensor` that requires only two arguments: the *dimension* $m \geq 1$, and an `AbstractOrthoPoly`
 
 
-```julia
+```@example mysetup
 m = 3
 t = Tensor(3,opq)
 ```
 
-To get the desired entries, `Tensor`comes with a `get()` function that is called for some index $a \in \mathbb{N}_0^m$ that has the entries $a = [i_1, i_2, \dots, i_m]$.
+To get the desired entries, `Tensor` comes with a `get()` function that is called for some index $a \in \mathbb{N}_0^m$ that has the entries $a = [i_1, i_2, \dots, i_m]$.
 For example
 
 
 
-```julia
+```@example mysetup
 t.get([1,2,3])
 ```
 
 Or using comprehension
 
 
-```julia
-T = [ t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]
+```@example mysetup
+T = [ t.get([i1,i2,i3]) for i1=0:dim(opq)-1, i2=0:dim(opq)-1, i3=0:dim(opq)-1]
 ```
 
 Notice that we can cross-check the results.
 
 
-```julia
+```@example mysetup
 using LinearAlgebra
-@show normsq == LinearAlgebra.diag(T[:,:,1])
-@show normsq == LinearAlgebra.diag(T[:,1,:])
-@show normsq == LinearAlgebra.diag(T[1,:,:])
+normsq == diag(T[:,:,1]) == diag(T[:,1,:]) == diag(T[1,:,:])
 ```
 
 Also, `normsq` can be computed analogously in `Tensor` format
 
 
-```julia
-t2 = Tensor(2,opq)
-@show normsq == [ t2.get([i,i]) for i=0:dim(opq)-1]
+```@example mysetup
+t2 = Tensor(2, opq)
+normsq == [ t2.get([i, i]) for i in 0:dim(opq)-1]
 ```
 
 ### Arbitrary Weights
-Of course, the type `OrthoPolyQ` can be constructed for arbitrary weights $w(t)$.
+Of course, the type `OrthoPoly` can be constructed for arbitrary weights $w(t)$.
 In this case we have to compute the orthogonal basis and the respective quadrature rule.
 Let's re-work the above example by hand.
 
 
-```julia
+```@example mysetup
 using SpecialFunctions
-supp = (0,1)
-function w(t)
-    supp[1]<=t<=supp[2] ? (t^(s_α-1)*(1-t)^(s_β-1)/SpecialFunctions.beta(s_α,s_β)) : error("$t not in support")
-end
-my_meas = Measure("my_meas",w,supp,false,Dict())
-my_op = OrthoPoly("my_op",deg,my_meas;Nrec=n)
-my_quad = Quad(n,my_op)
-my_opq = OrthoPolyQ(my_op,my_quad)
+supp = (0, 1)
+w(t) = (t^(s_α-1)*(1-t)^(s_β-1)/SpecialFunctions.beta(s_α,s_β))
+my_meas = Measure("my_meas", w, supp, false)
+my_opq = OrthoPoly("my_op", deg, my_meas; Nrec=n, addQuadrature = true)
 ```
 
 Now we can compute the squared norms $\| \phi_k \|^2$
 
 
-```julia
+```@example mysetup
 my_normsq = computeSP2(my_opq)
 ```
 
 And the tensor
 
 
-```julia
-my_t = Tensor(m,my_opq)
+```@example mysetup
+my_t = Tensor(m, my_opq)
 my_T = [ my_t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]
 ```
 
 Let's compare the results:
 
+```@example mysetup
+abs.(normsq-my_normsq)
+```
 
-```julia
-@show abs.(normsq-my_normsq)
-@show norm(T-my_T)
+```@example mysetup
+norm(T-my_T)
 ```
 
 !!! note
@@ -143,12 +166,12 @@ Let's compare the results:
 For multivariate polynomials the syntax for `Tensor` is very much alike, except that we are dealing with the type `MultiOrthoPoly` now.
 
 
-```julia
-mop = MultiOrthoPoly([opq,my_opq],deg)
+```@example mysetup
+mop = MultiOrthoPoly([opq, my_opq], deg)
 ```
 
 
-```julia
+```@example mysetup
 mt2 = Tensor(2,mop)
 mt3 = Tensor(3,mop)
 mT2 = [ mt2.get([i,i]) for i=0:dim(mop)-1 ]
@@ -158,20 +181,22 @@ Notice that `mT2` carries the elements of the 2-dimensional tensors for the univ
 The encoding is given by the multi-index `mop.ind`
 
 
-```julia
+```@example mysetup
 mop.ind
 ```
 
 To cross-check the results we can distribute the multi-index back to its univariate indices with the help of `findUnivariateIndices`.
 
 
-```julia
+```@example mysetup
 ind_opq = findUnivariateIndices(1,mop.ind)
 ind_my_opq = findUnivariateIndices(2,mop.ind)
 ```
 
+```@example mysetup
+mT2[ind_opq] - normsq
+```
 
-```julia
-@show mT2[ind_opq] - normsq
-@show mT2[ind_my_opq] - my_normsq;
+```@example mysetup
+mT2[ind_my_opq] - my_normsq
 ```

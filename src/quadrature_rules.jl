@@ -8,10 +8,10 @@ export  fejer,
         radau,
         lobatto
 """
-    fejer(N::Int64)
+    fejer(N::Int)
 Fejer's first quadrature rule.
 """
-function fejer(N::Int64)
+function fejer(N::Int)
     @assert N >= 1 "N has to be positive"
     N == 1 && return zeros(1), [2.]
     θ = map(x->(2x-1)*pi/(2N),1:N)
@@ -20,10 +20,10 @@ function fejer(N::Int64)
 end
 
 """
-    fejer2(n::Int64)
+    fejer2(n::Int)
 Fejer's second quadrature rule according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 """
-function fejer2(n::Int64)
+function fejer2(n::Int)
     @assert n >= 2
     N = 1:2:n-1
     m = n - length(N)
@@ -34,10 +34,10 @@ function fejer2(n::Int64)
 end
 
 """
-    clenshaw_curtis(n::Int64)
+    clenshaw_curtis(n::Int)
 Clenshaw-Curtis quadrature according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 """
-function clenshaw_curtis(n::Int64)::Tuple{Vector{Float64},Vector{Float64}}
+function clenshaw_curtis(n::Int)
     @assert n >= 2
     N = 1:2:n-1
     l = length(N)
@@ -53,14 +53,14 @@ function clenshaw_curtis(n::Int64)::Tuple{Vector{Float64},Vector{Float64}}
 end
 
 """
-    quadgp(weight::Function,lb::Float64,ub::Float64,N::Int64=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
+    quadgp(weight::Function,lb::Real,ub::Real,N::Int=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
 general purpose quadrature based on Gautschi, "Orthogonal Polynomials: Computation and Approximation", Section 2.2.2, pp. 93-95
 
 Compute the `N`-point quadrature rule for `weight` with support (`lb`, `ub`).
 The quadrature rule can be specified by the keyword `quadrature`.
 The keyword `bnd` sets the numerical value for infinity.
 """
-function quadgp(weight::Function,lb::Float64,ub::Float64,N::Int64=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
+function quadgp(weight::Function,lb::Real,ub::Real,N::Int=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
     @assert lb < ub "inconsistent interval bounds"
     t_fej,w_fej = quadrature(N)
     t, w, d = zeros(Float64,N),zeros(Float64,N),zeros(Float64,N)
@@ -87,7 +87,7 @@ end
 ####################################################
 # Quadrature rules based on recurrence coefficients
 
-function golubwelsch(α::Vector{Float64},β::Vector{Float64},maxiter::Int=30)
+function golubwelsch(α::Vector{<:Real}, β::Vector{<:Real}, maxiter::Int=30)
     N = length(α) - 1
     a, β0 = copy(α[1:N]), β[1]
     w = zero(a)
@@ -99,9 +99,9 @@ end
 golubwelsch(op::OrthoPoly) = golubwelsch(op.α,op.β)
 
 """
-    gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})
-    gauss(α::Vector{Float64},β::Vector{Float64})
-    gauss(N::Int64,op::OrthoPoly)
+    gauss(N::Int,α::Vector{<:Real},β::Vector{<:Real})
+    gauss(α::Vector{<:Real},β::Vector{<:Real})
+    gauss(N::Int,op::OrthoPoly)
     gauss(op::OrthoPoly)
 Gauss quadrature rule, also known as Golub-Welsch algorithm
 
@@ -116,7 +116,7 @@ with respect to the weight function.
 !!! note
     If no `N` is provided, then `N = length(α) - 1`.
 """
-function gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})
+function gauss(N::Int,α::Vector{<:Real},β::Vector{<:Real})
     N += 1
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) "inconsistent number of recurrence coefficients"
@@ -124,15 +124,15 @@ function gauss(N::Int64,α::Vector{Float64},β::Vector{Float64})
     @assert N0 >= N  "not enough recurrence coefficients"
     @inbounds golubwelsch(α[1:N],β[1:N])
 end
-gauss(α::Vector{Float64},β::Vector{Float64}) = gauss(length(α)-1,α,β)
-gauss(N::Int64,op::OrthoPoly) = gauss(N::Int64,op.α,op.β)
+gauss(α::Vector{<:Real},β::Vector{<:Real}) = gauss(length(α)-1,α,β)
+gauss(N::Int,op::OrthoPoly) = gauss(N::Int,op.α,op.β)
 gauss(op::OrthoPoly) = gauss(op.α,op.β)
 
 """
-    radau(N::Int64,α::Vector{Float64},β::Vector{Float64},end0::Float64)
-    radau(α::Vector{Float64},β::Vector{Float64},end0::Float64)
-    radau(N::Int64,op::OrthoPoly,end0::Float64)
-    radau(op::OrthoPoly,end0::Float64)
+    radau(N::Int,α::Vector{<:Real},β::Vector{<:Real},end0::Real)
+    radau(α::Vector{<:Real},β::Vector{<:Real},end0::Real)
+    radau(N::Int,op::OrthoPoly,end0::Real)
+    radau(op::OrthoPoly,end0::Real)
 Gauss-Radau quadrature rule.
 Given a weight function encoded by the recurrence coefficients `(α,β)`for the associated
 orthogonal polynomials, the function generates the
@@ -148,7 +148,7 @@ interval of w, or outside thereof).
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
-function radau(N::Int64,α_::Vector{Float64},β::Vector{Float64},end0::Float64)
+function radau(N::Int,α_::Vector{<:Real},β::Vector{<:Real},end0::Real)
     α = copy(α_)
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) > 0 "inconsistent number of recurrence coefficients"
@@ -163,15 +163,15 @@ function radau(N::Int64,α_::Vector{Float64},β::Vector{Float64},end0::Float64)
     @inbounds α[N+1] = end0 - β[N+1]*p0/p1
     gauss(N+1,α,β)
 end
-radau(α::Vector{Float64},β::Vector{Float64},end0::Float64) = radau(length(α)-2,α,β,end0)
-radau(N::Int64,op::OrthoPoly,end0::Float64) = radau(N,op.α,op.β,end0)
-radau(op::OrthoPoly,end0::Float64) = radau(op.α,op.β,end0::Float64)
+radau(α::Vector{<:Real},β::Vector{<:Real},end0::Real) = radau(length(α)-2,α,β,end0)
+radau(N::Int,op::OrthoPoly,end0::Real) = radau(N,op.α,op.β,end0)
+radau(op::OrthoPoly,end0::Real) = radau(op.α,op.β,end0::Real)
 
 """
-    lobatto(N::Int64,α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)
-    lobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64)
-    lobatto(N::Int64,op::OrthoPoly,endl::Float64,endr::Float64)
-    lobatto(op::OrthoPoly,endl::Float64,endr::Float64)
+    lobatto(N::Int,α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real)
+    lobatto(α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real)
+    lobatto(N::Int,op::OrthoPoly,endl::Real,endr::Real)
+    lobatto(op::OrthoPoly,endl::Real,endr::Real)
 Gauss-Lobatto quadrature rule.
 Given a weight function encoded by the recurrence coefficients for the associated
 orthogonal polynomials, the function generates
@@ -188,7 +188,7 @@ resp. to the right thereof).
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
-function lobatto(N::Int64,α_::Vector{Float64},β_::Vector{Float64},endl::Float64,endr::Float64)
+function lobatto(N::Int,α_::Vector{<:Real},β_::Vector{<:Real},endl::Real,endr::Real)
     α, β = copy(α_), copy(β_)
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) > 0 "inconsistent number of recurrence coefficients"
@@ -208,6 +208,6 @@ function lobatto(N::Int64,α_::Vector{Float64},β_::Vector{Float64},endl::Float6
     @inbounds β[N+2] = (endr - endl) * p1l * p1r / det;
     gauss(N+2,α,β)
 end
-lobatto(α::Vector{Float64},β::Vector{Float64},endl::Float64,endr::Float64) = lobatto(length(α)-3,α,β,endl,endr)
-lobatto(N::Int64,op::OrthoPoly,endl::Float64,endr::Float64) = lobatto(N,op.α,op.β,endl,endr)
-lobatto(op::OrthoPoly,endl::Float64,endr::Float64) = lobatto(op.α,op.β,endl,endr)
+lobatto(α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real) = lobatto(length(α)-3,α,β,endl,endr)
+lobatto(N::Int,op::OrthoPoly,endl::Real,endr::Real) = lobatto(N,op.α,op.β,endl,endr)
+lobatto(op::OrthoPoly,endl::Real,endr::Real) = lobatto(op.α,op.β,endl,endr)
