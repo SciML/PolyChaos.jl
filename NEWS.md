@@ -1,5 +1,14 @@
 # PolyChaos Release Notes
 
+## Version 0.2.0
+- new type hierarchy that involves four abstract types:
+    - `AbstractMeasure`
+    - `AbstractOrthoPoly`
+    - `AbstractQuad`
+    - `AbstractTensor`
+- canonical measures and orthogonal polynomials are now subtypes of `AbstractCanonicalMeasure` and `AbstractOrthoPoly`
+- code hygiene at several fronts
+
 ## Version 0.1.3
 - removed default `show` function for types specific to `PolyChaos.jl` as this was causing issues with the Atom editor
 - improved `showpoly`, and added `showbasis`
