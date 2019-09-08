@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Computation of Scalar Products · PolyChaos.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="../index.html"><img class="logo" src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><h1>PolyChaos.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Overview</a></li><li><a class="toctext" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="toctext">Usage</span><ul><li><a class="toctext" href="../numerical_integration/">Numerical Integration</a></li><li><a class="toctext" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="toctext" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li><a class="toctext" href="../gaussian_mixture_model/">Gaussian mixture models</a></li><li><a class="toctext" href="../multiple_discretization/">Multiple Discretization</a></li><li class="current"><a class="toctext" href>Computation of Scalar Products</a><ul class="internal"><li><a class="toctext" href="#Univariate-Polynomials-1">Univariate Polynomials</a></li><li><a class="toctext" href="#Multivariate-Polynomials-1">Multivariate Polynomials</a></li></ul></li><li><span class="toctext">Polynomial Chaos</span><ul><li><a class="toctext" href="../pce_tutorial/">Basic Usage</a></li><li><a class="toctext" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="toctext" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="toctext" href="../random_ode/">Random ODE</a></li></ul></li><li><a class="toctext" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="toctext" href="../math/">Mathematical Background</a></li><li><a class="toctext" href="../functions/">Functions</a></li></ul></nav><article id="docs"><header><nav><ul><li>Usage</li><li><a href>Computation of Scalar Products</a></li></ul><a class="edit-page" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/scalar_products.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Computation of Scalar Products</span><a class="fa fa-bars" href="#"></a></div></header><div></div><h1><a class="nav-anchor" id="ComputationOfScalarProducts-1" href="#ComputationOfScalarProducts-1">Computation of Scalar Products</a></h1><p>By now, we are able to construct orthogonal polynomials, and to construct quadrature rules for a given nonnegative weight function, respectively. Now we combine both ideas to solve integrals involving the orthogonal polynomials</p><div>\[\langle \phi_{i_1} \phi_{i_2} \cdots \phi_{i_{m-1}}, \phi_{i_m} \rangle
+= \int \phi_{i_1}(t) \phi_{i_2}(t) \cdots \phi_{i_{m-1}}(t) \phi_{i_m}(t) w(t) \mathrm{d} t,\]</div><p>both for the univariate and multivariate case. The integrand is a polynomial (possibly multivariate) that can be solved exactly with the appropriate Gauss quadrature rules.</p><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>To simplify notation we drop the integration interval. It is clear from the context.</p></div></div><h2><a class="nav-anchor" id="Univariate-Polynomials-1" href="#Univariate-Polynomials-1">Univariate Polynomials</a></h2><h3><a class="nav-anchor" id="Classical-Polynomials-1" href="#Classical-Polynomials-1">Classical Polynomials</a></h3><p>Let&#39;s begin with a univariate basis for some <em>classical</em> orthogonal polynomial</p><pre><code class="language-julia">using PolyChaos
+deg, n = 4, 20
+s_α, s_β = 2.1, 3.2
+opq = Beta01OrthoPoly(deg, s_α, s_β; Nrec=n, addQuadrature=true)</code></pre><pre><code class="language-none">Beta01OrthoPoly(4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Beta01Measure(getfield(PolyChaos, Symbol(&quot;##108#109&quot;)){Float64,Float64}(2.1, 3.2), (0, 1), false, 2.1, 3.2), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5]))</code></pre><p>By setting <code>addQuadrature = true</code> (which is default), an <span>$n$</span>-point Gauss quadrature rule is create relative to the underlying measure <code>opq.measure</code>, where <span>$n$</span> is the number of recurrence coefficients stored in <code>opq.α</code> and <code>opq.β</code>.</p><p>To compute the squared norms</p><div>\[\| \phi_k \|^2 = \langle \phi_k, \phi_k  \rangle
+= \int \phi_k(t) \phi_k(t) w(t) \mathrm{d} t\]</div><p>of the basis we call <code>computeSP2()</code></p><pre><code class="language-julia">normsq = computeSP2(opq)</code></pre><pre><code class="language-none">5-element Array{Float64,1}:
+ 1.0                   
+ 0.03797318144060756   
+ 0.0018807430768498865 
+ 0.00010249372143217383
+ 5.849823409553853e-6  </code></pre><p>For the general case</p><div>\[\langle \phi_{i_1} \phi_{i_2} \cdots \phi_{i_{m-1}}, \phi_{i_m} \rangle
+= \int \phi_{i_1}(t) \phi_{i_2}(t) \cdots \phi_{i_{m-1}}(t) \phi_{i_m}(t) w(t) \mathrm{d} t,\]</div><p>there exists a type <code>Tensor</code> that requires only two arguments: the <em>dimension</em> <span>$m \geq 1$</span>, and an <code>AbstractOrthoPoly</code></p><pre><code class="language-julia">m = 3
+t = Tensor(3,opq)</code></pre><pre><code class="language-none">Tensor(3,   [1 ]  =  1.0
+  [6 ]  =  0.0379732
+  [11]  =  0.00188074
+  [16]  =  0.000102494
+  [21]  =  5.84982e-6
+  [22]  =  0.00215924
+  [23]  =  0.00188074
+        ⋮
+  [45]  =  5.84982e-6
+  [48]  =  7.80614e-6
+  [49]  =  7.09802e-7
+  [53]  =  4.73123e-7
+  [64]  =  9.40423e-7
+  [65]  =  5.08904e-7
+  [69]  =  6.53232e-8
+  [85]  =  3.55404e-8, getfield(PolyChaos, Symbol(&quot;#getfun#41&quot;)){Int64,Beta01OrthoPoly,SparseArrays.SparseVector{Float64,Int64}}(3, Beta01OrthoPoly(4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Beta01Measure(getfield(PolyChaos, Symbol(&quot;##108#109&quot;)){Float64,Float64}(2.1, 3.2), (0, 1), false, 2.1, 3.2), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5])),   [1 ]  =  1.0
+  [6 ]  =  0.0379732
+  [11]  =  0.00188074
+  [16]  =  0.000102494
+  [21]  =  5.84982e-6
+  [22]  =  0.00215924
+  [23]  =  0.00188074
+        ⋮
+  [45]  =  5.84982e-6
+  [48]  =  7.80614e-6
+  [49]  =  7.09802e-7
+  [53]  =  4.73123e-7
+  [64]  =  9.40423e-7
+  [65]  =  5.08904e-7
+  [69]  =  6.53232e-8
+  [85]  =  3.55404e-8), Beta01OrthoPoly(4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Beta01Measure(getfield(PolyChaos, Symbol(&quot;##108#109&quot;)){Float64,Float64}(2.1, 3.2), (0, 1), false, 2.1, 3.2), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5])))</code></pre><p>To get the desired entries, <code>Tensor</code> comes with a <code>get()</code> function that is called for some index <span>$a \in \mathbb{N}_0^m$</span> that has the entries <span>$a = [i_1, i_2, \dots, i_m]$</span>. For example</p><pre><code class="language-julia">t.get([1,2,3])</code></pre><pre><code class="language-none">0.00010249372143217367</code></pre><p>Or using comprehension</p><pre><code class="language-julia">T = [ t.get([i1,i2,i3]) for i1=0:dim(opq)-1, i2=0:dim(opq)-1, i3=0:dim(opq)-1]</code></pre><pre><code class="language-none">5×5×5 Array{Float64,3}:
+[:, :, 1] =
+ 1.0  0.0        0.0         0.0          0.0       
+ 0.0  0.0379732  0.0         0.0          0.0       
+ 0.0  0.0        0.00188074  0.0          0.0       
+ 0.0  0.0        0.0         0.000102494  0.0       
+ 0.0  0.0        0.0         0.0          5.84982e-6
+
+[:, :, 2] =
+ 0.0        0.0379732   0.0          0.0          0.0       
+ 0.0379732  0.00215924  0.00188074   0.0          0.0       
+ 0.0        0.00188074  0.000144891  0.000102494  0.0       
+ 0.0        0.0         0.000102494  8.86598e-6   5.84982e-6
+ 0.0        0.0         0.0          5.84982e-6   5.36411e-7
+
+[:, :, 3] =
+ 0.0         0.0          0.00188074   0.0          0.0       
+ 0.0         0.00188074   0.000144891  0.000102494  0.0       
+ 0.00188074  0.000144891  0.000127149  1.0934e-5    5.84982e-6
+ 0.0         0.000102494  1.0934e-5    7.80614e-6   7.09802e-7
+ 0.0         0.0          5.84982e-6   7.09802e-7   4.73123e-7
+
+[:, :, 4] =
+ 0.0          0.0          0.0          0.000102494  0.0       
+ 0.0          0.0          0.000102494  8.86598e-6   5.84982e-6
+ 0.0          0.000102494  1.0934e-5    7.80614e-6   7.09802e-7
+ 0.000102494  8.86598e-6   7.80614e-6   9.40423e-7   5.08904e-7
+ 0.0          5.84982e-6   7.09802e-7   5.08904e-7   6.53232e-8
+
+[:, :, 5] =
+ 0.0         0.0         0.0         0.0         5.84982e-6
+ 0.0         0.0         0.0         5.84982e-6  5.36411e-7
+ 0.0         0.0         5.84982e-6  7.09802e-7  4.73123e-7
+ 0.0         5.84982e-6  7.09802e-7  5.08904e-7  6.53232e-8
+ 5.84982e-6  5.36411e-7  4.73123e-7  6.53232e-8  3.55404e-8</code></pre><p>Notice that we can cross-check the results.</p><pre><code class="language-julia">using LinearAlgebra
+normsq == diag(T[:,:,1]) == diag(T[:,1,:]) == diag(T[1,:,:])</code></pre><pre><code class="language-none">true</code></pre><p>Also, <code>normsq</code> can be computed analogously in <code>Tensor</code> format</p><pre><code class="language-julia">t2 = Tensor(2, opq)
+normsq == [ t2.get([i, i]) for i in 0:dim(opq)-1]</code></pre><pre><code class="language-none">true</code></pre><h3><a class="nav-anchor" id="Arbitrary-Weights-1" href="#Arbitrary-Weights-1">Arbitrary Weights</a></h3><p>Of course, the type <code>OrthoPoly</code> can be constructed for arbitrary weights <span>$w(t)$</span>. In this case we have to compute the orthogonal basis and the respective quadrature rule. Let&#39;s re-work the above example by hand.</p><pre><code class="language-julia">using SpecialFunctions
+supp = (0, 1)
+w(t) = (t^(s_α-1)*(1-t)^(s_β-1)/SpecialFunctions.beta(s_α,s_β))
+my_meas = Measure(&quot;my_meas&quot;, w, supp, false)
+my_opq = OrthoPoly(&quot;my_op&quot;, deg, my_meas; Nrec=n, addQuadrature = true)</code></pre><pre><code class="language-none">OrthoPoly(&quot;my_op&quot;, 4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Measure(&quot;my_meas&quot;, Main.ex-mysetup.w, (0, 1), false, Dict{Any,Any}()), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5]))</code></pre><p>Now we can compute the squared norms <span>$\| \phi_k \|^2$</span></p><pre><code class="language-julia">my_normsq = computeSP2(my_opq)</code></pre><pre><code class="language-none">5-element Array{Float64,1}:
+ 0.9999999999996537    
+ 0.037973181440551666  
+ 0.0018807430768424916 
+ 0.00010249372143130949
+ 5.8498234094609706e-6 </code></pre><p>And the tensor</p><pre><code class="language-julia">my_t = Tensor(m, my_opq)
+my_T = [ my_t.get([i1,i2,i3]) for i1=0:dim(opq)-1,i2=0:dim(opq)-1,i3=0:dim(opq)-1]</code></pre><pre><code class="language-none">5×5×5 Array{Float64,3}:
+[:, :, 1] =
+ 1.0  0.0        0.0         0.0          0.0       
+ 0.0  0.0379732  0.0         0.0          0.0       
+ 0.0  0.0        0.00188074  0.0          0.0       
+ 0.0  0.0        0.0         0.000102494  0.0       
+ 0.0  0.0        0.0         0.0          5.84982e-6
+
+[:, :, 2] =
+ 0.0        0.0379732   0.0          0.0          0.0       
+ 0.0379732  0.00215924  0.00188074   0.0          0.0       
+ 0.0        0.00188074  0.000144891  0.000102494  0.0       
+ 0.0        0.0         0.000102494  8.86598e-6   5.84982e-6
+ 0.0        0.0         0.0          5.84982e-6   5.36411e-7
+
+[:, :, 3] =
+ 0.0         0.0          0.00188074   0.0          0.0       
+ 0.0         0.00188074   0.000144891  0.000102494  0.0       
+ 0.00188074  0.000144891  0.000127149  1.0934e-5    5.84982e-6
+ 0.0         0.000102494  1.0934e-5    7.80614e-6   7.09802e-7
+ 0.0         0.0          5.84982e-6   7.09802e-7   4.73123e-7
+
+[:, :, 4] =
+ 0.0          0.0          0.0          0.000102494  0.0       
+ 0.0          0.0          0.000102494  8.86598e-6   5.84982e-6
+ 0.0          0.000102494  1.0934e-5    7.80614e-6   7.09802e-7
+ 0.000102494  8.86598e-6   7.80614e-6   9.40423e-7   5.08904e-7
+ 0.0          5.84982e-6   7.09802e-7   5.08904e-7   6.53232e-8
+
+[:, :, 5] =
+ 0.0         0.0         0.0         0.0         5.84982e-6
+ 0.0         0.0         0.0         5.84982e-6  5.36411e-7
+ 0.0         0.0         5.84982e-6  7.09802e-7  4.73123e-7
+ 0.0         5.84982e-6  7.09802e-7  5.08904e-7  6.53232e-8
+ 5.84982e-6  5.36411e-7  4.73123e-7  6.53232e-8  3.55404e-8</code></pre><p>Let&#39;s compare the results:</p><pre><code class="language-julia">abs.(normsq-my_normsq)</code></pre><pre><code class="language-none">5-element Array{Float64,1}:
+ 3.462785613805863e-13 
+ 5.5892790395972725e-14
+ 7.394909337654632e-15 
+ 8.643395244326002e-16 
+ 9.288224486411756e-17 </code></pre><pre><code class="language-julia">norm(T-my_T)</code></pre><pre><code class="language-none">3.600950956401631e-13</code></pre><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>The possibility to create quadrature rules for arbitrary weights should be reserved to cases different from <em>classical</em> ones.</p></div></div><h2><a class="nav-anchor" id="Multivariate-Polynomials-1" href="#Multivariate-Polynomials-1">Multivariate Polynomials</a></h2><p>For multivariate polynomials the syntax for <code>Tensor</code> is very much alike, except that we are dealing with the type <code>MultiOrthoPoly</code> now.</p><pre><code class="language-julia">mop = MultiOrthoPoly([opq, my_opq], deg)</code></pre><pre><code class="language-none">MultiOrthoPoly([&quot;Beta01OrthoPoly&quot;, &quot;my_op&quot;], 4, 15, [0 0; 1 0; … ; 1 3; 0 4], ProductMeasure(getfield(PolyChaos, Symbol(&quot;#w#36&quot;)){Array{AbstractOrthoPoly,1}}(AbstractOrthoPoly[Beta01OrthoPoly(4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Beta01Measure(##108#109{Float64,Float64}(2.1, 3.2), (0, 1), false, 2.1, 3.2), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5])), OrthoPoly(&quot;my_op&quot;, 4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Measure(&quot;my_meas&quot;, w, (0, 1), false, Dict{Any,Any}()), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5]))]), AbstractMeasure[Beta01Measure(##108#109{Float64,Float64}(2.1, 3.2), (0, 1), false, 2.1, 3.2), Measure(&quot;my_meas&quot;, w, (0, 1), false, Dict{Any,Any}())]), AbstractOrthoPoly[Beta01OrthoPoly(4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Beta01Measure(##108#109{Float64,Float64}(2.1, 3.2), (0, 1), false, 2.1, 3.2), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5])), OrthoPoly(&quot;my_op&quot;, 4, [0.396226, 0.453089, 0.473266, 0.482729, 0.487923, 0.491081, 0.493143, 0.494564, 0.495585, 0.496343, 0.496921, 0.497372, 0.497731, 0.498021, 0.498259, 0.498456, 0.498622, 0.498762, 0.498882, 0.498985], [1.0, 0.0379732, 0.0495282, 0.0544964, 0.0570749, 0.0585822, 0.0595388, 0.0601835, 0.0606385, 0.0609715, 0.0612226, 0.0614165, 0.0615694, 0.0616921, 0.061792, 0.0618745, 0.0619433, 0.0620014, 0.0620509, 0.0620933], Measure(&quot;my_meas&quot;, w, (0, 1), false, Dict{Any,Any}()), Quad(&quot;golubwelsch&quot;, 19, [0.00878891, 0.0284501, 0.0585213, 0.0983381, 0.147024, 0.203505, 0.266539, 0.334737, 0.406597, 0.480536, 0.554927, 0.62813, 0.698535, 0.76459, 0.824841, 0.877962, 0.922785, 0.958329, 0.983839], [0.00115168, 0.00700726, 0.0203149, 0.0414026, 0.0677717, 0.0947199, 0.116731, 0.129136, 0.129476, 0.118122, 0.0980077, 0.0735996, 0.0495353, 0.0293896, 0.014964, 0.00625271, 0.00197967, 0.000403515, 3.42927e-5]))])</code></pre><pre><code class="language-julia">mt2 = Tensor(2,mop)
+mt3 = Tensor(3,mop)
+mT2 = [ mt2.get([i,i]) for i=0:dim(mop)-1 ]</code></pre><pre><code class="language-none">15-element Array{Float64,1}:
+ 0.9999999999996537    
+ 0.03797318144059441   
+ 0.037973181440551666  
+ 0.0018807430768492354 
+ 0.00144196250871918   
+ 0.0018807430768424916 
+ 0.00010249372143213834
+ 7.141779810028215e-5  
+ 7.141779810010645e-5  
+ 0.00010249372143130949
+ 5.8498234095518276e-6 
+ 3.892012680461295e-6  
+ 3.5371945211048704e-6 
+ 3.892012680434203e-6  
+ 5.8498234094609706e-6 </code></pre><p>Notice that <code>mT2</code> carries the elements of the 2-dimensional tensors for the univariate bases <code>opq</code> and <code>my_opq</code>. The encoding is given by the multi-index <code>mop.ind</code></p><pre><code class="language-julia">mop.ind</code></pre><pre><code class="language-none">15×2 Array{Int64,2}:
+ 0  0
+ 1  0
+ 0  1
+ 2  0
+ 1  1
+ 0  2
+ 3  0
+ 2  1
+ 1  2
+ 0  3
+ 4  0
+ 3  1
+ 2  2
+ 1  3
+ 0  4</code></pre><p>To cross-check the results we can distribute the multi-index back to its univariate indices with the help of <code>findUnivariateIndices</code>.</p><pre><code class="language-julia">ind_opq = findUnivariateIndices(1,mop.ind)
+ind_my_opq = findUnivariateIndices(2,mop.ind)</code></pre><pre><code class="language-none">5-element Array{Int64,1}:
+  1
+  3
+  6
+ 10
+ 15</code></pre><pre><code class="language-julia">mT2[ind_opq] - normsq</code></pre><pre><code class="language-none">5-element Array{Float64,1}:
+ -3.462785613805863e-13 
+ -1.3149203947904198e-14
+ -6.51171824794794e-16  
+ -3.54940686217442e-17  
+ -2.025255776885032e-18 </code></pre><pre><code class="language-julia">mT2[ind_my_opq] - my_normsq</code></pre><pre><code class="language-none">5-element Array{Float64,1}:
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0</code></pre><footer><hr/><a class="previous" href="../multiple_discretization/"><span class="direction">Previous</span><span class="title">Multiple Discretization</span></a><a class="next" href="../pce_tutorial/"><span class="direction">Next</span><span class="title">Basic Usage</span></a></footer></article></body></html>
