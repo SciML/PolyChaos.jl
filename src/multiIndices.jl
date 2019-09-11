@@ -1,4 +1,5 @@
-export calculateMultiIndices, findUnivariateIndices, calculateMultiIndices_interaction
+export  calculateMultiIndices,
+        findUnivariateIndices
 
 function calculateMultiIndices(d::Int, n::Int)
     # d denotes dimension of random variables/number of sources of uncertainty,
@@ -133,14 +134,14 @@ function findUnivariateIndices(i::Int64,ind::Matrix{Int64})::Vector{Int64}
 end
 
 #################################################################
-function calculateMultiIndices_interaction(nξ::Int,deg::Int,j::Int,p::Int)
-    inds = calculateMultiIndices(nξ,deg)
-    get_interaction(inds,j,p)
-end
+# function calculateMultiIndices_interaction(nξ::Int,deg::Int,j::Int,p::Int)
+#     inds = calculateMultiIndices(nξ,deg)
+#     get_interaction(inds,j,p)
+# end
 
-function get_interaction(inds::Matrix{Int},j::Int,p::Int)
-    j < 0 && throw(error("interaction order must be non-negative"))
-    j > size(inds,2) && throw(error("interaction order cannot be greater than number of uncertainties"))
-    Iterators.filter(x -> count(!iszero,x) == j && sum(x) == p, eachrow(inds))
-    # alternative -> collect
-end
+# function get_interaction(inds::Matrix{Int},j::Int,p::Int)
+#     j < 0 && throw(error("interaction order must be non-negative"))
+#     j > size(inds,2) && throw(error("interaction order cannot be greater than number of uncertainties"))
+#     Iterators.filter(x -> count(!iszero,x) == j && sum(x) == p, eachrow(inds))
+#     # alternative -> collect
+# end

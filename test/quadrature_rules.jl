@@ -123,3 +123,18 @@ intervals = [(-5.,5.),(-Inf,Inf),(-Inf,-1.),(1.,Inf),(-3.,5.),(-10.,1.)]
             @test isapprox(exp.(-abs.(nod2))'*wei2-analytic,0;atol=1e-4)
         end
 end
+
+degree = 9
+N = degree + 1
+α, β = rm_legendre01(degree + 1)
+op = Uniform01OrthoPoly(degree)
+endl, endr = 0, 1
+
+myMeas = Measure("myMeasure", t->1, (0, 1), true)
+op_num = OrthoPoly("myOp", degree, myMeas)
+
+@testset "OrthoPoly overloading" begin
+    @test gauss(N-1, α, β) == gauss(α, β) == gauss(N-1, op) == gauss(op)
+    @test radau(N-2, α, β, endr) == radau(α, β, endr) == radau(N-2, op, endr) == radau(op, endr)
+    @test lobatto(N-3, α, β, endl, endr) == lobatto(α, β, endl, endr) == lobatto(N-3, op, endl, endr) == lobatto(op, endl, endr)
+end
