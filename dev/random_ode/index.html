@@ -48,63 +48,63 @@ asmpl = evaluatePCE(a, ξ, opq)     # sample random variable with PCE coefficien
 xmc = [ solve(ODEProblem((u,p,t)-&gt;aa*u,x0,(0,tend));saveat=0:Δt:tend).u for aa in asmpl]
 xmc = hcat(xmc...);</code></pre><pre><code class="language-none">301×5000 Array{Float64,2}:
  2.0       2.0       2.0       2.0       …  2.0       2.0       2.0     
- 1.98941   1.98974   1.98953   1.99252      1.99119   1.98922   1.9901  
- 1.97888   1.97953   1.97911   1.98507      1.98242   1.9785    1.98024 
- 1.96841   1.96938   1.96875   1.97764      1.97368   1.96784   1.97044 
- 1.95799   1.95927   1.95844   1.97024      1.96499   1.95723   1.96068 
- 1.94762   1.94922   1.94818   1.96287   …  1.95633   1.94668   1.95097 
- 1.93731   1.93922   1.93798   1.95553      1.94771   1.93619   1.94131 
- 1.92705   1.92928   1.92783   1.94821      1.93913   1.92576   1.9317  
- 1.91685   1.91938   1.91774   1.94093      1.93059   1.91538   1.92213 
- 1.90671   1.90953   1.9077    1.93367      1.92208   1.90506   1.91262 
+ 1.9901    1.9893    1.99015   1.9897       1.99075   1.99068   1.98904 
+ 1.98026   1.97866   1.98035   1.97944      1.98154   1.9814    1.97814 
+ 1.97046   1.96808   1.9706    1.96925      1.97237   1.97217   1.9673  
+ 1.96071   1.95756   1.9609    1.9591       1.96325   1.96298   1.95652 
+ 1.95101   1.94709   1.95124   1.94901   …  1.95417   1.95383   1.9458  
+ 1.94136   1.93667   1.94163   1.93897      1.94513   1.94472   1.93514 
+ 1.93175   1.92632   1.93207   1.92898      1.93613   1.93566   1.92454 
+ 1.9222    1.91601   1.92256   1.91904      1.92717   1.92664   1.91399 
+ 1.91269   1.90577   1.91309   1.90915      1.91825   1.91766   1.9035  
  ⋮                                       ⋱                              
- 0.42455   0.445447  0.431768  0.669531     0.550948  0.412801  0.469388
- 0.422303  0.443162  0.429507  0.667026     0.54852   0.410576  0.467064
- 0.420067  0.440888  0.427258  0.664531     0.546104  0.408364  0.464752
- 0.417844  0.438626  0.425021  0.662045  …  0.543698  0.406163  0.46245 
- 0.415632  0.436376  0.422795  0.659569     0.541303  0.403974  0.46016 
- 0.413431  0.434138  0.420581  0.657102     0.538918  0.401797  0.457882
- 0.411243  0.43191   0.418379  0.654644     0.536544  0.399631  0.455615
- 0.409066  0.429695  0.416188  0.652195     0.53418   0.397478  0.453358
- 0.4069    0.42749   0.414009  0.649755  …  0.531827  0.395336  0.451114</code></pre><p>Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.</p><pre><code class="language-julia">[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
- 0.0           0.0        
- 2.03729e-5   -5.80485e-7 
- 4.0542e-5    -1.13505e-6 
- 6.05091e-5   -1.66402e-6 
- 8.02756e-5   -2.16773e-6 
- 9.9843e-5    -2.64648e-6 
- 0.000119213  -3.10058e-6 
- 0.000138387  -3.53033e-6 
- 0.000157366  -3.93606e-6 
- 0.000176152  -4.31804e-6 
- ⋮                        
- 0.00139952    0.000191852
- 0.0013974     0.000192481
- 0.00139527    0.000193108
- 0.00139312    0.000193731
- 0.00139097    0.00019435 
- 0.0013888     0.000194966
- 0.00138662    0.000195579
- 0.00138442    0.000196188
- 0.00138221    0.000196794</code></pre><p>Clearly, the accuracy of PCE deteriorates over time. Possible remedies are to increase the dimension of PCE, and to tweak the tolerances of the integrator.</p><p>Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.</p><pre><code class="language-julia">logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
-[ mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
- -6.66134e-16   6.662e-16 
-  1.02376e-5   -2.96785e-7
-  2.04753e-5   -5.93566e-7
-  3.07129e-5   -8.90343e-7
-  4.09505e-5   -1.18712e-6
-  5.11882e-5   -1.48391e-6
-  6.14258e-5   -1.7807e-6 
-  7.16634e-5   -2.0775e-6 
-  8.19011e-5   -2.37429e-6
-  9.21387e-5   -2.67107e-6
+ 0.469943  0.417821  0.473169  0.442565     0.516438  0.511251  0.402021
+ 0.467618  0.415587  0.470839  0.440285     0.514049  0.508868  0.399818
+ 0.465305  0.413364  0.468521  0.438016     0.511671  0.506496  0.397627
+ 0.463002  0.411154  0.466214  0.435759  …  0.509304  0.504136  0.395448
+ 0.460712  0.408955  0.463918  0.433514     0.506948  0.501786  0.393281
+ 0.458432  0.406767  0.461633  0.431281     0.504602  0.499448  0.391126
+ 0.456164  0.404592  0.45936   0.429059     0.502268  0.49712   0.388983
+ 0.453907  0.402428  0.457098  0.426848     0.499944  0.494803  0.386852
+ 0.451661  0.400276  0.454847  0.424649  …  0.497632  0.492497  0.384732</code></pre><p>Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.</p><pre><code class="language-julia">[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
+  0.0          0.0        
+ -1.64818e-5   9.3285e-6  
+ -3.27899e-5   1.85457e-5 
+ -4.89255e-5   2.76527e-5 
+ -6.48901e-5   3.66504e-5 
+ -8.06851e-5   4.554e-5   
+ -9.63117e-5   5.43223e-5 
+ -0.000111771  6.29984e-5 
+ -0.000127066  7.15693e-5 
+ -0.000142195  8.0036e-5  
   ⋮                       
-  0.00298966   -8.68376e-5
-  0.00299991   -8.71371e-5
-  0.00301015   -8.7436e-5 
-  0.00302039   -8.77345e-5
-  0.00303062   -8.80324e-5
-  0.00304086   -8.83299e-5
-  0.0030511    -8.8627e-5 
-  0.00306134   -8.89239e-5
-  0.00307158   -8.92206e-5</code></pre><footer><hr/><a class="previous" href="../chi_squared_k_greater1/"><span class="direction">Previous</span><span class="title">Chi Squared, Several DOFs</span></a><a class="next" href="../DCsOPF/"><span class="direction">Next</span><span class="title">Optimal Power Flow</span></a></footer></article></body></html>
+ -0.00104084   0.000513909
+ -0.00103895   0.000512891
+ -0.00103705   0.000511872
+ -0.00103514   0.00051085 
+ -0.00103322   0.000509826
+ -0.00103129   0.0005088  
+ -0.00102936   0.000507772
+ -0.00102742   0.000506742
+ -0.00102548   0.00050571 </code></pre><p>Clearly, the accuracy of PCE deteriorates over time. Possible remedies are to increase the dimension of PCE, and to tweak the tolerances of the integrator.</p><p>Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.</p><pre><code class="language-julia">logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
+[ mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
+ -6.66134e-16  6.662e-16 
+ -8.28455e-6   4.69223e-6
+ -1.65691e-5   9.38446e-6
+ -2.48537e-5   1.40767e-5
+ -3.31382e-5   1.87689e-5
+ -4.14228e-5   2.34612e-5
+ -4.97073e-5   2.81534e-5
+ -5.79919e-5   3.28456e-5
+ -6.62764e-5   3.75378e-5
+ -7.4561e-5    4.22301e-5
+  ⋮                      
+ -0.00241881   0.00136995
+ -0.00242709   0.00137464
+ -0.00243537   0.00137933
+ -0.00244365   0.00138402
+ -0.00245193   0.00138871
+ -0.00246022   0.0013934 
+ -0.0024685    0.00139809
+ -0.00247679   0.00140279
+ -0.00248507   0.00140748</code></pre><footer><hr/><a class="previous" href="../chi_squared_k_greater1/"><span class="direction">Previous</span><span class="title">Chi Squared, Several DOFs</span></a><a class="next" href="../DCsOPF/"><span class="direction">Next</span><span class="title">Optimal Power Flow</span></a></footer></article></body></html>
