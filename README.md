@@ -32,8 +32,8 @@ We would like to solve the integral
 
 Exploiting the underlying uniform measure, the integration can be done exactly with a 3-point quadrature rule.
 ```@example mysetup
-opq = OrthoPolyQ("uniform01",3)
-integrate(x->6x^5,opq)
+opq = Uniform01OrthoPoly(3)
+integrate(x -> 6x^5, opq)
 ```
 
 
