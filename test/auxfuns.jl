@@ -1,5 +1,17 @@
 using Test, PolyChaos
 
+@test nw(EmptyQuad()) |> typeof == Array{Float64,2}
+@test nw(EmptyQuad()) |> length == 0
+
+nodes, weights = gauss(rm_legendre01(5)...)
+myQuad = Quad("myQuad", length(nodes), nodes, weights)
+foo(x) = 6*x^5
+res = 1
+@test isapprox(integrate(foo, nodes, weights), res)
+@test isapprox(integrate(foo, myQuad), res)
+@test_throws DomainError integrate(foo, EmptyQuad())
+@test isapprox(integrate(foo, Uniform01OrthoPoly(4)), res)
+
 d, nunc = 5, 10
 op = genLaguerreOrthoPoly(d,1.23,addQuadrature = false)
 opq = genLaguerreOrthoPoly(d,1.23)

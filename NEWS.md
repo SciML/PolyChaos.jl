@@ -1,5 +1,10 @@
 # PolyChaos Release Notes
 
+## Version 0.2.1
+- increased code coverage
+- examples work with new type hierarchy
+- updated dependencies
+
 ## Version 0.2.0
 - new type hierarchy that involves four abstract types:
     - `AbstractMeasure`

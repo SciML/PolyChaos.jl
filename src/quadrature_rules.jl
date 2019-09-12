@@ -96,13 +96,13 @@ function golubwelsch(α::Vector{<:Real}, β::Vector{<:Real}, maxiter::Int=30)
     a[idx], (β0*w.^2)[idx]
 end
 
-golubwelsch(op::OrthoPoly) = golubwelsch(op.α,op.β)
+golubwelsch(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly}) = golubwelsch(op.α,op.β)
 
 """
     gauss(N::Int,α::Vector{<:Real},β::Vector{<:Real})
     gauss(α::Vector{<:Real},β::Vector{<:Real})
-    gauss(N::Int,op::OrthoPoly)
-    gauss(op::OrthoPoly)
+    gauss(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
+    gauss(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
 Gauss quadrature rule, also known as Golub-Welsch algorithm
 
 `gauss()` generates the `N` Gauss quadrature nodes and weights for a given weight function.
@@ -124,15 +124,18 @@ function gauss(N::Int,α::Vector{<:Real},β::Vector{<:Real})
     @assert N0 >= N  "not enough recurrence coefficients"
     @inbounds golubwelsch(α[1:N],β[1:N])
 end
+
 gauss(α::Vector{<:Real},β::Vector{<:Real}) = gauss(length(α)-1,α,β)
-gauss(N::Int,op::OrthoPoly) = gauss(N::Int,op.α,op.β)
-gauss(op::OrthoPoly) = gauss(op.α,op.β)
+
+gauss(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly}) = gauss(N::Int,op.α,op.β)
+
+gauss(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly}) = gauss(op.α,op.β)
 
 """
     radau(N::Int,α::Vector{<:Real},β::Vector{<:Real},end0::Real)
     radau(α::Vector{<:Real},β::Vector{<:Real},end0::Real)
-    radau(N::Int,op::OrthoPoly,end0::Real)
-    radau(op::OrthoPoly,end0::Real)
+    radau(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
+    radau(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
 Gauss-Radau quadrature rule.
 Given a weight function encoded by the recurrence coefficients `(α,β)`for the associated
 orthogonal polynomials, the function generates the
@@ -164,14 +167,14 @@ function radau(N::Int,α_::Vector{<:Real},β::Vector{<:Real},end0::Real)
     gauss(N+1,α,β)
 end
 radau(α::Vector{<:Real},β::Vector{<:Real},end0::Real) = radau(length(α)-2,α,β,end0)
-radau(N::Int,op::OrthoPoly,end0::Real) = radau(N,op.α,op.β,end0)
-radau(op::OrthoPoly,end0::Real) = radau(op.α,op.β,end0::Real)
+radau(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real) = radau(N,op.α,op.β,end0)
+radau(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real) = radau(op.α,op.β,end0::Real)
 
 """
     lobatto(N::Int,α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real)
     lobatto(α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real)
-    lobatto(N::Int,op::OrthoPoly,endl::Real,endr::Real)
-    lobatto(op::OrthoPoly,endl::Real,endr::Real)
+    lobatto(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
+    lobatto(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
 Gauss-Lobatto quadrature rule.
 Given a weight function encoded by the recurrence coefficients for the associated
 orthogonal polynomials, the function generates
@@ -209,5 +212,5 @@ function lobatto(N::Int,α_::Vector{<:Real},β_::Vector{<:Real},endl::Real,endr:
     gauss(N+2,α,β)
 end
 lobatto(α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real) = lobatto(length(α)-3,α,β,endl,endr)
-lobatto(N::Int,op::OrthoPoly,endl::Real,endr::Real) = lobatto(N,op.α,op.β,endl,endr)
-lobatto(op::OrthoPoly,endl::Real,endr::Real) = lobatto(op.α,op.β,endl,endr)
+lobatto(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real) = lobatto(N,op.α,op.β,endl,endr)
+lobatto(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real) = lobatto(op.α,op.β,endl,endr)
