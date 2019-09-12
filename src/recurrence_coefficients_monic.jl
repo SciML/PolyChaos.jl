@@ -194,17 +194,49 @@ that are orthogonal on ``(0,1)`` relative to ``w(t) = 1``.
 rm_legendre01(N::Int) = rm_jacobi01(N)
 
 
-function rm_chebyshev1(N::Int)
-    @assert N>=0 "N has to be non-negative"
-    α = zeros(Float64,N)
-    if N == 1
-        return α, [pi]
-    elseif N == 2
-        return α, [pi; 0.5]
+"""
+    rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
+    rm_meixner_pollaczek(N::Int,lambda::Real)
+
+ Creates `N` recurrence coefficients for monic
+ Meixner-Pollaczek polynomials with parameters λ and ϕ. These are orthogonal on
+ ``[-\\infty,\\infty]`` relative to the weight function ``w(t)=(2 \\pi)^{-1} \\exp{(2 \\phi-\\pi)t} |\\Gamma(\\lambda+ i t)|^2``.
+
+ The call `rm_meixner_pollaczek(n,lambda)` is the same as `rm_meixner_pollaczek(n,lambda,pi/2)`.
+"""
+function rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
+    @assert N>=0 && lambda>0. && phi>0. "parameter(s) out of range"
+    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    n=1:N;
+    sinphi=sin(phi); lam2=2*lambda;
+    ab=zeros(Float64,N,2)
+    if sinphi==1
+      ab[:,1]=zeros(N);
     else
-        return α, pushfirst!(pushfirst!(0.25*ones(N-2),0.5),pi)
+        ab[:,1]= -(n .+ (lambda-1))/tan(phi);
     end
+    ab[:,2]= (n .- 1).*(n .+ (lam2-2))/(4*sinphi^2);
+    ab[1,2]=gamma(lam2)/(2*sinphi)^lam2;
+    return ab[:,1], ab[:,2]
 end
+rm_meixner_pollaczek(N::Int,lambda::Real) = rm_meixner_pollaczek(N,lambda,pi/2)
+
+
+###################################################################
+###################################################################
+###################################################################
+
+# function rm_chebyshev1(N::Int)
+#     @assert N>=0 "N has to be non-negative"
+#     α = zeros(Float64,N)
+#     if N == 1
+#         return α, [pi]
+#     elseif N == 2
+#         return α, [pi; 0.5]
+#     else
+#         return α, pushfirst!(pushfirst!(0.25*ones(N-2),0.5),pi)
+#     end
+# end
 #     rm_hahn(N::Int,a::Real,b::Real)
 #     rm_hahn(N::Int,a::Real)
 #     rm_hahn(N::Int)
@@ -248,30 +280,3 @@ end
 # end
 # rm_hahn(N::Int,a::Real) = rm_hahn(N,a,a)
 # rm_hahn(N::Int) = rm_hahn(N,0.,0.)
-
-"""
-    rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
-    rm_meixner_pollaczek(N::Int,lambda::Real)
-
- Creates `N` recurrence coefficients for monic
- Meixner-Pollaczek polynomials with parameters λ and ϕ. These are orthogonal on
- ``[-\\infty,\\infty]`` relative to the weight function ``w(t)=(2 \\pi)^{-1} \\exp{(2 \\phi-\\pi)t} |\\Gamma(\\lambda+ i t)|^2``.
-
- The call `rm_meixner_pollaczek(n,lambda)` is the same as `rm_meixner_pollaczek(n,lambda,pi/2)`.
-"""
-function rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
-    @assert N>=0 && lambda>0. && phi>0. "parameter(s) out of range"
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
-    n=1:N;
-    sinphi=sin(phi); lam2=2*lambda;
-    ab=zeros(Float64,N,2)
-    if sinphi==1
-      ab[:,1]=zeros(N);
-    else
-        ab[:,1]= -(n .+ (lambda-1))/tan(phi);
-    end
-    ab[:,2]= (n .- 1).*(n .+ (lam2-2))/(4*sinphi^2);
-    ab[1,2]=gamma(lam2)/(2*sinphi)^lam2;
-    return ab[:,1], ab[:,2]
-end
-rm_meixner_pollaczek(N::Int,lambda::Real) = rm_meixner_pollaczek(N,lambda,pi/2)

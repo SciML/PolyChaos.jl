@@ -88,31 +88,6 @@ function lanczos(N::Int64,nodes::Vector{Float64},weights::Vector{Float64};remove
     @inbounds p0[Base.OneTo(N)], p1[Base.OneTo(N)]
 end
 
-
-function mcdis_twologistics(n::Int,p1::Vector{Float64},p2::Vector{Float64};Mmax::Int=100,eps0::Real=1e-9)
-    M0 = n
-    Mcap = 0
-    Mi = M0
-    α, β = zeros(n), zeros(n)
-    for i=1:Mmax
-        nai, wai = quadrature_logistic(Mi,p1[1],p1[2])
-        nbi, wbi = quadrature_logistic(Mi,p2[1],p2[2])
-        wai, wbi = 0.5*wai, 0.5*wbi
-        ni, wi   = [nai; nbi], [wai; wbi]
-        α_, β_ = stieltjes(n,ni,wi)
-        err = maximum( abs(β_[k]-β[k])/β_[k] for k=1:n )
-        display("err = $err")
-        if err<=eps0
-            Mcap = i-1
-            return α_, β_
-        else
-            α, β, = α_, β_
-            i==1 ? Mi = M0+1 : Mi = Int(2^(floor((i-1)/5))*n)
-        end
-    end
-    warn("Algorithm did not terminate after $Mmax iterations.")
-end
-
 """
     mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)
 This routine returns ``N`` recurrence coefficients of the polynomials that are

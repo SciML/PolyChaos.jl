@@ -47,6 +47,7 @@ end
                     @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
                     αβcom = coeffs(JacobiOrthoPoly(n-1, al, be, addQuadrature=false))
                     @test isapprox(norm(αβref-[αβcom[:,1];αβcom[:,2]],Inf),0.;atol=tol)
+                    @test rm_jacobi(n,al) == rm_jacobi(n,al,al)
                     close(myfile)
             end
     end
@@ -58,6 +59,7 @@ end
                     myfile = open("dataRecCoeffs/jac01$(n)al$(al)be$(be).txt")
                     αβref = parse.(Float64,readlines(myfile))
                     αβcom = rm_jacobi01(n,al,be)
+                    @test rm_jacobi01(n,al) == rm_jacobi01(n,al,al)
                     @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
                     close(myfile)
             end
@@ -89,6 +91,9 @@ meipol = 0.1:0.2:2
                 αβcom = coeffs(MeixnerPollaczekOrthoPoly(n-1, lambda, phi, addQuadrature=false))
                 @test isapprox(norm(αβref-[αβcom[:,1];αβcom[:,2]],Inf),0.;atol=tol)
                 close(myfile)
+                @test rm_meixner_pollaczek(n,lambda) == rm_meixner_pollaczek(n,lambda,pi/2)
+                @test rm_meixner_pollaczek(n,lambda,pi/2)[1] == zeros(n)
             end
+
     end
 end
