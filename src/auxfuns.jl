@@ -67,7 +67,7 @@ coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
 
 """
 ```
-integrate(f::Function,nodes::AbstractArray{<:Real, 1},weights::AbstractArray{<:Real, 1})
+integrate(f::Function,nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real})
 integrate(f::Function,q::AbstractQuad)
 integrate(f::Function,opq::AbstractOrthoPoly)
 ```
