@@ -9,8 +9,8 @@ julia:
 
 before_script:
   - julia --color=yes -e 'using Pkg;
-      Pkg.add(PackageSpec(name = "MbedTLS", version="0.6.6"));
-      Pkg.pin(PackageSpec(name = "MbedTLS", version="0.6.6"));
+      Pkg.add(PackageSpec(name = "MbedTLS", version="0.7.0"));
+      Pkg.pin(PackageSpec(name = "MbedTLS", version="0.7.0"));
       Pkg.add(PackageSpec(name="BinaryProvider", rev="master"));
       Pkg.add(PackageSpec(name="BinaryBuilder", rev="master"))'
 
