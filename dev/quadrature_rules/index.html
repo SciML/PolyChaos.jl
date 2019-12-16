@@ -27,7 +27,7 @@ print(&quot;first point:\t $(n_fej[1])\n&quot;)
 print(&quot;end point:\t $(n_fej[end])\n&quot;)
 print(&quot;error Fejer:\t $(int_fej-int_exact)&quot;)</code></pre><pre><code class="language-none">first point:	 0.9238795325112867
 end point:	 -0.9238795325112867
-error Fejer:	 -0.05060511879836693</code></pre><h2><a class="nav-anchor" id="Fejér&#39;s-Second-Rule-1" href="#Fejér&#39;s-Second-Rule-1">Fejér&#39;s Second Rule</a></h2><p><a href="https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature">Fejér&#39;s second</a> rule does include the end points of the interval.</p><pre><code class="language-julia">n_fej2, w_fej2 = fejer2(N)
+error Fejer:	 -0.05060511879836699</code></pre><h2><a class="nav-anchor" id="Fejér&#39;s-Second-Rule-1" href="#Fejér&#39;s-Second-Rule-1">Fejér&#39;s Second Rule</a></h2><p><a href="https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature">Fejér&#39;s second</a> rule does include the end points of the interval.</p><pre><code class="language-julia">n_fej2, w_fej2 = fejer2(N)
 int_fej2 = dot(w_fej2, my_f.(n_fej2).*(1 .- n_fej2).^a.*(1 .+ n_fej2).^b)
 print(&quot;first point:\t $(n_fej2[1])\n&quot;)
 print(&quot;end point:\t $(n_fej2[end])\n&quot;)
