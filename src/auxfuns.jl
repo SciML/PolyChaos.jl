@@ -67,7 +67,7 @@ coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
 
 """
 ```
-integrate(f::Function,nodes::Vector{<:Real},weights::Vector{<:Real})
+integrate(f::Function,nodes::AbstractArray{<:Real, 1},weights::AbstractArray{<:Real, 1})
 integrate(f::Function,q::AbstractQuad)
 integrate(f::Function,opq::AbstractOrthoPoly)
 ```
@@ -84,7 +84,7 @@ julia> integrate(x -> 6x^5, opq)
 - function ``f`` is assumed to return a scalar.
 - interval of integration is "hidden" in `nodes`.
 """
-function integrate(f::Function, nodes::Vector{<:Real}, weights::Vector{<:Real})
+function integrate(f::Function, nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real})
     dot(weights, f.(nodes))
 end
 
@@ -105,20 +105,20 @@ Is the measure symmetric (around any point in the domain)?
 issymmetric(m::AbstractMeasure) = m.symmetric
 issymmetric(op::AbstractOrthoPoly) = issymmetric(op.measure)
 
-function multi2uni(a::Vector{<:Int}, ind::Matrix{<:Int})
+function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
     minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
     l, p = size(ind) # p-variate basis
     m = length(a) # dimension of scalar product
     l -= 1 # (l+1)-dimensional basis
     maximum(a) > l && throw(DomainError(a, "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
     A = zeros(Int64,p,m)
-    for (i, a_) in enumerate(a)
-        A[:,i] = ind[a_+1,:]
+    for (i, a_element) in enumerate(a)
+        A[:, i] = ind[a_element + 1, :]
     end
     return A
 end
 
-function getentry(a::Vector{<:Int}, T::SparseVector{<:Real,<:Int}, ind::Matrix{<:Int}, dim::Int)
+function getentry(a::AbstractVector{<:Int}, T::SparseVector{<:Real,<:Int}, ind::AbstractMatrix{<:Int}, dim::Int)
     m = length(a)
     l = size(ind,1)-1
     minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
