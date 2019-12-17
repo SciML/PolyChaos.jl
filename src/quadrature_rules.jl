@@ -87,7 +87,7 @@ end
 ####################################################
 # Quadrature rules based on recurrence coefficients
 
-function golubwelsch(α::Vector{<:Real}, β::Vector{<:Real}, maxiter::Int=30)
+function golubwelsch(α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, maxiter::Int=30)
     N = length(α) - 1
     a, β0 = copy(α[1:N]), β[1]
     w = zero(a)
@@ -99,8 +99,8 @@ end
 golubwelsch(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly}) = golubwelsch(op.α,op.β)
 
 """
-    gauss(N::Int,α::Vector{<:Real},β::Vector{<:Real})
-    gauss(α::Vector{<:Real},β::Vector{<:Real})
+    gauss(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real})
+    gauss(α::AbstractVector{<:Real},β::AbstractVector{<:Real})
     gauss(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
     gauss(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
 Gauss quadrature rule, also known as Golub-Welsch algorithm
@@ -116,7 +116,7 @@ with respect to the weight function.
 !!! note
     If no `N` is provided, then `N = length(α) - 1`.
 """
-function gauss(N::Int,α::Vector{<:Real},β::Vector{<:Real})
+function gauss(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real})
     N += 1
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) "inconsistent number of recurrence coefficients"
@@ -125,15 +125,15 @@ function gauss(N::Int,α::Vector{<:Real},β::Vector{<:Real})
     @inbounds golubwelsch(α[1:N],β[1:N])
 end
 
-gauss(α::Vector{<:Real},β::Vector{<:Real}) = gauss(length(α)-1,α,β)
+gauss(α::AbstractVector{<:Real},β::AbstractVector{<:Real}) = gauss(length(α)-1,α,β)
 
 gauss(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly}) = gauss(N::Int,op.α,op.β)
 
 gauss(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly}) = gauss(op.α,op.β)
 
 """
-    radau(N::Int,α::Vector{<:Real},β::Vector{<:Real},end0::Real)
-    radau(α::Vector{<:Real},β::Vector{<:Real},end0::Real)
+    radau(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real)
+    radau(α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real)
     radau(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
     radau(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
 Gauss-Radau quadrature rule.
@@ -151,28 +151,28 @@ interval of w, or outside thereof).
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
-function radau(N::Int,α_::Vector{<:Real},β::Vector{<:Real},end0::Real)
-    α = copy(α_)
+function radau(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real)
+    α_ = copy(α)
     @assert N > 0 "only positive N allowed"
-    @assert length(α) == length(β) > 0 "inconsistent number of recurrence coefficients"
-    @assert length(α) >= N + 1 "not enough recurrence coefficients"
+    @assert length(α_) == length(β) > 0 "inconsistent number of recurrence coefficients"
+    @assert length(α_) >= N + 1 "not enough recurrence coefficients"
     p0 = 0.
     p1 = 1.
     for n in Base.OneTo(N)
       pm1 = p0
       p0 = p1;
-      @inbounds p1 = (end0 - α[n])*p0 - β[n]*pm1;
+      @inbounds p1 = (end0 - α_[n])*p0 - β[n]*pm1;
     end
-    @inbounds α[N+1] = end0 - β[N+1]*p0/p1
-    gauss(N+1,α,β)
+    @inbounds α_[N+1] = end0 - β[N+1]*p0/p1
+    gauss(N+1 , α_, β)
 end
-radau(α::Vector{<:Real},β::Vector{<:Real},end0::Real) = radau(length(α)-2,α,β,end0)
+radau(α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real) = radau(length(α)-2,α,β,end0)
 radau(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real) = radau(N,op.α,op.β,end0)
 radau(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real) = radau(op.α,op.β,end0::Real)
 
 """
-    lobatto(N::Int,α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real)
-    lobatto(α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real)
+    lobatto(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real},endl::Real,endr::Real)
+    lobatto(α::AbstractVector{<:Real},β::AbstractVector{<:Real},endl::Real,endr::Real)
     lobatto(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
     lobatto(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
 Gauss-Lobatto quadrature rule.
@@ -191,7 +191,7 @@ resp. to the right thereof).
 !!! note
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
-function lobatto(N::Int,α_::Vector{<:Real},β_::Vector{<:Real},endl::Real,endr::Real)
+function lobatto(N::Int,α_::AbstractVector{<:Real},β_::AbstractVector{<:Real},endl::Real,endr::Real)
     α, β = copy(α_), copy(β_)
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) > 0 "inconsistent number of recurrence coefficients"
@@ -211,6 +211,6 @@ function lobatto(N::Int,α_::Vector{<:Real},β_::Vector{<:Real},endl::Real,endr:
     @inbounds β[N+2] = (endr - endl) * p1l * p1r / det;
     gauss(N+2,α,β)
 end
-lobatto(α::Vector{<:Real},β::Vector{<:Real},endl::Real,endr::Real) = lobatto(length(α)-3,α,β,endl,endr)
+lobatto(α::AbstractVector{<:Real},β::AbstractVector{<:Real},endl::Real,endr::Real) = lobatto(length(α)-3,α,β,endl,endr)
 lobatto(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real) = lobatto(N,op.α,op.β,endl,endr)
 lobatto(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real) = lobatto(op.α,op.β,endl,endr)

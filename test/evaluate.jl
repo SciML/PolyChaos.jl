@@ -54,14 +54,16 @@ combinations = Iterators.product([α, αs], [β, βs])
     for x in X
         [ @test evaluate(mop.ind,x,a,b) == evaluate(mop.ind,x,mop) == evaluate(x,mop) for (a, b) in combinations ]
         if typeof(x) <: AbstractVector{<:Real}
-            [ @test evaluate(mop.ind,x,a,b) == evaluate(mop.ind,x,mop) == evaluate(x,mop) == evaluate(mop.ind,reshape(x,1,length(x)),coeffs(mop)...) ]
+            [ @test evaluate(mop.ind,x,a,b) == evaluate(mop.ind,x,mop) == evaluate(x,mop) == evaluate(mop.ind,reshape(x,1,length(x)),coeffs(mop)...) for (a, b) in combinations]
             [ @test evaluate(x,mop) == evaluate(mop.ind,reshape(x,1,length(x)),mop) == evaluate(mop.ind,reshape(x,1,length(x)),a,b) for (a, b) in combinations ]
         else
             [ @test evaluate(x,mop) == evaluate(mop.ind,x,mop) == evaluate(mop.ind,x,a,b) for (a, b) in combinations ]
         end
-        for d in eachrow(mop.ind[1:3,:])
-            [ @test evaluate(collect(d),x,a,b) == evaluate(collect(d),x,mop) for (a, b) in combinations ]
-            [ @test evaluate(d,x,a,b) == evaluate(collect(d),x,mop) for (a, b) in combinations ]
+        if VERSION >= VersionNumber("1.1.1")
+            for d in eachrow(mop.ind[1:3,:])
+                [ @test evaluate(collect(d),x,a,b) == evaluate(collect(d),x,mop) for (a, b) in combinations ]
+                [ @test evaluate(d,x,a,b) == evaluate(collect(d),x,mop) for (a, b) in combinations ]
+            end
         end
     end
 end

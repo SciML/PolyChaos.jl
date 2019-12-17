@@ -1,4 +1,4 @@
-using PolyChaos, Test
+using PolyChaos, Test, StaticArrays
 import LinearAlgebra: norm
 myfile = open("dataQuadratureRules/config.txt")
 ns = parse.(Int,readlines(myfile))
@@ -52,6 +52,7 @@ end
             myfile = open("dataQuadratureRules/gaussLog$n.txt")
             αβref = parse.(Float64,readlines(myfile))
             αβcom = gauss(n,d1[:,1],d1[:,2])
+            @test gauss(n,d1[:,1],d1[:,2]) == gauss(n,SVector(d1[:,1]...),SVector(d1[:,2]...))
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
             q = Quad(n,d1[:,1],d1[:,2])
             @test isapprox(norm(αβref - vcat(nw(q)...),Inf),0.;atol=tol)
@@ -59,6 +60,7 @@ end
             myfile = open("dataQuadratureRules/gaussHerm$n.txt")
             αβref = parse.(Float64,readlines(myfile))
             αβcom = gauss(n,d2[:,1],d2[:,2])
+            @test gauss(n,d2[:,1],d2[:,2]) == gauss(n,SVector(d2[:,1]...),SVector(d2[:,2]...))
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
             q = Quad(n,d2[:,1],d2[:,2])
             @test isapprox(norm(αβref - vcat(nw(q)...),Inf),0.;atol=tol)
@@ -71,10 +73,11 @@ end
         d1 = reshape(parse.(Float64,readlines(data1)),:,2)
         close(data1)
     for n in ns
-        for i in [endPts;-endPts]
+        for i in [endPts; -endPts]
             myfile = open("dataQuadratureRules/radauLog$(n)pt$i.txt")
             αβref = parse.(Float64,readlines(myfile))
             αβcom = radau(n,d1[:,1],d1[:,2],i)
+            @test radau(n,d1[:,1],d1[:,2],i) == radau(n,MVector(d1[:,1]...),MVector(d1[:,2]...),i) == radau(n,MVector(d1[:,1]...),d1[:,2],i) == radau(n,d1[:,1],MVector(d1[:,2]...),i)
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
             close(myfile)
 
@@ -91,6 +94,7 @@ end
             myfile = open("dataQuadratureRules/radauHerm$(n)pt$i.txt")
             αβref = parse.(Float64,readlines(myfile))
             αβcom = radau(n,d2[:,1],d2[:,2],i)
+            @test radau(n,d2[:,1],d2[:,2],i) == radau(n,MVector(d2[:,1]...),MVector(d2[:,2]...),i) == radau(n,MVector(d2[:,1]...),d2[:,2],i) == radau(n,d2[:,1],MVector(d2[:,2]...),i)
             @test isapprox(norm(αβref-[αβcom[1];αβcom[2]],Inf),0.;atol=tol)
             close(myfile)
         end
@@ -130,11 +134,8 @@ N = degree + 1
 op = Uniform01OrthoPoly(degree)
 endl, endr = 0, 1
 
-myMeas = Measure("myMeasure", t->1, (0, 1), true)
-op_num = OrthoPoly("myOp", degree, myMeas)
-
 @testset "OrthoPoly overloading" begin
-    @test gauss(N-1, α, β) == gauss(α, β) == gauss(N-1, op) == gauss(op)
+    @test gauss(N-1, α, β) == gauss(α, β) == gauss(N-1, op) == gauss(op) == gauss(N-1, SVector(α...), β) == gauss(N-1, α, SVector(β...))
     @test radau(N-2, α, β, endr) == radau(α, β, endr) == radau(N-2, op, endr) == radau(op, endr)
-    @test lobatto(N-3, α, β, endl, endr) == lobatto(α, β, endl, endr) == lobatto(N-3, op, endl, endr) == lobatto(op, endl, endr)
+    @test lobatto(N-3, α, β, endl, endr) == lobatto(α, β, endl, endr) == lobatto(N-3, op, endl, endr) == lobatto(op, endl, endr) == lobatto(N-3, MVector(α...), MVector(β...), endl, endr)
 end
