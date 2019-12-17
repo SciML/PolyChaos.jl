@@ -14,11 +14,11 @@ export  r_scale,
         rm_chebyshev1,
         rm_compute
 """
-    r_scale(c::Real,β::Vector{<:Real},α::Vector{<:Real})
+    r_scale(c::Real,β::AbstractVector{<:Real},α::AbstractVector{<:Real})
 Given the recursion coefficients `(α,β)` for a system of orthogonal polynomials that are orthogonal with respect to some positive weight ``m(t)``,
 this function returns the recursion coefficients `(α_,β_)` for the scaled measure ``c m(t)`` for some positive ``c``.
 """
-function r_scale(c::Real,a::Vector{<:Real},b::Vector{<:Real})
+function r_scale(c::Real,a::AbstractVector{<:Real},b::AbstractVector{<:Real})
     c <= 0 && throw(DomainError(c,"Measure can only be scaled by positive number (provided c=$c)"))
     return a, [c*b[1]; b[2:end]]
 end
@@ -48,7 +48,7 @@ end
 rm_compute(m::AbstractMeasure,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2],Npoly,Nquad,quadrature=quadrature,discretization=discretization)
 
 ##
-function rm_logisticsum(n::Int,p1::Vector{<:Real},p2::Vector{<:Real};Mmax::Int=100,eps0::Real=1e-9)
+function rm_logisticsum(n::Int,p1::AbstractVector{<:Real},p2::AbstractVector{<:Real};Mmax::Int=100,eps0::Real=1e-9)
     M0 = n
     Mcap = 0
     Mi = M0
@@ -78,7 +78,7 @@ on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\m
 """
 function rm_logistic(N::Int)
     @assert N >= 0 "parameter(s) out of range."
-    N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
+    N == 0 && return Vector{Float64}(undef,0), Vector{Float64}(undef,0)
     zeros(N), pushfirst!(map(k->k^4*pi^2/(4*k^2-1),Base.OneTo(N-1)),1.)
 end
 
@@ -124,7 +124,7 @@ function rm_laguerre(N::Int,a::Real)
     N == 0 && return Array{Float64,1}(undef,0), Array{Float64,1}(undef,0)
     N==1 && return [a+1.], [gamma(a+1)]
     n = 1.:N-1
-    return pushfirst!(map(x->2x+a+1.,n)::Vector{<:Real},a+1.), pushfirst!(map(x->x^2+a*x,n)::Vector{<:Real},gamma(a+1))
+    return pushfirst!(map(x->2x+a+1.,n),a+1.), pushfirst!(map(x->x^2+a*x,n),gamma(a+1))
 end
 function rm_laguerre(N::Int)
     rm_laguerre(N,0.)
@@ -152,7 +152,7 @@ function rm_jacobi(N::Int,a::Real,b::Real)
     B1 = map(x->4*(x+a)*(x+b)*x*(x+a+b),n[2:N-1])
     B2 = map(x->(x^2.)*(x+1.)*(x-1.),nab[2:N-1])
     B3 = 4. * (a + 1) * (b + 1) / ((a + b + 2)^2 * (a + b + 3));
-    A, pushfirst!(pushfirst!(B1./B2,B3),mu)::Vector{<:Real}
+    A, pushfirst!(pushfirst!(B1./B2,B3),mu)
 end
 
 rm_jacobi(N::Int,a::Real) = rm_jacobi(N,a,a)
