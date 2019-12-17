@@ -35,11 +35,14 @@ function _checkBounds(lb::Real, ub::Real)
     lb >= ub && throw(DomainError((lb, ub), "inconsistent bounds"))
 end
 
+function _checkNumberOfSamples(n::Int)
+    n < 1 && throw(DomainError(n, "invalid number of samples"))
+end
 """
-    calculateAffinePCE(α::Vector{<:Real})
+    calculateAffinePCE(α::AbstractVector{<:Real})
 Computes the affine PCE coefficients ``x_0`` and ``x_1`` from recurrence coefficients ``\alpha``.
 """
-function calculateAffinePCE(α::Vector{<:Real})
+function calculateAffinePCE(α::AbstractVector{<:Real})
     length(α) < 1 && throw(DomainError(length(α), "not enough recursion coefficients"))
     return [α[1], 1.]
 end
@@ -77,7 +80,7 @@ end
 
 function convert2affinePCE(par1::Real, par2::Real, op::Uniform01OrthoPoly; kind::String="lbub")
     kind = _checkKind(kind)
-    a1, a2 = 
+    a1, a2 =
         if kind == "lbub"
             _checkBounds(par1, par2)
             par1, par2 - par1
@@ -91,7 +94,7 @@ end
 function convert2affinePCE(p1::Real, p2::Real, op::Beta01OrthoPoly; kind::String="lbub")
     kind = _checkKind(kind)
     α, β = op.measure.ashapeParameter, op.measure.bshapeParameter
-    a1, a2 = 
+    a1, a2 =
         if kind == "lbub"
             _checkBounds(p1, p2)
             a1, a2 = p1, p2-p1
@@ -112,7 +115,7 @@ function convert2affinePCE(p1::Real, p2::Real, op::LogisticOrthoPoly)
 end
 
 
-function assign2multi(x::Vector{<:Real},i::Int,ind::Matrix{<:Int})
+function assign2multi(x::AbstractVector{<:Real},i::Int,ind::AbstractMatrix{<:Int})
     l, p = size(ind)
     nx, deg = length(x), ind[end,end]
     nx > deg + 1 && throw(DomainError(nx, "inconsistent number of coefficients ($nx vs $(deg+1))"))
@@ -128,9 +131,9 @@ end
 """
 __Univariate__
 ```
-sampleMeasure(n::Int64,name::String,w::Function,dom::Tuple{<:Real,<:Real},symm::Bool,d::Dict;method::String="adaptiverejection")
-sampleMeasure(n::Int64,m::Measure;method::String="adaptiverejection")
-sampleMeasure(n::Int64,op::AbstractOrthoPoly;method::String="adaptiverejection")
+sampleMeasure(n::Int,name::String,w::Function,dom::Tuple{<:Real,<:Real},symm::Bool,d::Dict;method::String="adaptiverejection")
+sampleMeasure(n::Int,m::Measure;method::String="adaptiverejection")
+sampleMeasure(n::Int,op::AbstractOrthoPoly;method::String="adaptiverejection")
 ```
 Draw `n` samples from the measure `m` described by its
 - `name`
@@ -145,14 +148,14 @@ The function is dispatched to accept `AbstractOrthoPoly`.
 
 __Multivariate__
 ```
-sampleMeasure(n::Int64,m::ProductMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
-sampleMeasure(n::Int64,mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
+sampleMeasure(n::Int,m::ProductMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
+sampleMeasure(n::Int,mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
 ```
 Multivariate extension which provides array of samples with `n` rows and
 as many columns as the multimeasure has univariate measures.
 """
 function sampleMeasure(n::Int, w::Function, dom::Tuple{<:Real,<:Real}; method::String="adaptiverejection")
-    n < 0 && throw(DomainError(n, "invalid number of samples"))
+    _checkNumberOfSamples(n)
     method = lowercase(method)
 
     if method == "adaptiverejection"
@@ -178,8 +181,8 @@ sampleMeasure(n::Int, op::AbstractOrthoPoly; method::String="adaptiverejection")
 sampleMeasure(n::Int, op::AbstractCanonicalOrthoPoly) = sampleMeasure(n, op.measure::AbstractCanonicalMeasure)
 
 function sampleMeasure(n::Int, dist::Distribution{Univariate,Continuous})
-    n < 0 && throw(DomainError(n, "invalid number of samples"))
-    return rand(dist, n)
+    _checkNumberOfSamples(n)
+    rand(dist, n)
 end
 
 sampleMeasure(n::Int, meas::GaussMeasure) = sampleMeasure(n, Normal())
@@ -198,13 +201,13 @@ function sampleMeasure(n::Int, measure::ProductMeasure; method::Vector{String}=_
     for (k, unimeasure) in enumerate(measure.measures)
         samples = hcat(samples, sampleMeasure(n, unimeasure; method = method[k]))
     end
-    return samples
+    samples
 end
 
 sampleMeasure(n::Int, mop::MultiOrthoPoly; method::Vector{String}=_createMethodVector(mop)) = sampleMeasure(n,mop.measure; method=method)
 
 """
-    evaluatePCE(x::Vector{<:Real},ξ::Vector{<:Real},α::Vector{<:Real},β::Vector{<:Real})
+    evaluatePCE(x::AbstractVector{<:Real},ξ::AbstractVector{<:Real},α::AbstractVector{<:Real},β::AbstractVector{<:Real})
 Evaluation of polynomial chaos expansion
 ```math
 \\mathsf{x} = \\sum_{i=0}^{L} x_i \\phi_i{\\xi_j},
@@ -212,10 +215,10 @@ Evaluation of polynomial chaos expansion
 where `L+1 = length(x)` and ``x_j`` is the ``j``th sample where ``j=1,\\dots,m``
 with `m = length(ξ)`.
 """
-function evaluatePCE(x::Vector{<:Real},ξ::Vector{<:Real},α::Vector{<:Real},β::Vector{<:Real})
+function evaluatePCE(x::AbstractVector{<:Real},ξ::AbstractVector{<:Real},α::AbstractVector{<:Real},β::AbstractVector{<:Real})
     length(α) != length(β) && throw(InconsistencyError("inconsistent number of recurrence coefficients"))
     Nsmpl = length(ξ)
-    Nsmpl < 1 && throw(InconsistencyError("inconsistent number $Nsmpl of samples"))
+    _checkNumberOfSamples(Nsmpl)
     Nx, Nrec = length(x), length(α)
     Nx > Nrec && throw(InconsistencyError("not enough recursion coefficients"))
     if Nrec > Nx α,β = α[1:Nx], β[1:Nx] end
@@ -225,12 +228,12 @@ function evaluatePCE(x::Vector{<:Real},ξ::Vector{<:Real},α::Vector{<:Real},β:
     end
     ϕ*x
 end
-evaluatePCE(x::Vector{<:Real},ξ::Real,α::Vector{<:Real},β::Vector{<:Real}) = evaluatePCE(x,[ξ],α,β)
-evaluatePCE(x::Vector{<:Real},ξ::Vector{<:Real},op::AbstractOrthoPoly) = evaluatePCE(x,ξ,op.α,op.β)
+evaluatePCE(x::AbstractVector{<:Real},ξ::Real,α::AbstractVector{<:Real},β::AbstractVector{<:Real}) = evaluatePCE(x,[ξ],α,β)
+evaluatePCE(x::AbstractVector{<:Real},ξ::AbstractVector{<:Real},op::AbstractOrthoPoly) = evaluatePCE(x,ξ,op.α,op.β)
 
-function evaluatePCE(x::Vector{<:Real},ξ::Matrix{<:Real},α::Vector{<:Vector{<:Real}},β::Vector{<:Vector{<:Real}},ind::Matrix{Int64})
+function evaluatePCE(x::AbstractVector{<:Real},ξ::Matrix{<:Real},α::AbstractVector{<:AbstractVector{<:Real}},β::AbstractVector{<:AbstractVector{<:Real}},ind::AbstractMatrix{Int})
     Nsmpl = size(ξ,1)
-    Nsmpl < 1 && throw(InconsistencyError("inconsistent number $Nsmpl of samples"))
+    _checkNumberOfSamples(Nsmpl)
     !(length(α) == length(β) == size(ξ,2) == size(ind,2)) && throw(InconsistencyError("inconsistent number of coefficients"))
     Nx = length(x)
     Nx > size(ind,1) && throw(InconsistencyError("too few pc coefficients (resp: too small basis)"))
@@ -240,7 +243,7 @@ function evaluatePCE(x::Vector{<:Real},ξ::Matrix{<:Real},α::Vector{<:Vector{<:
     end
     ϕ*x
 end
-function evaluatePCE(x::Vector{<:Real},ξ::Matrix{<:Real},mOP::MultiOrthoPoly)
+function evaluatePCE(x::AbstractVector{<:Real},ξ::Matrix{<:Real},mOP::MultiOrthoPoly)
     a,b = coeffs(mOP)
     evaluatePCE(x,ξ,a,b,mOP.ind)
 end
@@ -248,27 +251,27 @@ end
 """
 __Univariate__
 ```
-samplePCE(n::Int,x::Vector{<:Real},op::AbstractOrthoPoly;method::String="adaptiverejection")
+samplePCE(n::Int,x::AbstractVector{<:Real},op::AbstractOrthoPoly;method::String="adaptiverejection")
 ```
 Combines [`sampleMeasure`](@ref) and [`evaluatePCE`](@ref), i.e. it first draws `n` samples
 from the measure, then evaluates the PCE for those samples.
 
 __Multivariate__
 ```
-samplePCE(n::Int64,x::Vector{<:Real},mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
+samplePCE(n::Int,x::AbstractVector{<:Real},mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
 ```
 """
-function samplePCE(n::Int,x::Vector{<:Real},op::AbstractOrthoPoly;method::String="adaptiverejection")
+function samplePCE(n::Int,x::AbstractVector{<:Real},op::AbstractOrthoPoly;method::String="adaptiverejection")
     ξ = sampleMeasure(n,op;method=method)
     evaluatePCE(x,ξ,op)
 end
 
-function samplePCE(n::Int,x::Vector{<:Real},op::AbstractCanonicalOrthoPoly;method::String="adaptiverejection")
+function samplePCE(n::Int,x::AbstractVector{<:Real},op::AbstractCanonicalOrthoPoly;method::String="adaptiverejection")
     ξ = sampleMeasure(n,op)
     evaluatePCE(x,ξ,op)
 end
 
-function samplePCE(n::Int,x::Vector{<:Real},mop::MultiOrthoPoly;method::Vector{String} = _createMethodVector(mop))
+function samplePCE(n::Int,x::AbstractVector{<:Real},mop::MultiOrthoPoly;method::Vector{String} = _createMethodVector(mop))
     ξ = sampleMeasure(n, mop; method=method)
     evaluatePCE(x, ξ, mop)
 end
@@ -276,17 +279,17 @@ end
 """
 __Univariate__
 ```
-mean(x::Vector{},op::AbstractOrthoPoly)
+mean(x::AbstractVector,op::AbstractOrthoPoly)
 ```
 __Multivariate__
 ```
-mean(x::Vector{},mop::MultiOrthoPoly)
+mean(x::AbstractVector,mop::MultiOrthoPoly)
 ```
 compute mean of random variable with PCE `x`
 """
-mean(x::Vector{},op::AbstractOrthoPoly) = x[1]*computeSP2(0,op.β)
+mean(x::AbstractVector,op::AbstractOrthoPoly) = x[1]*computeSP2(0,op.β)
 
-function mean(x::Vector{},mop::MultiOrthoPoly)
+function mean(x::AbstractVector,mop::MultiOrthoPoly)
     nunc = length(mop.uni)
     x[1]*computeSP(zeros(Int64,nunc),mop)
 end
@@ -294,27 +297,27 @@ end
 """
 __Univariate__
 ```
-var(x::Vector{},op::AbstractOrthoPoly)
-var(x::Vector{},t2::Tensor)
+var(x::AbstractVector,op::AbstractOrthoPoly)
+var(x::AbstractVector,t2::Tensor)
 ```
 __Multivariate__
 ```
-var(x::Vector{},mop::MultiOrthoPoly)
-var(x::Vector{},t2::Tensor)
+var(x::AbstractVector,mop::MultiOrthoPoly)
+var(x::AbstractVector,t2::Tensor)
 ```
 compute variance of random variable with PCE `x`
 """
-function var(x::Vector{},op::AbstractOrthoPoly)
+function var(x::AbstractVector,op::AbstractOrthoPoly)
     t = computeSP2(op)
     # length(t2) > length(x) && throw(InconsistencyError("cannot compute variance; too many PCE coefficients"))
     sum( x[i]^2*t[i] for i in 2:length(x) )
 end
 
-function var(x::Vector{},t2::Tensor)
+function var(x::AbstractVector,t2::AbstractTensor)
     sum( x[i]^2*t2.get([i-1,i-1]) for i in 2:length(x) )
 end
 
-function var(x::Vector{},mop::MultiOrthoPoly)
+function var(x::AbstractVector,mop::MultiOrthoPoly)
     length(x) > size(mop.ind,1) && throw(InconsistencyError("cannot compute variance; too many PCE coefficients"))
     var(x,Tensor(2,mop))
 end
@@ -322,13 +325,13 @@ end
 """
 __Univariate__
 ```
-std(x::Vector{},op::AbstractOrthoPoly)
+std(x::AbstractVector,op::AbstractOrthoPoly)
 ```
 __Multivariate__
 ```
-std(x::Vector{},mop::MultiOrthoPoly)
+std(x::AbstractVector,mop::MultiOrthoPoly)
 ```
 compute standard deviation of random variable with PCE `x`
 """
-std(x::Vector{},op::AbstractOrthoPoly) = sqrt(var(x,op))
-std(x::Vector{},mop::MultiOrthoPoly) = sqrt(var(x,mop))
+std(x::AbstractVector,op::AbstractOrthoPoly) = sqrt(var(x,op))
+std(x::AbstractVector,mop::MultiOrthoPoly) = sqrt(var(x,mop))
