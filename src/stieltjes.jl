@@ -1,6 +1,6 @@
 export stieltjes, lanczos, mcdiscretization
 
-function removeZeroWeights(n::Vector{Float64},w::Vector{Float64})
+function removeZeroWeights(n::AbstractVector{<:Real},w::AbstractVector{<:Real})
     nw = [n w]
     inds = findall(w->abs(w)>=eps(), nw[:,2])
     # nw = sortrows(nw, by=x->x[1])
@@ -10,14 +10,14 @@ function removeZeroWeights(n::Vector{Float64},w::Vector{Float64})
 end
 
 """
-    stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)
+    stieltjes(N::Int,nodes_::AbstractVector{<:Real},weights_::AbstractVector{<:Real};removezeroweights::Bool=true)
 Stieltjes procedure---Given the nodes and weights the function
 generates the first`N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
 
 Set the Boolean `removezeroweights` to `true` if zero weights should be removed.
 """
-function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};removezeroweights::Bool=true)
+function stieltjes(N::Int,nodes_::AbstractVector{<:Real},weights_::AbstractVector{<:Real};removezeroweights::Bool=true)
     tiny = 10*floatmin()
     huge = 0.1*floatmax()
     α, β = zeros(Float64,N), zeros(Float64,N)
@@ -33,12 +33,12 @@ function stieltjes(N::Int64,nodes_::Vector{Float64},weights_::Vector{Float64};re
         p0 = p1
         p1 = p2
         @inbounds p2 = (nodes .- α[k]) .* p1 - β[k]*p0
-        s1 = dot(weights,p2.^2)
+        s1 = dot(weights, p2.^2)
         s2 = dot(nodes, weights.*p2.^2)
         # s1 = sum( weights[ν]*p2[ν]^2 for ν=1:Ncap )
         # s2 = sum( weights[ν]*nodes[ν]*p2[ν]^2 for ν=1:Ncap )
-        @assert abs(s1)>=tiny "Underflow in stieltjes() for k=$k; try using `removeZeroWeights`"
-        @assert maximum(abs.(p2))<=huge && abs(s2)<=huge "Overflow in stieltjes for k=$k"
+        abs(s1) < tiny && throw(DomainError(tiny, "Underflow in stieltjes() for k=$k; try using `removeZeroWeights`"))
+        !(maximum(abs.(p2))<=huge && abs(s2)<=huge) && throw(DomainError(huge, "Overflow in stieltjes for k=$k"))
         @inbounds α[k+1] = s2/s1
         @inbounds β[k+1] = s1/s0
         s0 = s1
@@ -48,7 +48,7 @@ end
 
 
 """
-    lanczos(N::Int64,nodes::Vector{Float64},weights::Vector{Float64};removezeroweights::Bool=true)
+    lanczos(N::Int,nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};removezeroweights::Bool=true)
 Lanczos procedure---given the nodes and weights the function
 generates the first `N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
@@ -60,17 +60,17 @@ W.B. Gragg and W.J. Harrod, *The numerically stable
 reconstruction of Jacobi matrices from spectral data*,
 Numer. Math. 44 (1984), 317-335.
 """
-function lanczos(N::Int64,nodes::Vector{Float64},weights::Vector{Float64};removezeroweights::Bool=true)
-    @assert length(nodes) == length(weights) > 0 "inconsistent number of nodes and weights"
+function lanczos(N::Int,nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};removezeroweights::Bool=true)
+    !(length(nodes) == length(weights) > 0) && throw(InconsistencyError("inconsistent number of nodes and weights"))
     nodes, weights = removezeroweights ? removeZeroWeights(nodes,weights) : (nodes, weights)
     Ncap = length(nodes)
-    (N<=0 || N>Ncap) && error("$N out of range")
+    (N<=0 || N>Ncap) && throw(DomainError(N, "out of range"))
     p0 = copy(nodes)
     p1 = zeros(Float64,Ncap);
     @inbounds p1[1] = first(weights)
     for n = 1:Ncap-1
       @inbounds pn = weights[n+1]
-      gam = 1.; sig = 0.; t = 0.;
+      gam, sig, t = 1., 0., 0.
       @inbounds xlam = nodes[n+1]
       for k = 1:n+1
         @inbounds ρ = p1[k] + pn
@@ -89,7 +89,7 @@ function lanczos(N::Int64,nodes::Vector{Float64},weights::Vector{Float64};remove
 end
 
 """
-    mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)
+    mcdiscretization(N::Int,quads::Vector{},discretemeasure::AbstractMatrix{<:Real}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)
 This routine returns ``N`` recurrence coefficients of the polynomials that are
 orthogonal relative to a weight function ``w`` that
 is decomposed as a sum of ``m`` weights ``w_i`` with domains ``[a_i,b_i]`` for ``i=1,\\dots,m``,
@@ -98,7 +98,7 @@ w(t) = \\sum_{i}^{m} w_i(t) \\quad \\text{with } \\operatorname{dom}(w_i) = [a_i
 ```
 For each weight ``w_i`` and its domain ``[a_i, b_i]`` the function `mcdiscretization()`
 expects a quadrature rule of the form
-    nodes::Vector{Float64}, weights::Vector{Float64} = my_quad_i(N::Int64)
+    nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real} = my_quad_i(N::Int)
 all of which are stacked in the parameter `quad`
     quad = [ my_quad_1, ..., my_quad_m ]
 If the weight function has a discrete part (specified by `discretemeasure`)
@@ -121,16 +121,16 @@ are available *for all* ``m`` weights ``w_i(t)`` with ``i = 1, \\dots, m``.
 For further information, please see W. Gautschi "Orthogonal Polynomials: Approximation
 and Computation", Section 2.2.4.
 """
-function mcdiscretization(N::Int64,quads::Vector{},discretemeasure::Matrix{Float64}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false,removezeroweights::Bool=false)
-    @assert Nmax>0 && Nmax>N "invalid choice of Nmax=$Nmax."
-    @assert ε>0 "invalid choice of ε = $ε"
-    @assert discretization in [stieltjes, lanczos] "unknown discretization $discretization"
-    @assert length(quads)>0 "no quadrature rule specified"
+function mcdiscretization(N::Int,quads::AbstractVector,discretemeasure::AbstractMatrix{<:Real}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false,removezeroweights::Bool=false)
+    !(Nmax>0 && Nmax>N) && throw(DomainError(Nmax, "invalid choice of Nmax=$Nmax"))
+    ε <= 0 && throw(DomainError(ε, "invalid choice of ε"))
+    discretization ∉ [stieltjes, lanczos] && throw(DomainError(discretization, "unknown discretization"))
+    length(quads) <= 0 && throw(InconsistencyError("no quadrature rule specified"))
     δ = !gaussquad ? 1 : 2
-    # δ::Int64=1
+    # δ::Int=1
     # gaussquad ? δ=2 : ()
     mc, mp = size(quads,1), size(discretemeasure,1)
-    Δ::Int64=1; kount::Int64=-1;
+    Δ, kount = 1, -1
     α, β, b = zeros(Float64,N), zeros(Float64,N), ones(Float64,N)
     Mi = floor(Int64,(2*N-1)/δ);
     while any(abs.(β-b).>ε*abs.(β))

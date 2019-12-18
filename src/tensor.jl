@@ -1,9 +1,9 @@
 export computeTensorizedSP
 
 function computeTensorizedSP(m::Int,
-                             α::Vector{<:Vector{<:Real}},β::Vector{<:Vector{<:Real}},
-                             nodes::Vector{<:Vector{<:Real}},weights::Vector{<:Vector{<:Real}},
-                             ind::Matrix{<:Int};
+                             α::AbstractVector{<:AbstractVector{<:Real}},β::AbstractVector{<:AbstractVector{<:Real}},
+                             nodes::AbstractVector{<:AbstractVector{<:Real}},weights::AbstractVector{<:AbstractVector{<:Real}},
+                             ind::AbstractMatrix{<:Int};
                              issymmetric::BitArray=falses(length(α)))
     m < 1 && throw(DomainError(m, "`dimension` has to be positive"))
     l,p = size(ind)
@@ -15,7 +15,7 @@ function computeTensorizedSP(m::Int,
     end
     return T
 end
-function computeTensorizedSP(m::Int, op::Vector{<:AbstractOrthoPoly}, ind::Matrix{<:Int})
+function computeTensorizedSP(m::Int, op::AbstractVector{<:AbstractOrthoPoly}, ind::AbstractMatrix{<:Int})
     α, β = coeffs(op)
     nodes, weights = nw(op)
     computeTensorizedSP(m, α, β, nodes, weights, ind; issymmetric=issymmetric.(op))
