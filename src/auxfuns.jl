@@ -56,10 +56,10 @@ function coeffs(op::AbstractOrthoPoly)
     [op.α op.β]
 end
 
-function coeffs(op::Vector{<:AbstractOrthoPoly})
+function coeffs(op::Array{<:AbstractOrthoPoly})
     a = [ p.α for p in op]
     b = [ p.β for p in op]
-    return a,b
+    return a, b
 end
 
 coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
@@ -89,7 +89,7 @@ function integrate(f::Function, nodes::AbstractVector{<:Real}, weights::Abstract
 end
 
 function integrate(f::Function, quad::AbstractQuad)
-    typeof(quad) == EmptyQuad && throw(DomainError(quad, "supplied an empty quadrature"))
+    typeof(quad) == typeof(EmptyQuad()) && throw(DomainError(quad, "supplied an empty quadrature"))
     integrate(f, quad.nodes, quad.weights)
 end
 
