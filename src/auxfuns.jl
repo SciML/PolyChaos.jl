@@ -18,7 +18,7 @@ deg(mop::MultiOrthoPoly) = mop.deg
 nw(q::EmptyQuad)
 nw(q::AbstractQuad)
 nw(opq::AbstractOrthoPoly)
-nw(opq::Vector{<:AbstractOrthoPoly})
+nw(opq::AbstractVector)
 nw(mop::MultiOrthoPoly)
 ```
 returns nodes and weights in matrix form
@@ -47,7 +47,7 @@ nw(mop::MultiOrthoPoly) = nw(mop.uni)
 """
 ```
 coeffs(op::AbstractOrthoPoly)
-coeffs(op::Vector{<:AbstractOrthoPoly})
+coeffs(op::AbstractVector)
 coeffs(mop::MultiOrthoPoly)
 ```
 returns recurrence coefficients of in matrix form
@@ -56,7 +56,7 @@ function coeffs(op::AbstractOrthoPoly)
     [op.α op.β]
 end
 
-function coeffs(op::AbstractArray)
+function coeffs(op::AbstractVector)
     a = [ p.α for p in op]
     b = [ p.β for p in op]
     return a, b

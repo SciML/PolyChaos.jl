@@ -11,8 +11,8 @@ function computeSP(a_::AbstractVector{<:Int},
     l, p = size(ind) # p-variate basis
     p == 1 && computeSP(a_,α[1],β[1],nodes[1],weights[1];issymmetric=issymmetric[1])
     l -= 1
-    maximum(a_) > l && throw(DomainError(maximum(a_), "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
-    !(length(α)==length(β)==length(nodes)==length(weights)==length(issymmetric)==p) && throm(InconsistencyError("inconsistent number of rec. coefficients and/or nodes/weights"))
+    maximum(a_) > l && throw(DomainError(maximum(a_), "not enough elements in multi-index (requested: $(maximum(a_)), max: $l)"))
+    !(length(α)==length(β)==length(nodes)==length(weights)==length(issymmetric)==p) && throw(InconsistencyError("inconsistent number of recurrence coefficients and/or nodes/weights"))
 
     a = Vector{Int64}()
 
@@ -57,7 +57,7 @@ computeSP( a::AbstractVector{<:Int},
            nodes::AbstractVector{<:AbstractVector{<:Real}},weights::AbstractVector{<:AbstractVector{<:Real}},
            ind::Matrix{<:Int};
            issymmetric::BitArray=falses(length(α)))
-computeSP(a::AbstractVector{<:Int},op::Vector{<:AbstractOrthoPoly},ind::Matrix{<:Int})
+computeSP(a::AbstractVector{<:Int},op::AbstractVector,ind::Matrix{<:Int})
 computeSP(a::AbstractVector{<:Int},mOP::MultiOrthoPoly)
 ```
 

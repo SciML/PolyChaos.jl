@@ -1,17 +1,17 @@
 export  r_scale,
         rm_logistic,
         rm_laguerre,
-        rm_logisticsum,
+        # rm_logisticsum,
         rm_hermite,
         rm_hermite_prob,
         rm_laguerre,
         rm_jacobi,
         rm_jacobi01,
-        rm_hahn,
+        # rm_hahn,
         rm_meixner_pollaczek,
         rm_legendre,
         rm_legendre01,
-        rm_chebyshev1,
+        # rm_chebyshev1,
         rm_compute
 """
     r_scale(c::Real,β::AbstractVector{<:Real},α::AbstractVector{<:Real})
@@ -48,28 +48,28 @@ end
 rm_compute(m::AbstractMeasure,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis,discretization::Function=stieltjes) = rm_compute(m.w,m.dom[1],m.dom[2],Npoly,Nquad,quadrature=quadrature,discretization=discretization)
 
 ##
-function rm_logisticsum(n::Int,p1::AbstractVector{<:Real},p2::AbstractVector{<:Real};Mmax::Int=100,eps0::Real=1e-9)
-    M0 = n
-    Mcap = 0
-    Mi = M0
-    α, β = zeros(n), zeros(n)
-    for i=1:Mmax
-        nai, wai = quadrature_logistic(Mi,p1[1],p1[2],0.5) # 0.5 is needed to make the weight function a density, i.e. integral is 1.
-        nbi, wbi = quadrature_logistic(Mi,p2[1],p2[2],0.5) # 0.5 is needed to make the weight function a density, i.e. integral is 1.
-        ni, wi   = [nai; nbi], [wai; wbi]
-        α_, β_ = stieltjes(n,ni,wi)
-        err = maximum( abs(β_[k]-β[k])/β_[k] for k=1:n )
-        # display("err = $err")
-        if err<=eps0
-            Mcap = i-1
-            return α_, β_
-        else
-            α, β, = α_, β_
-            i==1 ? Mi = M0+1 : Mi = Int(2^(floor((i-1)/5))*n)
-        end
-    end
-    warn("Algorithm did not terminate after $Mmax iterations.")
-end
+# function rm_logisticsum(n::Int,p1::AbstractVector{<:Real},p2::AbstractVector{<:Real};Mmax::Int=100,eps0::Real=1e-9)
+#     M0 = n
+#     Mcap = 0
+#     Mi = M0
+#     α, β = zeros(n), zeros(n)
+#     for i=1:Mmax
+#         nai, wai = quadrature_logistic(Mi,p1[1],p1[2],0.5) # 0.5 is needed to make the weight function a density, i.e. integral is 1.
+#         nbi, wbi = quadrature_logistic(Mi,p2[1],p2[2],0.5) # 0.5 is needed to make the weight function a density, i.e. integral is 1.
+#         ni, wi   = [nai; nbi], [wai; wbi]
+#         α_, β_ = stieltjes(n,ni,wi)
+#         err = maximum( abs(β_[k]-β[k])/β_[k] for k=1:n )
+#         # display("err = $err")
+#         if err<=eps0
+#             Mcap = i-1
+#             return α_, β_
+#         else
+#             α, β, = α_, β_
+#             i==1 ? Mi = M0+1 : Mi = Int(2^(floor((i-1)/5))*n)
+#         end
+#     end
+#     warn("Algorithm did not terminate after $Mmax iterations.")
+# end
 
 """
     rm_logistic(N::Int)
