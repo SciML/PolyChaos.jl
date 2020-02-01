@@ -23,7 +23,7 @@ nw(mop::MultiOrthoPoly)
 ```
 returns nodes and weights in matrix form
 """
-nw(quad::EmptyQuad) = Array{Float64}(undef,0,2)
+nw(quad::typeof(EmptyQuad())) = Array{Float64}(undef,0,2)
 
 function nw(quad::AbstractQuad)
     [quad.nodes quad.weights]
@@ -37,7 +37,7 @@ function nw(quads::Vector{<:AbstractQuad})
     return nodes, weights
 end
 
-function nw(ops::Vector{<:AbstractOrthoPoly})
+function nw(ops::AbstractVector)
     quad = [ op.quad for op in ops ]
     nw(quad)
 end
@@ -56,7 +56,7 @@ function coeffs(op::AbstractOrthoPoly)
     [op.α op.β]
 end
 
-function coeffs(op::Array{<:AbstractOrthoPoly})
+function coeffs(op::AbstractArray)
     a = [ p.α for p in op]
     b = [ p.β for p in op]
     return a, b

@@ -15,18 +15,18 @@ function computeTensorizedSP(m::Int,
     end
     return T
 end
-function computeTensorizedSP(m::Int, op::AbstractVector{<:AbstractOrthoPoly}, ind::AbstractMatrix{<:Int})
+function computeTensorizedSP(m::Int, op::AbstractVector, ind::AbstractMatrix{<:Int})
     α, β = coeffs(op)
     nodes, weights = nw(op)
     computeTensorizedSP(m, α, β, nodes, weights, ind; issymmetric=issymmetric.(op))
 end
 
 function computeTensorizedSP(m::Int, mop::MultiOrthoPoly)
-    any([typeof(op.quad) == EmptyQuad for op in mop.uni]) && throw(InconsistencyError("at least one quadrature rule missing"))
+    any([typeof(op.quad) == typeof(EmptyQuad()) for op in mop.uni]) && throw(InconsistencyError("at least one quadrature rule missing"))
     computeTensorizedSP(m, mop.uni, mop.ind)
 end
 
 function computeTensorizedSP(m::Int, op::AbstractOrthoPoly)
-    typeof(op.quad) == EmptyQuad && throw(InconsistencyError("no quadrature rule provided"))
+    typeof(op.quad) == typeof(EmptyQuad()) && throw(InconsistencyError("no quadrature rule provided"))
     computeTensorizedSP(m, [op], calculateMultiIndices(1, deg(op)))
 end

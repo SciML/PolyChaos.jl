@@ -36,7 +36,7 @@ function computeSP(a_::AbstractVector{<:Int},
     return val
 end
 
-function computeSP(a::AbstractVector{<:Int}, op::Vector{<:AbstractOrthoPoly}, ind::Matrix{<:Int})
+function computeSP(a::AbstractVector{<:Int}, op::AbstractVector, ind::Matrix{<:Int})
     α, β = coeffs(op)
     nodes, weights = nw(op)
     computeSP(a, α, β, nodes, weights, ind; issymmetric=issymmetric.(op))

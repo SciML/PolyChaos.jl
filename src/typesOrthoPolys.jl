@@ -257,13 +257,13 @@ end
 # #####################################################
 # #####################################################
 
-struct MultiOrthoPoly{M, Q} <: AbstractOrthoPoly{M, Q}
+struct MultiOrthoPoly{M, Q, V<:AbstractVector} <: AbstractOrthoPoly{M, Q}
 name::Vector{String}
 deg::Int
 dim::Int
 ind::Matrix{Int} # multi-index
 measure::ProductMeasure
-uni
+uni::V
     function MultiOrthoPoly(uniOrthoPolys, deg::Int)
       degs = [ op.deg for op in uniOrthoPolys ]
       deg > minimum(degs) && throw(DomainError(deg, "Requested degree $deg is greater than smallest univariate degree $(minimum(degs))."))
@@ -276,6 +276,6 @@ uni
       ind = calculateMultiIndices(length(uniOrthoPolys), deg)
       dim = size(ind,1)
 
-      new{typeof(measure), typeof(first(uniOrthoPolys).quad)}(names, deg, dim, ind, measure, uniOrthoPolys)
+      new{typeof(measure), typeof(first(uniOrthoPolys).quad), typeof(uniOrthoPolys)}(names, deg, dim, ind, measure, uniOrthoPolys)
     end
 end
