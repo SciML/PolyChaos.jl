@@ -272,10 +272,20 @@ uni::V
       measures = [ op.measure for op in uniOrthoPolys ]
       measure = ProductMeasure(w, measures)
 
-      names = [ hasfield(typeof(op), :name) ? op.name : string(typeof(op)) for op in uniOrthoPolys ]
+        
+      names = 
+        if VERSION >= v"1.2.0"
+            [ hasfield(typeof(op), :name) ? op.name : string(typeof(op)) for op in uniOrthoPolys ]
+        else
+            [ :name in fieldnames(typeof(op)) ? op.name : string(typeof(op)) for op in uniOrthoPolys ]
+        end
       ind = calculateMultiIndices(length(uniOrthoPolys), deg)
       dim = size(ind,1)
 
       new{typeof(measure), typeof(first(uniOrthoPolys).quad), typeof(uniOrthoPolys)}(names, deg, dim, ind, measure, uniOrthoPolys)
     end
+end
+
+function _hasfield(op::AbstractOrthoPoly, name::Symbol)
+    name in fieldnames(op)
 end
