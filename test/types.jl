@@ -92,7 +92,7 @@ mop = MultiOrthoPoly([GaussOrthoPoly(deg; Nrec=3*deg), LogisticOrthoPoly(deg; Nr
     for m in M, op in [opq, mop]
         tensor = Tensor(m,op)
         for ind in Iterators.product([collect(0:deg) for i=1:m]...)
-            @test isapprox(tensor.get(collect(ind)), computeSP(collect(ind),op); atol = tol)
+            @test isapprox(tensor.get(collect(ind)), computeSP(collect(ind), op); atol = tol)
         end
     end
 end

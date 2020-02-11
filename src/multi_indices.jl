@@ -16,21 +16,21 @@ function calculateMultiIndices(d::Int, n::Int)
   inds = vcat(zeros(Int64,1,d),Matrix(1I,d,d),zeros(Int64, No-d-1, d));  #initiate index matrix for basis
   pi=ones(Int64,No,d);
 
-  for k=2:No
+  for k in 2:No
     g = 0;
-    for l=1:d
+    for l in 1:d
       pi[k,l]=sum(pi[k-1,:])-g;
       g=g+pi[k-1,l];
     end
   end
 
-  P=d+1;
-  for k=2:n
+  P = d + 1;
+  for k in 2:n
     L = P;
-    for j=1:d, m=L-pi[k,j]+1:L
-        P=P+1;
-        inds[P,:]=inds[m,:];
-        inds[P,j]=inds[P,j]+1;
+    for j in 1:d, m in L-pi[k,j]+1:L
+        P += 1;
+        inds[P,:] = inds[m,:];
+        inds[P,j] = inds[P,j]+1;
     end
   end
 
@@ -48,32 +48,19 @@ function numberPolynomials(d::Int64, n::Int64)
 end
 
 """
-    findUnivariateIndices(i::Int64,ind::Matrix{Int64})::Vector{Int64}
+    findUnivariateIndices(i::Int,ind::AbstractMatrix{Int64,2})
 Given the multi-index `ind` this function returns all entries of the multivariate basis
 that correspond to the `i`th univariate basis.
 """
-function findUnivariateIndices(i::Int64,ind::Matrix{Int64})::Vector{Int64}
+function findUnivariateIndices(i::Int,ind::AbstractMatrix{Int})
   l,p = size(ind)
-  @assert i<=p "basis is $p-variate, you requested $i-variate"
+  i > p && throw(DomainError((i,p), "basis is $p-variate, you requested $i-variate"))
   deg = ind[end,end]
-  @assert deg>=0 "invalid degree"
+  deg < 0 && throw(DomainError(deg, "invalid degree"))
   col = ind[:,i]
   myind = zeros(Int64,deg)
-  for deg_ = 1:deg
+  for deg_ in 1:deg
       myind[deg_] = findfirst(x->x==deg_,col)
   end
   pushfirst!(myind,1)
 end
-
-#################################################################
-# function calculateMultiIndices_interaction(nξ::Int,deg::Int,j::Int,p::Int)
-#     inds = calculateMultiIndices(nξ,deg)
-#     get_interaction(inds,j,p)
-# end
-
-# function get_interaction(inds::Matrix{Int},j::Int,p::Int)
-#     j < 0 && throw(error("interaction order must be non-negative"))
-#     j > size(inds,2) && throw(error("interaction order cannot be greater than number of uncertainties"))
-#     Iterators.filter(x -> count(!iszero,x) == j && sum(x) == p, eachrow(inds))
-#     # alternative -> collect
-# end

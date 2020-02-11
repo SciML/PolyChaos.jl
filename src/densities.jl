@@ -42,7 +42,7 @@ function w_genhermite(t,μ)
 end
 
 function build_w_genlaguerre(a)
-    return t->w_genlaguerre(t,a)
+    return t -> w_genlaguerre(t,a)
 end
 
 function w_laguerre(t)

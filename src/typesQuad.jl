@@ -3,28 +3,27 @@ export  EmptyQuad,
 
 
 
-struct Quad <: AbstractQuad
-    name::String              # name of quadrature
-    Nquad::Int              # number of qudrature points
-    nodes::Vector{<:Real}
-    weights::Vector{<:Real}
+struct Quad{T, V<:AbstractVector{<:T}} <: AbstractQuad{T}
+    name::String
+    Nquad::Int # number of qudrature points
+    nodes::V
+    weights::V
 
-    function Quad(name::String, N::Int, nodes::Vector{<:Real}, weights::Vector{<:Real})
+    function Quad(name::String, N::Int, nodes, weights)
         N <= 0 && throw(DomainError(N,"number of qudrature points has to be positive"))
         !(length(nodes) == length(weights)) && throw(InconsistencyError("inconsistent numbers of nodes and weights"))
-        new(lowercase(name), N, nodes, weights)
+        new{promote_type(eltype(nodes), eltype(weights)), promote_type(typeof(nodes), typeof(weights))}(lowercase(name), N, nodes, weights)
     end
 end
 
-struct EmptyQuad <: AbstractQuad
-    EmptyQuad() = new()
+struct EmptyQuad{T} <: AbstractQuad{T}
+    EmptyQuad() = new{Float64}()
 end
 
 # general constructor
-function Quad(N::Int, α::Vector{<:Real}, β::Vector{<:Real})
+function Quad(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
     !(length(α) == length(β)) && throw(InconsistencyError("inconsistent numbers of recurrence coefficients"))
-    !(N <= length(α) - 1) && throw(DomainError(N),"requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients")
-
+    !(N <= length(α) - 1) && throw(DomainError(N,"requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"))
     nodes, weights = gauss(N,α,β)
     Quad("golubwelsch", N, nodes, weights)
 end
