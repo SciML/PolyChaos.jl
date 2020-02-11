@@ -73,20 +73,20 @@ julia> deg = 4
 4
 
 julia> op = GaussOrthoPoly(deg)
-GaussOrthoPoly(4, [0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 3.0, 4.0], GaussMeasure(PolyChaos.w_gaussian, (-Inf, Inf), true), Quad("golubwelsch", 4, [-2.33441, -0.741964, 0.741964, 2.33441], [0.0458759, 0.454124, 0.454124, 0.0458759]))
+GaussOrthoPoly{Array{Float64,1},GaussMeasure,Quad{Float64,Array{Float64,1}}}(4, [0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 3.0, 4.0], GaussMeasure(PolyChaos.w_gaussian, (-Inf, Inf), true), Quad{Float64,Array{Float64,1}}("golubwelsch", 4, [-2.3344142183389778, -0.7419637843027257, 0.7419637843027258, 2.3344142183389778], [0.04587585476806844, 0.45412414523193134, 0.45412414523193106, 0.04587585476806852]))
 
 julia> show(op)
 
 Univariate orthogonal polynomials
-degree:     4
-#coeffs:    5
-α =     [0.0, 0.0, 0.0, 0.0, 0.0]
-β =     [1.0, 1.0, 2.0, 3.0, 4.0]
+degree:         4
+#coeffs:        5
+α =             [0.0, 0.0, 0.0, 0.0, 0.0]
+β =             [1.0, 1.0, 2.0, 3.0, 4.0]
 
 Measure dλ(t)=w(t)dt
-w:  PolyChaos.w_gaussian
+w:      w_gaussian
 dom:    (-Inf, Inf)
-symmetric:  true
+symmetric:      true
 
 ```
 
@@ -113,20 +113,21 @@ This is why `Nrec` is a keyword for the constructor `OrthoPoly`.
 julia> N = 100
 100
 
-julia> opLogistic = LogisticOrthoPoly(deg; Nrec=N);
+julia> opLogistic = LogisticOrthoPoly(deg; Nrec=N)
+LogisticOrthoPoly{Array{Float64,1},LogisticMeasure,Quad{Float64,Array{Float64,1}}}(4, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 3.289868133696453, 10.527578027828648, 22.841084471092515, 40.10505915363294, 62.30810859273584, 89.4476035231595, 121.52266752315666, 158.53293971318436, 200.47824915030117  …  19986.565781520196, 20433.165380253333, 20884.69978120051, 21341.168984361153, 21802.572989734712, 22268.91179732067, 22740.185407118537, 23216.393819127847, 23697.53703334815, 24183.61504977904], LogisticMeasure(PolyChaos.w_logistic, (-Inf, Inf), true), Quad{Float64,Array{Float64,1}}("golubwelsch", 99, [-285.97091675697385, -266.56611354854135, -251.01698966393153, -237.53179686807928, -225.4187633699017, -214.31820469129195, -204.0126795649811, -194.35793540921836, -185.25200558110012, -176.61940782973926  …  176.61940782973895, 185.25200558110018, 194.35793540921847, 204.01267956498108, 214.31820469129212, 225.4187633699016, 237.53179686807948, 251.01698966393138, 266.56611354854135, 285.9709167569736], [1.4541663108207099e-123, 2.897917000559268e-115, 1.3858976222735606e-108, 8.826460482953542e-103, 1.4618715331286334e-97, 8.935651454381735e-93, 2.49282531464423e-88, 3.6557113389197252e-84, 3.1147999002113552e-80, 1.660700338355251e-76  …  1.6607003383554774e-76, 3.1147999002111335e-80, 3.6557113389195227e-84, 2.492825314644278e-88, 8.935651454380596e-93, 1.461871533128785e-97, 8.826460482953113e-103, 1.3858976222735651e-108, 2.8979170005595435e-115, 1.4541663108207404e-123]))
 
 julia> show(opLogistic)
 
 Univariate orthogonal polynomials
-degree:     4
-#coeffs:    100
-α =     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]...
-β =     [1.0, 3.28987, 10.5276, 22.8411, 40.1051, 62.3081, 89.4476]...
+degree:         4
+#coeffs:        100
+α =             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]...
+β =             [1.0, 3.289868133696453, 10.527578027828648, 22.841084471092515, 40.10505915363294, 62.30810859273584, 89.4476035231595]...
 
 Measure dλ(t)=w(t)dt
-w:  PolyChaos.w_logistic
+w:      w_logistic
 dom:    (-Inf, Inf)
-symmetric:  true
+symmetric:      true
 
 ```
 
@@ -134,7 +135,7 @@ Let's check whether we truly have more coefficients:
 
 
 ```jldoctest mylabel
-julia> size(coeffs(opLogistic),1)==N
+julia> size(coeffs(opLogistic),1) == N
 true
 ```
 
@@ -145,12 +146,13 @@ First, we define the measure by specifying a name, the weight, the support, symm
 
 ```jldoctest mylabel
 julia> supp = (-1, 1)
+(-1, 1)
 
 julia> w(t) = 1 + t
 w (generic function with 1 method)
 
 julia> my_meas = Measure("my_meas", w, supp, false, Dict())
-Measure("my_meas", w, (-1, 1), false, Dict{Any,Any}())
+Measure("my_meas", w, (-1.0, 1.0), false, Dict{Any,Any}())
 ```
 
 Notice: it is advisable to define the weight such that an error is thrown for arguments outside of the support.
@@ -165,16 +167,16 @@ julia> my_op = OrthoPoly("my_op", deg, my_meas; Nquad=200);
 julia> show(my_op)
 
 Univariate orthogonal polynomials
-degree:     4
-#coeffs:    5
-α =     [0.333333, 0.0666667, 0.0285714, 0.015873, 0.010101]
-β =     [2.0, 0.222222, 0.24, 0.244898, 0.246914]
+degree:         4
+#coeffs:        5
+α =             [0.3333333333333335, 0.06666666666666644, 0.028571428571428848, 0.015873015873015657, 0.010101010101010171]
+β =             [2.0, 0.2222222222222223, 0.23999999999999996, 0.24489795918367344, 0.2469135802469136]
 
 Measure dλ(t)=w(t)dt
 name:   my_meas
-w:  w
-dom:    (-1, 1)
-symmetric:  false
+w:      w
+dom:    (-1.0, 1.0)
+symmetric:      false
 pars:   Dict{Any,Any}()
 
 ```
@@ -232,20 +234,20 @@ julia> mop = MultiOrthoPoly(ops, d);
 julia> show(mop)
 
 4-variate orthogonal polynomials
-name:       GaussOrthoPoly
-        Uniform01OrthoPoly
-        Beta01OrthoPoly
-        my_op
-deg:        3
-dim:        35
-ind:        [0, 0, 0, 0]
-        [1, 0, 0, 0]
-        [0, 1, 0, 0]
-        [0, 0, 1, 0]
-        [0, 0, 0, 1]
-        [2, 0, 0, 0]
-        [1, 1, 0, 0]
-        ...
+name:           GaussOrthoPoly{Array{Float64,1},GaussMeasure,Quad{Float64,Array{Float64,1}}}
+                Uniform01OrthoPoly{Array{Float64,1},Uniform01Measure,Quad{Float64,Array{Float64,1}}}
+                Beta01OrthoPoly{Array{Float64,1},Beta01Measure,Quad{Float64,Array{Float64,1}}}
+                my_op
+deg:            3
+dim:            35
+ind:            [0, 0, 0, 0]
+                [1, 0, 0, 0]
+                [0, 1, 0, 0]
+                [0, 0, 1, 0]
+                [0, 0, 0, 1]
+                [2, 0, 0, 0]
+                [1, 1, 0, 0]
+                ...
 
 false
 

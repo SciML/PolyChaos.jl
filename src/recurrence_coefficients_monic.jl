@@ -11,7 +11,7 @@ export  r_scale,
         rm_meixner_pollaczek,
         rm_legendre,
         rm_legendre01,
-        # rm_chebyshev1,
+        rm_chebyshev1,
         rm_compute
 """
     r_scale(c::Real,β::AbstractVector{<:Real},α::AbstractVector{<:Real})
@@ -222,21 +222,22 @@ end
 rm_meixner_pollaczek(N::Int,lambda::Real) = rm_meixner_pollaczek(N,lambda,pi/2)
 
 
+function rm_chebyshev1(N::Int)
+    @assert N>=0 "N has to be non-negative"
+    α = zeros(Float64,N)
+    if N == 1
+        return α, [pi]
+    elseif N == 2
+        return α, [pi; 0.5]
+    else
+        return α, pushfirst!(pushfirst!(0.25*ones(N-2),0.5),pi)
+    end
+end
+
 ###################################################################
 ###################################################################
 ###################################################################
 
-# function rm_chebyshev1(N::Int)
-#     @assert N>=0 "N has to be non-negative"
-#     α = zeros(Float64,N)
-#     if N == 1
-#         return α, [pi]
-#     elseif N == 2
-#         return α, [pi; 0.5]
-#     else
-#         return α, pushfirst!(pushfirst!(0.25*ones(N-2),0.5),pi)
-#     end
-# end
 #     rm_hahn(N::Int,a::Real,b::Real)
 #     rm_hahn(N::Int,a::Real)
 #     rm_hahn(N::Int)

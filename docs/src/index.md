@@ -50,10 +50,23 @@ Exploiting the underlying uniform measure, the integration can be done exactly w
 julia> using PolyChaos
 
 julia> opq = Uniform01OrthoPoly(3, addQuadrature = true)
-Uniform01OrthoPoly(3, [0.5, 0.5, 0.5, 0.5], [1.0, 0.0833333, 0.0666667, 0.0642857], Uniform01Measure(PolyChaos.w_uniform01, (0, 1), true), Quad("golubwelsch", 3, [0.112702, 0.5, 0.887298], [0.277778, 0.444444, 0.277778]))
+Uniform01OrthoPoly{Array{Float64,1},Uniform01Measure,Quad{Float64,Array{Float64,1}}}(3, [0.5, 0.5, 0.5, 0.5], [1.0, 0.08333333333333333, 0.06666666666666667, 0.06428571428571428], Uniform01Measure(PolyChaos.w_uniform01, (0.0, 1.0), true), Quad{Float64,Array{Float64,1}}("golubwelsch", 3, [0.11270166537925838, 0.49999999999999994, 0.8872983346207417], [0.2777777777777777, 0.4444444444444444, 0.27777777777777757]))
 
 julia> integrate(x -> 6x^5, opq)
 0.9999999999999993
+
+julia> show(opq)
+
+Univariate orthogonal polynomials
+degree:         3
+#coeffs:        4
+α =             [0.5, 0.5, 0.5, 0.5]
+β =             [1.0, 0.08333333333333333, 0.06666666666666667, 0.06428571428571428]
+
+Measure dλ(t)=w(t)dt
+w:      w_uniform01
+dom:    (0.0, 1.0)
+symmetric:      true
 ```
 
 To get going with PolyChaos check out the tutorials such as the one on [numerical integration](@ref NumericalIntegration).

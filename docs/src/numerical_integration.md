@@ -21,7 +21,7 @@ julia> variant0 = integrate(f, op)
 0.4596976941320484
 
 julia> print("Numerical error: $(abs(1 - cos(1) - variant0))")
-Numerical error: 1.8818280267396403e-13
+Numerical error: 1.8868240303504535e-13
 ```
 with negligible numerical errors.
 
@@ -38,14 +38,16 @@ Now we define a measure, specifically the uniform measure $\mathrm{d}\lambda(t) 
 This measure can be defined using the composite type `Uniform01Measure`:
 ```jldoctest mylabel
 julia> measure = Uniform01Measure()
-Uniform01Measure(PolyChaos.w_uniform01, (0, 1), true)
+Uniform01Measure(PolyChaos.w_uniform01, (0.0, 1.0), true)
 ```
 Next, we need to compute the quadrature rule relative to the uniform measure.
 To do this we use the composite type `Quad`.
 
 ```jldoctest mylabel
 julia> quadRule1 = Quad(n-1, measure)
-Quad("quadgp", 4, [1.0, 0.853553, 0.5, 0.146447, 0.0], [0.0333333, 0.266667, 0.4, 0.266667, 0.0333333])
+┌ Warning: For measures of type Uniform01Measure the quadrature rule should be based on the recurrence coefficients.
+└ @ PolyChaos ~/Documents/Code/JuliaDev/PolyChaos/src/typesQuad.jl:58
+Quad{Float64,Array{Float64,1}}("quadgp", 4, [1.0, 0.8535533905932737, 0.5, 0.14644660940672627, 0.0], [0.033333333333333354, 0.26666666666666666, 0.4, 0.26666666666666666, 0.033333333333333354])
 
 julia> nw(quadRule1)
 5×2 Array{Float64,2}:
@@ -73,7 +75,7 @@ Let's take a closer look
 First, we compute the orthogonal polynomials using the composite type `OrthoPoly`, and we set the keyword `addQuadrature` to `false`.
 ```jldoctest mylabel
 julia> op = Uniform01OrthoPoly(n, addQuadrature=false)
-Uniform01OrthoPoly(5, [0.5, 0.5, 0.5, 0.5, 0.5, 0.5], [1.0, 0.0833333, 0.0666667, 0.0642857, 0.0634921, 0.0631313], Uniform01Measure(PolyChaos.w_uniform01, (0, 1), true), EmptyQuad())
+Uniform01OrthoPoly{Array{Float64,1},Uniform01Measure,EmptyQuad{Float64}}(5, [0.5, 0.5, 0.5, 0.5, 0.5, 0.5], [1.0, 0.08333333333333333, 0.06666666666666667, 0.06428571428571428, 0.06349206349206349, 0.06313131313131314], Uniform01Measure(PolyChaos.w_uniform01, (0.0, 1.0), true), EmptyQuad{Float64}())
 ```
 Note how `op` has a field `EmptyQuad`, i.e. we computed no quadrature rule.
 The resulting system of orthogonal polynomials is characterized by its recursion coefficients $(\alpha, \beta)$, which can be extracted with the function `coeffs()`.
@@ -90,7 +92,7 @@ julia> coeffs(op)
 Now, the quadrature rule can be constructed based on `op`, and the integral be solved.
 ```jldoctest mylabel
 julia> quadRule2 = Quad(n, op)
-Quad("golubwelsch", 5, [0.0469101, 0.230765, 0.5, 0.769235, 0.95309], [0.118463, 0.239314, 0.284444, 0.239314, 0.118463])
+Quad{Float64,Array{Float64,1}}("golubwelsch", 5, [0.046910077030667935, 0.23076534494715842, 0.49999999999999994, 0.7692346550528418, 0.9530899229693321], [0.11846344252809445, 0.23931433524968332, 0.28444444444444444, 0.23931433524968337, 0.1184634425280949])
 
 julia> nw(quadRule2)
 5×2 Array{Float64,2}:

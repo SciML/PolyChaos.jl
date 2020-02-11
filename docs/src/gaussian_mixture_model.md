@@ -20,7 +20,7 @@ using QuadGK
 T2num_2 = [quadgk(x -> evaluate(i,x,op)*evaluate(j,x,op)*ρ(x),-Inf,Inf)[1] for i in 0:deg, j in 0:deg ]
 T2num_1 - T2num_2
 ```
-# Gaussian mixture models
+# Gaussian Mixture Models
 Gaussian mixture models are popular for clustering data.
 Generally speaking, they are continuous random variables with a special probability density, namely
 ```math
