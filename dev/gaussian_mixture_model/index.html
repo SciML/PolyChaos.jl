@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Gaussian mixture models · PolyChaos.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="../index.html"><img class="logo" src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><h1>PolyChaos.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Overview</a></li><li><a class="toctext" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="toctext">Usage</span><ul><li><a class="toctext" href="../numerical_integration/">Numerical Integration</a></li><li><a class="toctext" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="toctext" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li class="current"><a class="toctext" href>Gaussian mixture models</a><ul class="internal"></ul></li><li><a class="toctext" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="toctext" href="../scalar_products/">Computation of Scalar Products</a></li><li><span class="toctext">Polynomial Chaos</span><ul><li><a class="toctext" href="../pce_tutorial/">Basic Usage</a></li><li><a class="toctext" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="toctext" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="toctext" href="../random_ode/">Random ODE</a></li></ul></li><li><a class="toctext" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="toctext" href="../math/">Mathematical Background</a></li><li><a class="toctext" href="../functions/">Functions</a></li></ul></nav><article id="docs"><header><nav><ul><li>Usage</li><li><a href>Gaussian mixture models</a></li></ul><a class="edit-page" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/gaussian_mixture_model.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Gaussian mixture models</span><a class="fa fa-bars" href="#"></a></div></header><div></div><h1><a class="nav-anchor" id="Gaussian-mixture-models-1" href="#Gaussian-mixture-models-1">Gaussian mixture models</a></h1><p>Gaussian mixture models are popular for clustering data. Generally speaking, they are continuous random variables with a special probability density, namely</p><div>\[\rho(x) = \sum_{i = 1}^{n} \frac{w_i}{\sqrt{2 \pi \sigma_i^2}} \exp \left( \frac{(x - \mu_i)^2}{2 \sigma_i^2} \right) \quad \text{with} \quad \sum_{i = 1}^n w_i = 1,\]</div><p>where the pairs of means and standard deviations <span>$(\mu_i, \sigma_i)$</span>, and the weights <span>$w_i$</span> for all <span>$i \in \{ 1, \dots, n \}$</span> are given. Let&#39;s consider a simple example.</p><pre><code class="language-julia">using Plots
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Gaussian Mixture Models · PolyChaos.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">PolyChaos.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Overview</a></li><li><a class="tocitem" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="tocitem">Usage</span><ul><li><a class="tocitem" href="../numerical_integration/">Numerical Integration</a></li><li><a class="tocitem" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="tocitem" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li class="is-active"><a class="tocitem" href>Gaussian Mixture Models</a></li><li><a class="tocitem" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="tocitem" href="../scalar_products/">Computation of Scalar Products</a></li><li><input class="collapse-toggle" id="menuitem-3-7" type="checkbox"/><label class="tocitem" for="menuitem-3-7"><span class="docs-label">Polynomial Chaos</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../pce_tutorial/">Basic Usage</a></li><li><a class="tocitem" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="tocitem" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="tocitem" href="../random_ode/">Random ODE</a></li></ul></li><li><a class="tocitem" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="tocitem" href="../math/">Mathematical Background</a></li><li><a class="tocitem" href="../functions/">Functions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Usage</a></li><li class="is-active"><a href>Gaussian Mixture Models</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Gaussian Mixture Models</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/gaussian_mixture_model.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Gaussian-Mixture-Models-1"><a class="docs-heading-anchor" href="#Gaussian-Mixture-Models-1">Gaussian Mixture Models</a><a class="docs-heading-anchor-permalink" href="#Gaussian-Mixture-Models-1" title="Permalink"></a></h1><p>Gaussian mixture models are popular for clustering data. Generally speaking, they are continuous random variables with a special probability density, namely</p><div>\[\rho(x) = \sum_{i = 1}^{n} \frac{w_i}{\sqrt{2 \pi \sigma_i^2}} \exp \left( \frac{(x - \mu_i)^2}{2 \sigma_i^2} \right) \quad \text{with} \quad \sum_{i = 1}^n w_i = 1,\]</div><p>where the pairs of means and standard deviations <span>$(\mu_i, \sigma_i)$</span>, and the weights <span>$w_i$</span> for all <span>$i \in \{ 1, \dots, n \}$</span> are given. Let&#39;s consider a simple example.</p><pre><code class="language-julia">using Plots
 f(x,μ,σ) = 1 / sqrt(2*π*σ^2) * exp(-(x - μ)^2 / (2σ^2))
 μs, σs, ws = [1., 1.7], [0.2, 0.3], [0.5, 0.5]
 ρ(x) = sum(w*f(x, μ, σ) for (μ, σ, w) in zip(μs, σs, ws))
@@ -8,120 +8,120 @@ plot(x, ρ.(x))
 xlabel!(&quot;x&quot;); ylabel!(&quot;rho(x)&quot;);</code></pre><?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="400" viewBox="0 0 2400 1600">
 <defs>
-  <clipPath id="clip2600">
+  <clipPath id="clip0100">
     <rect x="0" y="0" width="2400" height="1600"/>
   </clipPath>
 </defs>
-<polygon clip-path="url(#clip2600)" points="
-0,1600 2400,1600 2400,0 0,0 
+<path clip-path="url(#clip0100)" d="
+M0 1600 L2400 1600 L2400 0 L0 0  Z
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip2601">
+  <clipPath id="clip0101">
     <rect x="480" y="0" width="1681" height="1600"/>
   </clipPath>
 </defs>
-<polygon clip-path="url(#clip2600)" points="
-102.74,1505.26 2352.76,1505.26 2352.76,47.2441 102.74,47.2441 
+<path clip-path="url(#clip0100)" d="
+M102.74 1505.26 L2352.76 1505.26 L2352.76 47.2441 L102.74 47.2441  Z
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip2602">
+  <clipPath id="clip0102">
     <rect x="102" y="47" width="2251" height="1459"/>
   </clipPath>
 </defs>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   166.42,1505.26 166.42,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   873.972,1505.26 873.972,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   1581.52,1505.26 1581.52,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   2289.08,1505.26 2289.08,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   102.74,1464 2352.76,1464 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   102.74,1134.41 2352.76,1134.41 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   102.74,804.815 2352.76,804.815 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   102.74,475.222 2352.76,475.222 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   102.74,145.629 2352.76,145.629 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   102.74,1505.26 2352.76,1505.26 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   102.74,1505.26 102.74,47.2441 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  166.42,1505.26 166.42,1483.39 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  166.42,1505.26 166.42,1487.76 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  873.972,1505.26 873.972,1483.39 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  873.972,1505.26 873.972,1487.76 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  1581.52,1505.26 1581.52,1483.39 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1581.52,1505.26 1581.52,1487.76 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  2289.08,1505.26 2289.08,1483.39 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2289.08,1505.26 2289.08,1487.76 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,1464 136.49,1464 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,1464 129.74,1464 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,1134.41 136.49,1134.41 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,1134.41 129.74,1134.41 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,804.815 136.49,804.815 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,804.815 129.74,804.815 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,475.222 136.49,475.222 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,475.222 129.74,475.222 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  102.74,145.629 136.49,145.629 
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,145.629 129.74,145.629 
   "/>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 166.42, 1559.26)" x="166.42" y="1559.26">0</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 873.972, 1559.26)" x="873.972" y="1559.26">1</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1581.52, 1559.26)" x="1581.52" y="1559.26">2</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2289.08, 1559.26)" x="2289.08" y="1559.26">3</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 1481.5)" x="78.7402" y="1481.5">0.00</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 1151.91)" x="78.7402" y="1151.91">0.25</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 822.315)" x="78.7402" y="822.315">0.50</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 492.722)" x="78.7402" y="492.722">0.75</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 163.129)" x="78.7402" y="163.129">1.00</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1227.75, 1639.12)" x="1227.75" y="1639.12">x</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, -50.4901, 776.252)" x="-50.4901" y="776.252">rho(x)</text>
 </g>
-<polyline clip-path="url(#clip2602)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip0102)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
   166.42,1464 173.495,1463.99 180.571,1463.99 187.646,1463.99 194.722,1463.99 201.797,1463.98 208.873,1463.98 215.948,1463.97 223.024,1463.97 230.1,1463.96 
   237.175,1463.95 244.251,1463.93 251.326,1463.92 258.402,1463.9 265.477,1463.87 272.553,1463.84 279.628,1463.8 286.704,1463.76 293.779,1463.7 300.855,1463.64 
   307.93,1463.56 315.006,1463.46 322.081,1463.34 329.157,1463.2 336.232,1463.03 343.308,1462.83 350.383,1462.59 357.459,1462.31 364.534,1461.97 371.61,1461.57 
@@ -154,16 +154,16 @@ xlabel!(&quot;x&quot;); ylabel!(&quot;rho(x)&quot;);</code></pre><?xml version="
   2218.32,1463.71 2225.4,1463.74 2232.47,1463.78 2239.55,1463.8 2246.62,1463.83 2253.7,1463.85 2260.77,1463.87 2267.85,1463.89 2274.93,1463.9 2282,1463.92 
   2289.08,1463.93 
   "/>
-<polygon clip-path="url(#clip2600)" points="
-1989.93,251.724 2280.76,251.724 2280.76,130.764 1989.93,130.764 
+<path clip-path="url(#clip0100)" d="
+M1989.93 251.724 L2280.76 251.724 L2280.76 130.764 L1989.93 130.764  Z
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip0100)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1989.93,251.724 2280.76,251.724 2280.76,130.764 1989.93,130.764 1989.93,251.724 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip0100)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
   2013.93,191.244 2157.93,191.244 
   "/>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip0100)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2181.93, 208.744)" x="2181.93" y="208.744">y1</text>
 </g>
 </svg>
@@ -181,4 +181,4 @@ x^4 - 5.91x^3 + 12.35x^2 - 10.74x + 3.26</code></pre><p>Let&#39;s add the quadra
  0.0  0.1875  0.0     0.0        0.0       
  0.0  0.0     0.0385  0.0        0.0       
  0.0  0.0     0.0     0.0128086  0.0       
- 0.0  0.0     0.0     0.0        0.00485189</code></pre><p>Great!</p><footer><hr/><a class="previous" href="../orthogonal_polynomials_canonical/"><span class="direction">Previous</span><span class="title">Univariate Monic Orthogonal Polynomials</span></a><a class="next" href="../multiple_discretization/"><span class="direction">Next</span><span class="title">Multiple Discretization</span></a></footer></article></body></html>
+ 0.0  0.0     0.0     0.0        0.00485189</code></pre><p>Great!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../orthogonal_polynomials_canonical/">« Univariate Monic Orthogonal Polynomials</a><a class="docs-footer-nextpage" href="../multiple_discretization/">Multiple Discretization »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 12 February 2020 15:38">Wednesday 12 February 2020</span>. Using Julia version 1.1.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
