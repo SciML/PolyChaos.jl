@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Univariate Monic Orthogonal Polynomials · PolyChaos.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">PolyChaos.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Overview</a></li><li><a class="tocitem" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="tocitem">Usage</span><ul><li><a class="tocitem" href="../numerical_integration/">Numerical Integration</a></li><li><a class="tocitem" href="../quadrature_rules/">Quadrature Rules</a></li><li class="is-active"><a class="tocitem" href>Univariate Monic Orthogonal Polynomials</a><ul class="internal"><li><a class="tocitem" href="#Canonical-Orthogonal-Polynomials-1"><span>Canonical Orthogonal Polynomials</span></a></li><li><a class="tocitem" href="#Arbitrary-Weights-1"><span>Arbitrary Weights</span></a></li><li><a class="tocitem" href="#MultivariateMonicOrthogonalPolynomials-1"><span>Multivariate Monic Orthogonal Polynomials</span></a></li></ul></li><li><a class="tocitem" href="../gaussian_mixture_model/">Gaussian Mixture Models</a></li><li><a class="tocitem" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="tocitem" href="../scalar_products/">Computation of Scalar Products</a></li><li><input class="collapse-toggle" id="menuitem-3-7" type="checkbox"/><label class="tocitem" for="menuitem-3-7"><span class="docs-label">Polynomial Chaos</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../pce_tutorial/">Basic Usage</a></li><li><a class="tocitem" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="tocitem" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="tocitem" href="../random_ode/">Random ODE</a></li></ul></li><li><a class="tocitem" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="tocitem" href="../math/">Mathematical Background</a></li><li><a class="tocitem" href="../functions/">Functions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Usage</a></li><li class="is-active"><a href>Univariate Monic Orthogonal Polynomials</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Univariate Monic Orthogonal Polynomials</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/orthogonal_polynomials_canonical.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="UnivariateMonicOrthogonalPolynomials-1"><a class="docs-heading-anchor" href="#UnivariateMonicOrthogonalPolynomials-1">Univariate Monic Orthogonal Polynomials</a><a class="docs-heading-anchor-permalink" href="#UnivariateMonicOrthogonalPolynomials-1" title="Permalink"></a></h1><p>Univariate monic orthogonal polynomials make up the core building block of the package. These are real polynomials <span>$\{ \pi_k \}_{k \geq 0}$</span>, which are univariate <span>$\pi_k: \mathbb{R} \rightarrow \mathbb{R}$</span> and orthogonal relative to a nonnegative weight function <span>$w: \mathbb{R} \rightarrow \mathbb{R}_{\geq 0}$</span>, and which have a leading coefficient equal to one:</p><div>\[\begin{aligned}
+\pi_k(t) &amp;= t^k + a_{k-1} t^{k-1} + \dots + a_1 t + a_0 \quad \forall k = 0, 1, \dots \\
+\langle \pi_k, \pi_l \rangle &amp;= \int_{\mathbb{R}} \pi_k(t) \pi_l(t) w(t) \mathrm{d}t =
+\begin{cases}
+0 &amp; k \neq l, \text{ and }k,l \geq 0 \\
+\| \pi_k \|^2 &gt; 0 &amp; k = l \geq 0
+\end{cases}
+\end{aligned}\]</div><p>These univariate monic orthogonal polynomials satisfy the paramount three-term recurrence relation</p><div>\[\begin{aligned}
+\pi_{k+1}(t) &amp;= (t - \alpha_k) \pi_k(t) - \beta_k \pi_{k-1}(t), \quad k= 0, 1, \dots, \\
+\pi_o(t) &amp;= 1, \\
+\pi_{-1}(t) &amp;= 0.
+\end{aligned}\]</div><p>Hence, every system of <span>$n$</span> univariate monic orthogonal polynomials <span>$\{ \pi_k \}_{k=0}^n$</span> is isomorphic to its recurrence coefficients <span>$\{ \alpha_k, \beta_k \}_{k=0}^n$</span>.</p><h2 id="Canonical-Orthogonal-Polynomials-1"><a class="docs-heading-anchor" href="#Canonical-Orthogonal-Polynomials-1">Canonical Orthogonal Polynomials</a><a class="docs-heading-anchor-permalink" href="#Canonical-Orthogonal-Polynomials-1" title="Permalink"></a></h2><p>The so-called <em>classical</em> or <em>canonical</em> orthogonal polynomials are polynomials named after famous mathematicians who each discovered a special family of orthogonal polynomials, for example <a href="https://en.wikipedia.org/wiki/Hermite_polynomials">Hermite polynomials</a> or <a href="https://en.wikipedia.org/wiki/Jacobi_polynomials">Jacobi polynomials</a>. For <em>classical</em> orthogonal polynomials there exist closed-form expressions of–-among others–-the recurrence coefficients. Also quadrature rules for <em>classical</em> orthogonal polynomials are well-studied (with dedicated packages such as <a href="https://github.com/ajt60gaibb/FastGaussQuadrature.jl">FastGaussQuadrature.jl</a>. However, more often than not these <em>classical</em> orthogonal polynomials are neither monic nor orthogonal, hence not normalized in any sense. For example, there is a distinction between the <a href="https://en.wikipedia.org/wiki/Hermite_polynomials#Definition"><em>probabilists&#39;</em> Hermite polynomials</a> and the <a href="https://en.wikipedia.org/wiki/Hermite_polynomials#Definition"><em>physicists&#39;</em> Hermite polynomials</a>. The difference is in the weight function <span>$w(t)$</span> relative to which the polynomials are orthogonal:</p><div>\[\begin{aligned}
+&amp;\text{Probabilists&#39;:} &amp;&amp;&amp;w(t) = \frac{1}{\sqrt{2 \pi}} \, \exp \left( - \frac{t^2}{2} \right) \\
+&amp;\text{Physicists&#39;:} &amp;&amp;&amp;w(t) =  \exp \left( - t^2 \right).
+\end{aligned}\]</div><p>To streamline the computations, all <em>classical</em> orthogonal polynomials are converted to <strong>monic</strong> orthogonal polynomials (for which, of course, the closed-form expressions persist). Currently, the following weight functions (hence <em>classical</em> orthogonal polynomials) are supported:</p><table><tr><th style="text-align: right">Name</th><th style="text-align: right">Weight <span>$w(t)$</span></th><th style="text-align: right">Parameters</th><th style="text-align: right">Support</th><th style="text-align: right"><em>Classical</em> polynomial</th></tr><tr><td style="text-align: right"><code>hermite</code></td><td style="text-align: right">$ \exp \left( - t^2 \right)$</td><td style="text-align: right">-</td><td style="text-align: right"><span>$(-\infty, \infty)$</span></td><td style="text-align: right">Hermite</td></tr><tr><td style="text-align: right"><code>genhermite</code></td><td style="text-align: right">$ \lvert t \rvert^{2 \mu}\exp \left( - t^2 \right)$</td><td style="text-align: right"><span>$\mu &gt; -\frac{1}{2}$</span></td><td style="text-align: right"><span>$(-\infty, \infty)$</span></td><td style="text-align: right">Generalized Hermite</td></tr><tr><td style="text-align: right"><code>legendre</code></td><td style="text-align: right"><span>$1$</span></td><td style="text-align: right">-</td><td style="text-align: right"><span>$(-1,1)$</span></td><td style="text-align: right">Legendre</td></tr><tr><td style="text-align: right"><code>jacobi</code></td><td style="text-align: right"><span>$(1-t)^{\alpha} (1+t)^{\beta}$</span></td><td style="text-align: right"><span>$\alpha, \beta &gt; -1$</span></td><td style="text-align: right"><span>$(-1,1)$</span></td><td style="text-align: right">Jacobi</td></tr><tr><td style="text-align: right"><code>laguerre</code></td><td style="text-align: right"><span>$\exp(-t)$</span></td><td style="text-align: right">-</td><td style="text-align: right"><span>$(0,\infty)$</span></td><td style="text-align: right">Laguerre</td></tr><tr><td style="text-align: right"><code>genlaguerre</code></td><td style="text-align: right"><span>$t^{\alpha}\exp(-t)$</span></td><td style="text-align: right"><span>$\alpha&gt;-1$</span></td><td style="text-align: right"><span>$(0,\infty)$</span></td><td style="text-align: right">Generalized Laguerre</td></tr><tr><td style="text-align: right"><code>meixnerpollaczek</code></td><td style="text-align: right"><span>$\frac{1}{2 \pi} \exp((2\phi-\pi)t) \lvert\Gamma(\lambda + \mathrm{i}t)\rvert^2$</span></td><td style="text-align: right"><span>$\lambda &gt; 0, 0&lt;\phi&lt;\pi$</span></td><td style="text-align: right"><span>$(-\infty,\infty)$</span></td><td style="text-align: right">Meixner-Pollaczek</td></tr></table><p>Additionally, the following weight functions that are equivalent to probability density functions are supported:</p><table><tr><th style="text-align: right">Name</th><th style="text-align: right">Weight <span>$w(t)$</span></th><th style="text-align: right">Parameters</th><th style="text-align: right">Support</th><th style="text-align: right"><em>Classical</em> polynomial</th></tr><tr><td style="text-align: right"><code>gaussian</code></td><td style="text-align: right"><span>$\frac{1}{\sqrt{2 \pi}} \, \exp \left( - \frac{t^2}{2} \right)$</span></td><td style="text-align: right">-</td><td style="text-align: right"><span>$(-\infty, \infty)$</span></td><td style="text-align: right">Probabilists&#39; Hermite</td></tr><tr><td style="text-align: right"><code>uniform01</code></td><td style="text-align: right"><span>$1$</span></td><td style="text-align: right">-</td><td style="text-align: right"><span>$(0,1)$</span></td><td style="text-align: right">Legendre</td></tr><tr><td style="text-align: right"><code>beta01</code></td><td style="text-align: right"><span>$\frac{1}{B(\alpha,\beta)} \, t^{\alpha-1} (1-t)^{\beta-1}$</span></td><td style="text-align: right"><span>$\alpha, \beta &gt; 0$</span></td><td style="text-align: right"><span>$(0,1)$</span></td><td style="text-align: right">Jacobi</td></tr><tr><td style="text-align: right"><code>gamma</code></td><td style="text-align: right"><span>$\frac{\beta^\alpha}{\Gamma(\alpha)} t^{\alpha-1} \exp(-\beta t)$</span></td><td style="text-align: right"><span>$\alpha, \beta &gt; 0$</span></td><td style="text-align: right"><span>$(0,\infty)$</span></td><td style="text-align: right">Laguerre</td></tr><tr><td style="text-align: right"><code>logistic</code></td><td style="text-align: right"><span>$\frac{\exp(-t)}{(1+\exp(-t))^2}$</span></td><td style="text-align: right">-</td><td style="text-align: right"><span>$(-\infty,\infty)$</span></td><td style="text-align: right">-</td></tr></table><p>To generate the orthogonal polynomials up to maximum degree <code>deg</code>, simply call</p><pre><code class="language-julia-repl">julia&gt; using PolyChaos
+
+julia&gt; deg = 4
+4
+
+julia&gt; op = GaussOrthoPoly(deg)
+GaussOrthoPoly{Array{Float64,1},GaussMeasure,Quad{Float64,Array{Float64,1}}}(4, [0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 3.0, 4.0], GaussMeasure(PolyChaos.w_gaussian, (-Inf, Inf), true), Quad{Float64,Array{Float64,1}}(&quot;golubwelsch&quot;, 4, [-2.3344142183389778, -0.7419637843027257, 0.7419637843027258, 2.3344142183389778], [0.04587585476806844, 0.45412414523193134, 0.45412414523193106, 0.04587585476806852]))
+
+julia&gt; show(op)
+
+Univariate orthogonal polynomials
+degree:         4
+#coeffs:        5
+α =             [0.0, 0.0, 0.0, 0.0, 0.0]
+β =             [1.0, 1.0, 2.0, 3.0, 4.0]
+
+Measure dλ(t)=w(t)dt
+w:      w_gaussian
+dom:    (-Inf, Inf)
+symmetric:      true
+</code></pre><p>This generates <code>op</code>as a <code>GaussOrthoPoly</code> type with the underlying Gaussian measure <code>op.measure</code>. The recurrence coefficients are accessible via <code>coeffs()</code>.</p><pre><code class="language-julia-repl">julia&gt; coeffs(op)
+5×2 Array{Float64,2}:
+ 0.0  1.0
+ 0.0  1.0
+ 0.0  2.0
+ 0.0  3.0
+ 0.0  4.0</code></pre><p>By default, the constructor for <code>OrthoPoly</code> generates <code>deg+1</code> recurrence coefficients. Sometimes, some other number <code>Nrec</code> may be required. This is why <code>Nrec</code> is a keyword for the constructor <code>OrthoPoly</code>.</p><pre><code class="language-julia-repl">julia&gt; N = 100
+100
+
+julia&gt; opLogistic = LogisticOrthoPoly(deg; Nrec=N)
+LogisticOrthoPoly{Array{Float64,1},LogisticMeasure,Quad{Float64,Array{Float64,1}}}(4, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 3.289868133696453, 10.527578027828648, 22.841084471092515, 40.10505915363294, 62.30810859273584, 89.4476035231595, 121.52266752315666, 158.53293971318436, 200.47824915030117  …  19986.565781520196, 20433.165380253333, 20884.69978120051, 21341.168984361153, 21802.572989734712, 22268.91179732067, 22740.185407118537, 23216.393819127847, 23697.53703334815, 24183.61504977904], LogisticMeasure(PolyChaos.w_logistic, (-Inf, Inf), true), Quad{Float64,Array{Float64,1}}(&quot;golubwelsch&quot;, 99, [-285.97091675697385, -266.56611354854135, -251.01698966393153, -237.53179686807928, -225.4187633699017, -214.31820469129195, -204.0126795649811, -194.35793540921836, -185.25200558110012, -176.61940782973926  …  176.61940782973895, 185.25200558110018, 194.35793540921847, 204.01267956498108, 214.31820469129212, 225.4187633699016, 237.53179686807948, 251.01698966393138, 266.56611354854135, 285.9709167569736], [1.4541663108207099e-123, 2.897917000559268e-115, 1.3858976222735606e-108, 8.826460482953542e-103, 1.4618715331286334e-97, 8.935651454381735e-93, 2.49282531464423e-88, 3.6557113389197252e-84, 3.1147999002113552e-80, 1.660700338355251e-76  …  1.6607003383554774e-76, 3.1147999002111335e-80, 3.6557113389195227e-84, 2.492825314644278e-88, 8.935651454380596e-93, 1.461871533128785e-97, 8.826460482953113e-103, 1.3858976222735651e-108, 2.8979170005595435e-115, 1.4541663108207404e-123]))
+
+julia&gt; show(opLogistic)
+
+Univariate orthogonal polynomials
+degree:         4
+#coeffs:        100
+α =             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]...
+β =             [1.0, 3.289868133696453, 10.527578027828648, 22.841084471092515, 40.10505915363294, 62.30810859273584, 89.4476035231595]...
+
+Measure dλ(t)=w(t)dt
+w:      w_logistic
+dom:    (-Inf, Inf)
+symmetric:      true
+</code></pre><p>Let&#39;s check whether we truly have more coefficients:</p><pre><code class="language-julia-repl">julia&gt; size(coeffs(opLogistic),1) == N
+true</code></pre><h2 id="Arbitrary-Weights-1"><a class="docs-heading-anchor" href="#Arbitrary-Weights-1">Arbitrary Weights</a><a class="docs-heading-anchor-permalink" href="#Arbitrary-Weights-1" title="Permalink"></a></h2><p>If you are given a weight function <span>$w$</span> that does not belong to the Table above, it is still possible to generate the respective univariate monic orthogonal polynomials. First, we define the measure by specifying a name, the weight, the support, symmetry, and parameters</p><pre><code class="language-julia-repl">julia&gt; supp = (-1, 1)
+(-1, 1)
+
+julia&gt; w(t) = 1 + t
+w (generic function with 1 method)
+
+julia&gt; my_meas = Measure(&quot;my_meas&quot;, w, supp, false, Dict())
+Measure(&quot;my_meas&quot;, w, (-1.0, 1.0), false, Dict{Any,Any}())</code></pre><p>Notice: it is advisable to define the weight such that an error is thrown for arguments outside of the support.</p><p>Now, we want to construct the univariate monic orthogonal polynomials up to degree <code>deg</code> relative to <code>my_meas</code>. The constructor is</p><pre><code class="language-julia-repl">julia&gt; my_op = OrthoPoly(&quot;my_op&quot;, deg, my_meas; Nquad=200);
+
+julia&gt; show(my_op)
+
+Univariate orthogonal polynomials
+degree:         4
+#coeffs:        5
+α =             [0.3333333333333335, 0.06666666666666644, 0.028571428571428848, 0.015873015873015657, 0.010101010101010171]
+β =             [2.0, 0.2222222222222223, 0.23999999999999996, 0.24489795918367344, 0.2469135802469136]
+
+Measure dλ(t)=w(t)dt
+name:   my_meas
+w:      w
+dom:    (-1.0, 1.0)
+symmetric:      false
+pars:   Dict{Any,Any}()
+</code></pre><p>By default, the recurrence coefficients are computed using the <a href="https://warwick.ac.uk/fac/sci/maths/research/grants/equip/grouplunch/1985Gautschi.pdf">Stieltjes procuedure</a> with <a href="https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature">Clenshaw-Curtis</a> quadrature (with <code>Nquad</code> nodes and weights). Hence, the choice of <code>Nquad</code> influences accuracy.</p><h2 id="MultivariateMonicOrthogonalPolynomials-1"><a class="docs-heading-anchor" href="#MultivariateMonicOrthogonalPolynomials-1">Multivariate Monic Orthogonal Polynomials</a><a class="docs-heading-anchor-permalink" href="#MultivariateMonicOrthogonalPolynomials-1" title="Permalink"></a></h2><p>Suppose we have <span>$p$</span> systems of univariate monic orthogonal polynomials,</p><div>\[\{ \pi_k^{(1)} \}_{k\geq 0}, \: \{ \pi_k^{(2)} \}_{k\geq 0}, \dots, \{ \pi_k^{(p)} \}_{k\geq 0},\]</div><p>each system being orthogonal relative to the weights <span>$w^{(1)}, w^{(2)}, \dots, w^{(p)}$</span> with supports <span>$\mathcal{W}^{(1)}, \mathcal{W}^{(2)}, \dots, \mathcal{W}^{(p)}$</span>. Also, let <span>$d^{(i)}$</span> be the maximum degree of the <span>$i$</span>-th system of univariate orthogonal polynomials. We would like to construct a <span>$p$</span>-variate monic basis <span>$\{ \psi_k \}_{k \geq 0}$</span> with <span>$\psi: \mathbb{R}^p \rightarrow \mathbb{R}$</span> of degree at most <span>$0 \leq d \leq \min_{i=1,\dots,k}\{ d^{(i)}\}$</span>. Further, this basis shall be orthogonal relative to the product measure <span>$w: \mathcal{W} = \mathcal{W}^{(1)} \otimes \mathcal{W}^{(2)} \mathcal{W}^{(1)} \cdots \otimes \mathcal{W}^{(p)} \rightarrow \mathbb{R}_{\geq 0}$</span> given by</p><div>\[w(t) = \prod_{i=1}^{p} w^{(i)}(t_i),\]</div><p>hence satisfies</p><div>\[\langle \psi_k, \psi_l \rangle = \int_{\mathcal{W}} \psi_k(t) \psi_l(t) w(t) \mathrm{d} t =
+\begin{cases}
+0 &amp; k \neq l, \text{ and }k,l \geq 0 \\
+\| \psi_k \|^2 &gt; 0 &amp; k = l \geq 0
+\end{cases}\]</div><p>For this, there exists the composite struct <code>MultiOrthoPoly</code>. Let&#39;s consider an example where we mix <em>classical</em> orthogonal polynomials with an arbitrary weight.</p><pre><code class="language-julia-repl">julia&gt; deg = [3, 5, 6, 4]
+4-element Array{Int64,1}:
+ 3
+ 5
+ 6
+ 4
+
+julia&gt; d = minimum(deg)
+3
+
+julia&gt; op1 = GaussOrthoPoly(deg[1]);
+
+julia&gt; op2 = Uniform01OrthoPoly(deg[2]);
+
+julia&gt; op3 = Beta01OrthoPoly(deg[3], 2, 1.2);
+
+julia&gt; ops = [op1, op2, op3, my_op];
+
+julia&gt; mop = MultiOrthoPoly(ops, d);
+
+julia&gt; show(mop)
+
+4-variate orthogonal polynomials
+name:           GaussOrthoPoly{Array{Float64,1},GaussMeasure,Quad{Float64,Array{Float64,1}}}
+                Uniform01OrthoPoly{Array{Float64,1},Uniform01Measure,Quad{Float64,Array{Float64,1}}}
+                Beta01OrthoPoly{Array{Float64,1},Beta01Measure,Quad{Float64,Array{Float64,1}}}
+                my_op
+deg:            3
+dim:            35
+ind:            [0, 0, 0, 0]
+                [1, 0, 0, 0]
+                [0, 1, 0, 0]
+                [0, 0, 1, 0]
+                [0, 0, 0, 1]
+                [2, 0, 0, 0]
+                [1, 1, 0, 0]
+                ...
+
+false
+</code></pre><p>The total number of  basis polynomials is stored in the field <code>dim</code>. The univariate basis polynomials making up the multivariate basis are stored in the field <code>uni</code>. The field <code>ind</code> contains the multi-index, i.e. row <span>$i$</span> stores what combination of univariate polynomials makes up the <span>$i$</span>-th multivariate polynomial. For example,</p><pre><code class="language-julia-repl">julia&gt; i = 11;
+
+julia&gt; mop.ind[i+1, :]
+4-element Array{Int64,1}:
+ 0
+ 1
+ 0
+ 1</code></pre><p>translates mathematically to</p><div>\[\psi_{11}(t) = \pi_0^{(1)}(t_1) \pi_1^{(2)}(t_2) \pi_0^{(3)}(t_3) \pi_1^{(4)}(t_4).\]</div><p>Notice that there is an offset by one, because the basis counting starts at 0, but Julia is 1-indexed. The underlying measure of <code>mop</code> is now of type <code>ProductMeasure</code>, and stored in the field <code>measure</code> The weight <span>$w$</span> can be evaluated as one would expect.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../quadrature_rules/">« Quadrature Rules</a><a class="docs-footer-nextpage" href="../gaussian_mixture_model/">Gaussian Mixture Models »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 14 February 2020 00:23">Friday 14 February 2020</span>. Using Julia version 1.1.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
