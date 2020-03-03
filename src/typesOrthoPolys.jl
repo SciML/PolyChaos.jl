@@ -214,7 +214,7 @@ struct Uniform_11OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     quad::Q
 
     # inner constructor
-    function Uniform01OrthoPoly(deg::Int;Nrec::Int=deg+1, addQuadrature::Bool = true)
+    function Uniform_11OrthoPoly(deg::Int;Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
         α, β = r_scale(1., rm_legendre(Nrec)...)
         quadrature = addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad()

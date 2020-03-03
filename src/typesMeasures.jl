@@ -142,7 +142,7 @@ struct Uniform_11Measure <: AbstractCanonicalMeasure
     dom::Type_for_domain
     symmetric::Bool
 
-    function Uniform01Measure()
+    function Uniform_11Measure()
         new(w_uniform_11, (-1,1), true)
     end
 end
