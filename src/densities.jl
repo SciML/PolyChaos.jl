@@ -10,6 +10,7 @@ export  w_legendre,
 
         w_gaussian,
         w_uniform01,
+        w_uniform_11,
         w_logistic,
         w_genhermite,
         build_w_beta,
@@ -81,6 +82,10 @@ end
 
 function w_uniform01(t)
     0. <= t <= 1. ? 1. : _throwError(t)
+end
+
+function w_uniform_11(t)
+    -1. <= t <= 1. ? 0.5 : _throwError(t)
 end
 
 function w_logistic(t)
