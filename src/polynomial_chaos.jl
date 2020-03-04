@@ -96,10 +96,10 @@ function convert2affinePCE(par1::Real, par2::Real, op::Uniform_11OrthoPoly; kind
     a1, a2 =
         if kind == "lbub"
             _checkBounds(par1, par2)
-            par1, par2 - par1
+            0.5 * (par1 + par2), 0.5 * (par2 - par1)
         elseif kind == "μσ"
             _checkStandardDevation(par2)
-            par1 - sqrt(3)*par2 , 2*sqrt(3)*par2
+            par1, sqrt(3) * par2
         end
     convert2affinePCE(a1, a2, first(op.α))
 end
