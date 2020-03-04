@@ -12,6 +12,10 @@ res = 1
 @test_throws DomainError integrate(foo, EmptyQuad())
 @test isapprox(integrate(foo, Uniform01OrthoPoly(4)), res)
 
+foo(x) = 5*x^4
+res = 1
+@test isapprox(integrate(foo, Uniform_11OrthoPoly(4)), res)
+
 d, nunc = 5, 10
 op = genLaguerreOrthoPoly(d,1.23,addQuadrature = false)
 opq = genLaguerreOrthoPoly(d,1.23)

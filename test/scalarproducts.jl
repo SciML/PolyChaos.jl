@@ -1,7 +1,7 @@
 using PolyChaos, Test, QuadGK, StaticArrays
 import LinearAlgebra: norm
 
-names = [GaussOrthoPoly, Uniform01OrthoPoly, LogisticOrthoPoly, LegendreOrthoPoly, HermiteOrthoPoly, LaguerreOrthoPoly]
+names = [GaussOrthoPoly, Uniform01OrthoPoly, Uniform_11OrthoPoly, LogisticOrthoPoly, LegendreOrthoPoly, HermiteOrthoPoly, LaguerreOrthoPoly]
 deg = 10
 tol = 1e-7
 
