@@ -216,7 +216,7 @@ struct Uniform_11OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     # inner constructor
     function Uniform_11OrthoPoly(deg::Int;Nrec::Int=deg+1, addQuadrature::Bool = true)
         _checkConsistency(deg, Nrec)
-        α, β = r_scale(1., rm_legendre(Nrec)...)
+        α, β = r_scale(0.5, rm_legendre(Nrec)...)
         quadrature = addQuadrature ?  Quad(length(α)-1,α,β) : EmptyQuad()
         new{promote_type(typeof(α), typeof(β)), Uniform_11Measure, typeof(quadrature)}(deg, α, β, Uniform_11Measure(), quadrature)
     end
