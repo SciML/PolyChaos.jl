@@ -6,6 +6,7 @@ outliers = [-1.3, 1.3]
 
 densities = [w_legendre,
 			 w_uniform01,
+			 w_uniform_11,
 			 build_w_jacobi(1.2,3.4),
 			 build_w_beta(1.2,3.4)
 ]

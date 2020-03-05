@@ -26,6 +26,7 @@ AbstractMeasure
 │  ├─ LogisticMeasure
 │  ├─ MeixnerPollaczekMeasure
 │  ├─ Uniform01Measure
+│  ├─ Uniform_11Measure
 │  ├─ genHermiteMeasure
 │  └─ genLaguerreMeasure
 ├─ Measure
@@ -177,6 +178,14 @@ Some of them may require additional parameters.
 | `dom::Tuple{<:Real,<:Real}` |$(0, 1)$ |
 | `symmetric::Bool` | true |
 
+#### Uniform_11Measure
+
+| Field | Meaning |
+| --- | --- |
+| `w::Function` |  $0.5$|
+| `dom::Tuple{<:Real,<:Real}` |$(-1, 1)$ |
+| `symmetric::Bool` | true |
+
 #### genHermiteMeasure
 
 | Field | Meaning |
@@ -215,6 +224,7 @@ AbstractOrthoPoly
 │  ├─ LogisticOrthoPoly
 │  ├─ MeixnerPollaczekOrthoPoly
 │  ├─ Uniform01OrthoPoly
+│  ├─ Uniform_11OrthoPoly
 │  ├─ genHermiteOrthoPoly
 │  └─ genLaguerreOrthoPoly
 ├─ MultiOrthoPoly
@@ -287,6 +297,7 @@ AbstractCanonicalOrthoPoly
 ├─ LogisticOrthoPoly
 ├─ MeixnerPollaczekOrthoPoly
 ├─ Uniform01OrthoPoly
+├─ Uniform_11OrthoPoly
 ├─ genHermiteOrthoPoly
 └─ genLaguerreOrthoPoly
 ```

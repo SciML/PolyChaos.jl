@@ -10,6 +10,7 @@ export  Measure,
         Beta01Measure,
         GammaMeasure,
         Uniform01Measure,
+        Uniform_11Measure,
         LogisticMeasure,
         MeixnerPollaczekMeasure
 
@@ -133,6 +134,16 @@ struct Uniform01Measure <: AbstractCanonicalMeasure
 
     function Uniform01Measure()
         new(w_uniform01, (0,1), true)
+    end
+end
+
+struct Uniform_11Measure <: AbstractCanonicalMeasure
+    w::Function
+    dom::Type_for_domain
+    symmetric::Bool
+
+    function Uniform_11Measure()
+        new(w_uniform_11, (-1,1), true)
     end
 end
 
