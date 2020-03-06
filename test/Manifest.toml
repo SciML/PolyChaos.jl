@@ -3,11 +3,17 @@
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
+[[CompilerSupportLibraries_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "b57c5d019367c90f234a7bc7e24ff0a84971da5d"
+uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "0.2.0+1"
+
 [[DataStructures]]
 deps = ["InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "a1b652fb77ae8ca7ea328fa7ba5aa151036e5c10"
+git-tree-sha1 = "5a431d46abf2ef2a4d5d00bd0ae61f651cf854c8"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.17.6"
+version = "0.17.10"
 
 [[Dates]]
 deps = ["Printf"]
@@ -45,10 +51,10 @@ deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[OpenSpecFun_jll]]
-deps = ["Libdl", "Pkg"]
-git-tree-sha1 = "65f672edebf3f4e613ddf37db9dcbd7a407e5e90"
+deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg"]
+git-tree-sha1 = "d110040968b9afe95c6bd9c6233570b0fe8abd22"
 uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
-version = "0.5.3+1"
+version = "0.5.3+2"
 
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
@@ -57,7 +63,7 @@ uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.1.0"
 
 [[Pkg]]
-deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
+deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Test", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[Printf]]
@@ -93,9 +99,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[SpecialFunctions]]
 deps = ["OpenSpecFun_jll"]
-git-tree-sha1 = "268052ee908b2c086cc0011f528694f02f3e2408"
+git-tree-sha1 = "e19b98acb182567bcb7b75bb5d9eedf3a3b5ec6c"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "0.9.0"
+version = "0.10.0"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
