@@ -10,3 +10,4 @@ docs/build
 .project
 .tags
 Manifest.toml
+test/Manifest.toml
