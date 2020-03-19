@@ -8,5 +8,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 [compat]
 GaussQuadrature = "0.5"
 QuadGK = "2.1, 2.3"
-StaticArrays = "0.12"
 julia = "1"
