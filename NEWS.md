@@ -1,5 +1,10 @@
 # PolyChaos Release Notes
 
+## Version 0.2.3
+- support for Julia 1.3 and above
+- thinned out dependencies
+- fixed inconsistencies in documentation
+
 ## Version 0.2.2
 - switched to abstract arrays as suggested by [#26](https://github.com/timueh/PolyChaos.jl/issues/26)
 - re-definition of types was necessary, taking into account Julian recommendations, [see this discourse entry](https://discourse.julialang.org/t/inner-constructor-correct-type-for-new/34013), [see this discourse entry]()https://discourse.julialang.org/t/creating-ones-own-matrix-type/33553,  and [see the docs](https://docs.julialang.org/en/v1.3/manual/performance-tips/#Avoid-fields-with-abstract-type-1).
