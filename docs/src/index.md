@@ -27,11 +27,11 @@ However, a cornerstone principle of PolyChaos is to provide all the functionalit
     - a replacement for [FastGaussQuadrature.jl](https://github.com/ajt60gaibb/FastGaussQuadrature.jl)
 
 ## Installation
-The package requires `Julia 1.0` or newer.
+The package requires `Julia 1.3` or newer.
 In `Julia` switch to the package manager
 ```julia
 julia> ]
-(v1.0) pkg> add PolyChaos
+(v1.03 pkg> add PolyChaos
 ```
 This will install PolyChaos and its dependencies.
 Once that is done, load the package:
@@ -103,13 +103,21 @@ If you found the software useful and applied it to your own research, we'd appre
 Add the following to your BibTeX file
 
 ```tex
-@misc{Muehlpfordt18,
-  author       = {T. Mühlpfordt and F. Zahn and F. Becker and T. Faulwasser and V. Hagenmeyer},
-  title        = {PolyChaos.jl -- A Julia package for orthogonal polynomials, quadrature, and polynomial chaos expansion},
-  year         = 2019,
-  doi          = {10.5281/zenodo.2592031},
-  url          = {https://doi.org/10.5281/zenodo.2592031}
+@ARTICLE{2020arXiv200403970M,
+       author = {{M{\"u}hlpfordt}, Tillmann and {Zahn}, Frederik and {Hagenmeyer}, Veit and
+         {Faulwasser}, Timm},
+        title = "{PolyChaos.jl -- A Julia Package for Polynomial Chaos in Systems and Control}",
+      journal = {arXiv e-prints},
+     keywords = {Electrical Engineering and Systems Science - Systems and Control, Mathematics - Numerical Analysis, Mathematics - Optimization and Control},
+         year = 2020,
+        month = apr,
+          eid = {arXiv:2004.03970},
+        pages = {arXiv:2004.03970},
+archivePrefix = {arXiv},
+       eprint = {2004.03970},
 }
 ```
 
-Of course you are more than welcome to partake in GitHub's gamification aka :star: and :fork_and_knife:.
+Of course you are more than welcome to partake in GitHub's gamification: starring and forking is much appreciated.
+
+Enjoy.
