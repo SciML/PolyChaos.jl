@@ -1,6 +1,6 @@
 name = "PolyChaos"
 uuid = "8d666b04-775d-5f6e-b778-5ac7c70f65a3"
-authors = ["timueh <tillmann.muehlpfordt@kit.edu>"]
+authors = ["Tillmann Mühlpfordt <tillmann.muehlpfordt@kit.edu>"]
 version = "0.2.2"
 
 [deps]
