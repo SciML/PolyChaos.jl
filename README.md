@@ -12,11 +12,11 @@
 
 A Julia package to construct orthogonal polynomials, their quadrature rules, and use it with polynomial chaos expansions.
 
-The package requires `Julia 1.0` or newer.
+The package requires `Julia 1.3` or newer.
 In `Julia` switch to the package manager
 ```julia
 julia> ]
-(v1.0) pkg> add PolyChaos
+(v1.3) pkg> add PolyChaos
 ```
 This will install PolyChaos and its dependencies.
 Once that is done, load the package:
