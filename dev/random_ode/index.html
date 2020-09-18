@@ -3,7 +3,7 @@
 μ, σ = -0.5, 0.05
 tend, Δt = 3.0, 0.01</code></pre><pre><code class="language-none">(3.0, 0.01)</code></pre><p>Next, we define an orthogonal basis (and its quadrature rule) relative to the Gaussian measure using <code>PolyChaos</code>. We choose a maximum degree of <code>L</code>.</p><pre><code class="language-julia">using PolyChaos
 L, Nrec = 6, 40
-opq = GaussOrthoPoly(L; Nrec=Nrec, addQuadrature=true)</code></pre><pre><code class="language-none">GaussOrthoPoly{Array{Float64,1},GaussMeasure,Quad{Float64,Array{Float64,1}}}(6, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0  …  30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0], GaussMeasure(PolyChaos.w_gaussian, (-Inf, Inf), true), Quad{Float64,Array{Float64,1}}(&quot;golubwelsch&quot;, 39, [-11.2897, -10.3133, -9.50131, -8.77344, -8.09915, -7.46268, -6.85455, -6.26849, -5.70006, -5.14596  …  5.14596, 5.70006, 6.26849, 6.85455, 7.46268, 8.09915, 8.77344, 9.50131, 10.3133, 11.2897], [9.44334e-29, 2.78479e-24, 7.59245e-21, 5.3707e-18, 1.48613e-15, 1.99873e-13, 1.49172e-11, 6.74865e-10, 1.96987e-8, 3.88412e-7  …  3.88412e-7, 1.96987e-8, 6.74865e-10, 1.49172e-11, 1.99873e-13, 1.48613e-15, 5.3707e-18, 7.59245e-21, 2.78479e-24, 9.44334e-29]))</code></pre><p>Now we can define the PCE for <span>$\mathsf{a}$</span> and solve the Galerkin-projected ordinary differential equation using <code>DifferentialEquations.jl</code>.</p><pre><code class="language-julia">using DifferentialEquations
+opq = GaussOrthoPoly(L; Nrec=Nrec, addQuadrature=true)</code></pre><pre><code class="language-none">GaussOrthoPoly{Array{Float64,1},GaussMeasure,Quad{Float64,Array{Float64,1}}}(6, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0  …  30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0], GaussMeasure(PolyChaos.w_gaussian, (-Inf, Inf), true), Quad{Float64,Array{Float64,1}}(&quot;golubwelsch&quot;, 39, [-11.289716044476338, -10.31334144275699, -9.501306853782872, -8.773438698067654, -8.099152213152408, -7.46268237786604, -6.854552519790957, -6.268491549685282, -5.700062454271861, -5.1459645440941815  …  5.145964544094184, 5.700062454271859, 6.268491549685282, 6.854552519790963, 7.46268237786604, 8.099152213152397, 8.77343869806765, 9.501306853782866, 10.313341442756998, 11.289716044476336], [9.443344575063092e-29, 2.7847875052254124e-24, 7.592450542206571e-21, 5.370701458462944e-18, 1.4861295877333035e-15, 1.998726680623688e-13, 1.491720010448911e-11, 6.748646364787844e-10, 1.9698729205993654e-8, 3.8841182837133097e-7  …  3.884118283713288e-7, 1.9698729205993754e-8, 6.748646364787816e-10, 1.4917200104488884e-11, 1.9987266806237089e-13, 1.4861295877332983e-15, 5.370701458462905e-18, 7.592450542206324e-21, 2.784787505225327e-24, 9.443344575062904e-29]))</code></pre><p>Now we can define the PCE for <span>$\mathsf{a}$</span> and solve the Galerkin-projected ordinary differential equation using <code>DifferentialEquations.jl</code>.</p><pre><code class="language-julia">using DifferentialEquations
 
 a = [ convert2affinePCE(μ, σ, opq); zeros(Float64,L-1) ] # PCE coefficients of a
 xinit = [ x0; zeros(Float64,L) ] # PCE coefficients of initial condition
@@ -18,93 +18,93 @@ end
 
 probgalerkin = ODEProblem(ODEgalerkin,xinit,(0,tend),a)
 solgalerkin = solve(probgalerkin;saveat=0:Δt:tend)
-t, x = solgalerkin.t, solgalerkin.u;</code></pre><pre><code class="language-none">([0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09  …  2.91, 2.92, 2.93, 2.94, 2.95, 2.96, 2.97, 2.98, 2.99, 3.0], Array{Float64,1}[[2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.99003, 0.000995013, 2.48753e-7, 4.14589e-11, 5.18236e-15, 5.18237e-19, 4.44637e-23], [1.9801, 0.0019801, 9.90048e-7, 3.30222e-10, 7.19159e-14, 2.5523e-16, -9.33641e-19], [1.97023, 0.00295534, 2.2165e-6, 1.10878e-9, 3.88076e-13, 7.64708e-16, -3.06017e-18], [1.9604, 0.0039208, 3.9208e-6, 2.61457e-9, 1.26957e-12, 1.43091e-15, -5.3315e-18], [1.95063, 0.00487656, 6.0957e-6, 5.08041e-9, 3.13886e-12, 2.52265e-15, -6.64782e-18], [1.9409, 0.0058227, 8.73405e-6, 8.73449e-9, 6.52494e-12, 4.67557e-15, -5.85754e-18], [1.93122, 0.00675928, 1.18287e-5, 1.38004e-8, 1.20633e-11, 8.89217e-15, -1.75729e-18], [1.92159, 0.00768638, 1.53728e-5, 2.0497e-8, 2.04962e-11, 1.65418e-14, 6.90808e-18], [1.91201, 0.00860406, 1.93591e-5, 2.90386e-8, 3.26721e-11, 2.93607e-14, 2.14455e-17]  …  [0.471768, 0.0686422, 0.00499374, 0.000242195, 8.80991e-6, 2.56367e-7, 6.20038e-9], [0.469449, 0.0685395, 0.0050034, 0.000243497, 8.88773e-6, 2.5952e-7, 6.2981e-9], [0.467142, 0.0684363, 0.00501297, 0.000244798, 8.96582e-6, 2.62697e-7, 6.39692e-9], [0.464846, 0.0683324, 0.00502244, 0.000246098, 9.04418e-6, 2.65897e-7, 6.49683e-9], [0.462562, 0.0682278, 0.00503182, 0.000247396, 9.12281e-6, 2.69121e-7, 6.59785e-9], [0.460289, 0.0681227, 0.0050411, 0.000248692, 9.2017e-6, 2.72369e-7, 6.69997e-9], [0.458027, 0.068017, 0.00505028, 0.000249987, 9.28084e-6, 2.7564e-7, 6.80322e-9], [0.455777, 0.0679107, 0.00505936, 0.00025128, 9.36025e-6, 2.78934e-7, 6.90758e-9], [0.453537, 0.0678038, 0.00506835, 0.000252571, 9.43992e-6, 2.82252e-7, 7.01308e-9], [0.451309, 0.0676963, 0.00507724, 0.00025386, 9.51983e-6, 2.85594e-7, 7.11971e-9]])</code></pre><p>For later purposes we compute the expected value and the standard deviation at all time instants using PCE.</p><pre><code class="language-julia"># an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
+t, x = solgalerkin.t, solgalerkin.u;</code></pre><pre><code class="language-none">([0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09  …  2.91, 2.92, 2.93, 2.94, 2.95, 2.96, 2.97, 2.98, 2.99, 3.0], [[2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.9900252071385, 0.0009950126035692532, 2.4875315089174124e-7, 4.145885853203445e-11, 5.18235542414578e-15, 5.182372858830409e-19, 4.4463679915179475e-23], [1.9801006575270281, 0.001980100667935056, 9.900482838765526e-7, 3.3022172302461603e-10, 7.191588126714429e-14, 2.552297168272165e-16, -9.336413940907328e-19], [1.9702260956550872, 0.0029553391699344814, 2.2164991440241397e-6, 1.108778231932126e-9, 3.880756939524286e-13, 7.647076311529437e-16, -3.0601672035416215e-18], [1.9604012673415026, 0.003920802569373871, 3.92079565910784e-6, 2.614569329387374e-9, 1.2695719959132683e-12, 1.4309113331517722e-15, -5.331497886979387e-18], [1.9506259196896107, 0.004876564830716198, 6.095699691028394e-6, 5.080409655478233e-9, 3.1388591707103675e-12, 2.522646952235701e-15, -6.647819901734136e-18], [1.94089980108726, 0.005822699423080991, 8.734045035813635e-6, 8.73448754624683e-9, 6.524935783028917e-12, 4.675567394339299e-15, -5.8575412401594595e-18], [1.9312226612068097, 0.0067592793202444325, 1.1828737423618912e-5, 1.3800365033690686e-8, 1.2063344578682602e-11, 8.89217234192063e-15, -1.757291429632381e-18], [1.92159425100513, 0.0076863770006392875, 1.537275451872677e-5, 2.0496977845761823e-8, 2.0496172484610545e-11, 1.6541808253960652e-14, 6.9080784674465654e-18], [1.9120143227236033, 0.00860406444735494, 1.9359145919547074e-5, 2.9038635406367142e-8, 3.2672050608878766e-11, 2.93606683659633e-14, 2.1445495853653413e-17]  …  [0.47176823244752897, 0.06864220151584116, 0.004993736418114501, 0.0002421945024010764, 8.809905417026421e-6, 2.56366688100802e-7, 6.2003759830381115e-9], [0.4694494907227624, 0.06853954831320269, 0.0050034034535676435, 0.0002434972451458334, 8.88772936168224e-6, 2.5952015845324614e-7, 6.2981009199958616e-9], [0.46714226194361325, 0.06843626325913324, 0.005012972845686217, 0.0002447984435509822, 8.965822463870267e-6, 2.6269707595728394e-7, 6.396916976475764e-9], [0.46484648838468107, 0.06833235513849441, 0.00502244476425078, 0.00024609805746849084, 9.04418265064778e-6, 2.658974600032164e-7, 6.496830428853433e-9], [0.462562112631329, 0.06822783265780334, 0.005031819383026442, 0.0002473960470448727, 9.122807836593206e-6, 2.691213288272223e-7, 6.597847538522161e-9], [0.460289077579685, 0.06812270444523286, 0.0050410968797628625, 0.0002486923727211862, 9.20169592380607e-6, 2.723686995113561e-7, 6.6999745518928595e-9], [0.45802732643664096, 0.06801697905061128, 0.005050277436194252, 0.00024998699523303493, 9.280844801907035e-6, 2.7563958798354944e-7, 6.803217700394112e-9], [0.455776802719853, 0.06791066494542264, 0.005059361238039373, 0.00025127987561056775, 9.360252348037884e-6, 2.789340090176107e-7, 6.907583200472148e-9], [0.45353745025774184, 0.0678037705228065, 0.005068348475001534, 0.00025257097517847863, 9.439916426861515e-6, 2.8225197623322443e-7, 7.013077253590828e-9], [0.4513092131894926, 0.06769630409755806, 0.005077239340768596, 0.0002538602555560064, 9.51983489056194e-6, 2.8559350209595174e-7, 7.1197060462316646e-9]])</code></pre><p>For later purposes we compute the expected value and the standard deviation at all time instants using PCE.</p><pre><code class="language-julia"># an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
 mean_pce = [ mean(x_, opq) for x_ in x]
 std_pce = [ std(x_, opq) for x_ in x]</code></pre><pre><code class="language-none">301-element Array{Float64,1}:
- 0.0                  
+ 0.0
  0.0009950126657575441
- 0.001980101162958276 
+ 0.001980101162958276
  0.0029553408323056947
- 0.00392080649016589  
- 0.004876572450342803 
- 0.005822712524166966 
- 0.006759300020585329 
- 0.007686407746251844 
- 0.008604108005619072 
- ⋮                    
- 0.06890642513277548  
- 0.0688051118567387   
- 0.06870317328016866  
- 0.06860061804932972  
- 0.06849745473268207  
- 0.06839369182089518  
- 0.06828933772686158  
- 0.06818440078571053  
- 0.0680788892548222   </code></pre><p>We compare the solution from PCE to a Monte-Carlo-based solution. That means to solve the ordinary differential equation for many samples of <span>$\mathsf{a}$</span>. We first sample from the measure using <code>sampleMeasure</code>, and then generate samples of <span>$\mathsf{a}$</span> using <code>evaluatePCE</code>. After that we solve the ODE and store the results in <code>xmc</code>.</p><pre><code class="language-julia">using Statistics
+ 0.00392080649016589
+ 0.004876572450342803
+ 0.005822712524166966
+ 0.006759300020585329
+ 0.007686407746251844
+ 0.008604108005619072
+ ⋮
+ 0.06890642513277549
+ 0.06880511185673871
+ 0.06870317328016867
+ 0.06860061804932972
+ 0.06849745473268208
+ 0.06839369182089518
+ 0.06828933772686158
+ 0.06818440078571056
+ 0.0680788892548222</code></pre><p>We compare the solution from PCE to a Monte-Carlo-based solution. That means to solve the ordinary differential equation for many samples of <span>$\mathsf{a}$</span>. We first sample from the measure using <code>sampleMeasure</code>, and then generate samples of <span>$\mathsf{a}$</span> using <code>evaluatePCE</code>. After that we solve the ODE and store the results in <code>xmc</code>.</p><pre><code class="language-julia">using Statistics
 Nsmpl = 5000
 ξ = sampleMeasure(Nsmpl, opq)     # sample from Gaussian measure; effectively randn() here
 asmpl = evaluatePCE(a, ξ, opq)     # sample random variable with PCE coefficients a; effectively μ + σ*randn() here
 # or: asmpl = samplePCE(Nsmpl,a,opq)
 xmc = [ solve(ODEProblem((u,p,t)-&gt;aa*u,x0,(0,tend));saveat=0:Δt:tend).u for aa in asmpl]
 xmc = hcat(xmc...);</code></pre><pre><code class="language-none">301×5000 Array{Float64,2}:
- 2.0       2.0       2.0       2.0       …  2.0       2.0       2.0     
- 1.99118   1.98935   1.98969   1.99079      1.98793   1.99193   1.98921 
- 1.98241   1.97876   1.97944   1.98162      1.97594   1.9839    1.97849 
- 1.97367   1.96823   1.96924   1.97249      1.96402   1.97589   1.96781 
- 1.96497   1.95775   1.9591    1.96341      1.95217   1.96792   1.9572  
- 1.95631   1.94732   1.949     1.95436   …  1.94039   1.95999   1.94665 
- 1.94769   1.93696   1.93896   1.94536      1.92868   1.95208   1.93615 
- 1.9391    1.92664   1.92897   1.9364       1.91705   1.9442    1.92571 
- 1.93056   1.91638   1.91903   1.92748      1.90548   1.93636   1.91532 
- 1.92205   1.90618   1.90914   1.9186       1.89398   1.92855   1.90499 
- ⋮                                       ⋱                              
- 0.550622  0.42078   0.442505  0.519489     0.34166   0.614393  0.412327
- 0.548195  0.41854   0.440225  0.517096     0.339598  0.611914  0.410103
- 0.545779  0.416312  0.437957  0.514714     0.337549  0.609446  0.407892
- 0.543373  0.414095  0.4357    0.512343  …  0.335513  0.606987  0.405692
- 0.540978  0.411891  0.433455  0.509984     0.333489  0.604539  0.403504
- 0.538594  0.409698  0.431222  0.507635     0.331477  0.6021    0.401328
- 0.53622   0.407516  0.429     0.505296     0.329477  0.599672  0.399163
- 0.533856  0.405347  0.42679   0.502969     0.327489  0.597253  0.39701 
- 0.531503  0.403189  0.424591  0.500652  …  0.325513  0.594843  0.394869</code></pre><p>Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.</p><pre><code class="language-julia">[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
-  0.0           0.0       
- -1.12062e-5   -1.99428e-6
- -2.23026e-5   -3.96661e-6
- -3.329e-5     -5.91717e-6
- -4.41692e-5   -7.84613e-6
- -5.49411e-5   -9.75364e-6
- -6.56064e-5   -1.16399e-5
- -7.61659e-5   -1.35049e-5
- -8.66205e-5   -1.5349e-5 
- -9.69708e-5   -1.71723e-5
-  ⋮                       
- -0.000784696  -9.01148e-5
- -0.00078353   -8.96936e-5
- -0.000782358  -8.92712e-5
- -0.00078118   -8.88476e-5
- -0.000779994  -8.84227e-5
- -0.000778802  -8.79967e-5
- -0.000777604  -8.75694e-5
- -0.000776399  -8.7141e-5 
- -0.000775188  -8.67114e-5</code></pre><p>Clearly, the accuracy of PCE deteriorates over time. Possible remedies are to increase the dimension of PCE, and to tweak the tolerances of the integrator.</p><p>Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.</p><pre><code class="language-julia">logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
+ 2.0       2.0       2.0       2.0       …  2.0       2.0       2.0
+ 1.99068   1.98905   1.98993   1.98875      1.98937   1.9917    1.99075
+ 1.98141   1.97816   1.9799    1.97757      1.9788    1.98343   1.98154
+ 1.97218   1.96733   1.96993   1.96644      1.96829   1.97519   1.97238
+ 1.96299   1.95656   1.96      1.95538      1.95783   1.96699   1.96326
+ 1.95385   1.94584   1.95013   1.94439   …  1.94742   1.95882   1.95418
+ 1.94475   1.93519   1.94031   1.93345      1.93707   1.95069   1.94514
+ 1.93569   1.92459   1.93053   1.92258      1.92678   1.94259   1.93614
+ 1.92667   1.91406   1.92081   1.91176      1.91654   1.93453   1.92719
+ 1.91769   1.90357   1.91113   1.90101      1.90636   1.92649   1.91828
+ ⋮                                       ⋱                      
+ 0.511565  0.402506  0.457734  0.385294     0.422035  0.593484  0.516624
+ 0.509182  0.400302  0.455429  0.383127     0.419792  0.59102   0.514234
+ 0.50681   0.398111  0.453134  0.380972     0.417561  0.588566  0.511856
+ 0.504449  0.395931  0.450852  0.378829  …  0.415343  0.586122  0.509489
+ 0.502099  0.393763  0.448581  0.376699     0.413135  0.583689  0.507133
+ 0.49976   0.391607  0.446321  0.37458      0.41094   0.581265  0.504787
+ 0.497432  0.389463  0.444073  0.372473     0.408756  0.578852  0.502453
+ 0.495114  0.38733   0.441836  0.370379     0.406584  0.576448  0.500129
+ 0.492808  0.38521   0.43961   0.368295  …  0.404424  0.574055  0.497816</code></pre><p>Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.</p><pre><code class="language-julia">[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
+  0.0          0.0
+ -4.93834e-7   1.62107e-5
+ -9.66597e-7   3.22582e-5
+ -1.41853e-6   4.81436e-5
+ -1.8499e-6    6.38682e-5
+ -2.261e-6     7.94332e-5
+ -2.65211e-6   9.48398e-5
+ -3.0235e-6    0.000110089
+ -3.37544e-6   0.000125182
+ -3.70821e-6   0.000140121
+  ⋮            
+  0.000127481  0.00107828
+  0.000127833  0.00107642
+  0.000128182  0.00107455
+  0.000128527  0.00107268
+  0.000128869  0.00107079
+  0.000129207  0.00106889
+  0.000129541  0.00106699
+  0.000129872  0.00106507
+  0.0001302    0.00106315</code></pre><p>Clearly, the accuracy of PCE deteriorates over time. Possible remedies are to increase the dimension of PCE, and to tweak the tolerances of the integrator.</p><p>Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.</p><pre><code class="language-julia">logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
 [ mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
-  1.11022e-16   1.11033e-16
- -5.63063e-6   -1.00266e-6 
- -1.12613e-5   -2.00532e-6 
- -1.68919e-5   -3.00797e-6 
- -2.25226e-5   -4.01063e-6 
- -2.81532e-5   -5.01329e-6 
- -3.37838e-5   -6.01596e-6 
- -3.94144e-5   -7.01863e-6 
- -4.5045e-5    -8.02129e-6 
- -5.06757e-5   -9.02395e-6 
-  ⋮                        
- -0.00164386   -0.000292955
- -0.00164949   -0.00029396 
- -0.00165512   -0.000294965
- -0.00166075   -0.00029597 
- -0.00166638   -0.000296973
- -0.00167201   -0.000297977
- -0.00167764   -0.00029898 
- -0.00168327   -0.000299983
- -0.0016889    -0.000300985</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../chi_squared_k_greater1/">« Chi Squared, Several DOFs</a><a class="docs-footer-nextpage" href="../DCsOPF/">Optimal Power Flow »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 19 March 2020 16:30">Thursday 19 March 2020</span>. Using Julia version 1.1.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  1.11022e-16  1.11033e-16
+ -2.52214e-7   8.14639e-6
+ -5.04438e-7   1.62928e-5
+ -7.56669e-7   2.44392e-5
+ -1.00889e-6   3.25856e-5
+ -1.2611e-6    4.07319e-5
+ -1.5133e-6    4.88783e-5
+ -1.7655e-6    5.70247e-5
+ -2.01771e-6   6.51711e-5
+ -2.26992e-6   7.33175e-5
+  ⋮            
+ -7.33673e-5   0.00237856
+ -7.36152e-5   0.00238671
+ -7.38642e-5   0.00239485
+ -7.41141e-5   0.002403
+ -7.43649e-5   0.00241114
+ -7.46165e-5   0.00241929
+ -7.48687e-5   0.00242743
+ -7.51211e-5   0.00243558
+ -7.53735e-5   0.00244372</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../chi_squared_k_greater1/">« Chi Squared, Several DOFs</a><a class="docs-footer-nextpage" href="../DCsOPF/">Optimal Power Flow »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 18 September 2020 12:24">Friday 18 September 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
