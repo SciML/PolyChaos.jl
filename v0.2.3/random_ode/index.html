@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Random ODE · PolyChaos.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">PolyChaos.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Overview</a></li><li><a class="tocitem" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="tocitem">Usage</span><ul><li><a class="tocitem" href="../numerical_integration/">Numerical Integration</a></li><li><a class="tocitem" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="tocitem" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li><a class="tocitem" href="../gaussian_mixture_model/">Gaussian Mixture Models</a></li><li><a class="tocitem" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="tocitem" href="../scalar_products/">Computation of Scalar Products</a></li><li><input class="collapse-toggle" id="menuitem-3-7" type="checkbox" checked/><label class="tocitem" for="menuitem-3-7"><span class="docs-label">Polynomial Chaos</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../pce_tutorial/">Basic Usage</a></li><li><a class="tocitem" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="tocitem" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li class="is-active"><a class="tocitem" href>Random ODE</a><ul class="internal"><li><a class="tocitem" href="#Theory-1"><span>Theory</span></a></li><li><a class="tocitem" href="#Practice-1"><span>Practice</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="tocitem" href="../math/">Mathematical Background</a></li><li><a class="tocitem" href="../functions/">Functions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Usage</a></li><li><a class="is-disabled">Polynomial Chaos</a></li><li class="is-active"><a href>Random ODE</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Random ODE</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/random_ode.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Galerkin-based-Solution-of-Random-Differential-Equation-1"><a class="docs-heading-anchor" href="#Galerkin-based-Solution-of-Random-Differential-Equation-1">Galerkin-based Solution of Random Differential Equation</a><a class="docs-heading-anchor-permalink" href="#Galerkin-based-Solution-of-Random-Differential-Equation-1" title="Permalink"></a></h1><p>This tutorial demonstrates how random differential equations can be solved using polynomial chaos expansions (PCE).</p><h2 id="Theory-1"><a class="docs-heading-anchor" href="#Theory-1">Theory</a><a class="docs-heading-anchor-permalink" href="#Theory-1" title="Permalink"></a></h2><p>A random differential equation is an ordinary differential equation that has random parameters, hence its solution is itself a (time-varying) random variable. Perhaps the simplest non-trivial example is the following scalar, linear ordinary differential equation</p><div>\[\dot{x}(t) = a x(t), \quad x(0) = x_{0},\]</div><p>where <span>$a$</span> is the realization of a Gaussian random variable <span>$\mathsf{a} \sim \mathcal{N}(\mu, \sigma^2)$</span> with mean <span>$\mu$</span> and variance <span>$\sigma^2$</span>. Arguably, for every realization <span>$a$</span> we can solve the differential equation and obtain</p><div>\[x(t) = x_0 \mathrm{e}^{a t},\]</div><p>from which we find that</p><div>\[\ln (x(t)) = \ln (x_0) + at \sim \mathcal{N}(\ln(x_0) + \mu t, (\sigma t)^2).\]</div><p>In other words, the logarithm of the solution is normally distributed (so-called <a href="https://en.wikipedia.org/wiki/Log-normal_distribution">log-normal distribution</a>).</p><p>We&#39;d like to obtain this result numerically with the help of PCE. The first step is to define the (truncated) PCE for the random variable <span>$\mathsf{a}$</span></p><div>\[\mathsf{a} = \sum_{i=0}^{L} a_i \phi_i,\]</div><p>where <span>$a_i$</span> are the so-called PCE coefficients, and <span>$\phi_i$</span> are the orthogonal basis polynomials. As the solution to the random differential equation is itself a random variable, we treat <span>$x(t)$</span> as the realization of the random variable <span>$\mathsf{x}(t)$</span>, and define its PCE</p><div>\[\mathsf{x}(t) = \sum_{i=0}^{L} x_i(t) \phi_i.\]</div><p>The question is how to obtain the unknown PCE coefficients <span>$x_i(t)$</span> from the known PCE coefficients <span>$a_i$</span> relative to the orthogonal basis polynomials <span>$\phi_i$</span>. This can be done using Galerkin projection, which is nothing else than projecting onto the orthogonal basis. Think of a three-dimensional space, in which you have placed some three-dimensional object. If you know project the silhouett of the object onto every axis of the three-dimensional space, then you are doing a Galerkin projection. With PCE the concept is equivalent, but the imagination has a harder time. The first step for Galerkin projection is to insert the PCEs</p><div>\[\sum_{i=0}^{L} \dot{x}_i(t) \phi_i = \sum_{j=0}^{L} a_j \phi_j \sum_{k=0}^{L} x_k(t) \phi_k;\]</div><p>the second step is to project onto every basis polynomial <span>$\phi_m$</span> for <span>$m = 0, 1, \dots, L$</span>, and to exploit orthogonality of the basis. This gives</p><div>\[\dot{x}_m(t) \langle \phi_m, \phi_m \rangle = \sum_{j=0}^{L} \sum_{k=0}^{L} a_j x_k(t) \langle \phi_l \phi_k, \phi_m \rangle \quad m = 0, 1, \dots, L.\]</div><p>Of course, the initial condition must not be forgotten:</p><div>\[x_0(0) = x_0, \quad x_m(0) = 0 \quad m = 1, \dots, L.\]</div><p>If we can solve this enlarged system of ordinary random differential equations, we can reconstruct the analytic solution.</p><h2 id="Practice-1"><a class="docs-heading-anchor" href="#Practice-1">Practice</a><a class="docs-heading-anchor-permalink" href="#Practice-1" title="Permalink"></a></h2><p>We begin by defining the random differential equation</p><pre><code class="language-julia">x0 = 2.0
+μ, σ = -0.5, 0.05
+tend, Δt = 3.0, 0.01</code></pre><pre><code class="language-none">(3.0, 0.01)</code></pre><p>Next, we define an orthogonal basis (and its quadrature rule) relative to the Gaussian measure using <code>PolyChaos</code>. We choose a maximum degree of <code>L</code>.</p><pre><code class="language-julia">using PolyChaos
+L, Nrec = 6, 40
+opq = GaussOrthoPoly(L; Nrec=Nrec, addQuadrature=true)</code></pre><pre><code class="language-none">GaussOrthoPoly{Array{Float64,1},GaussMeasure,Quad{Float64,Array{Float64,1}}}(6, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  …  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0  …  30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0], GaussMeasure(PolyChaos.w_gaussian, (-Inf, Inf), true), Quad{Float64,Array{Float64,1}}(&quot;golubwelsch&quot;, 39, [-11.289716044476338, -10.31334144275699, -9.501306853782872, -8.773438698067654, -8.099152213152408, -7.46268237786604, -6.854552519790957, -6.268491549685282, -5.700062454271861, -5.1459645440941815  …  5.145964544094184, 5.700062454271859, 6.268491549685282, 6.854552519790963, 7.46268237786604, 8.099152213152397, 8.77343869806765, 9.501306853782866, 10.313341442756998, 11.289716044476336], [9.443344575063092e-29, 2.7847875052254124e-24, 7.592450542206571e-21, 5.370701458462944e-18, 1.4861295877333035e-15, 1.998726680623688e-13, 1.491720010448911e-11, 6.748646364787844e-10, 1.9698729205993654e-8, 3.8841182837133097e-7  …  3.884118283713288e-7, 1.9698729205993754e-8, 6.748646364787816e-10, 1.4917200104488884e-11, 1.9987266806237089e-13, 1.4861295877332983e-15, 5.370701458462905e-18, 7.592450542206324e-21, 2.784787505225327e-24, 9.443344575062904e-29]))</code></pre><p>Now we can define the PCE for <span>$\mathsf{a}$</span> and solve the Galerkin-projected ordinary differential equation using <code>DifferentialEquations.jl</code>.</p><pre><code class="language-julia">using DifferentialEquations
+
+a = [ convert2affinePCE(μ, σ, opq); zeros(Float64,L-1) ] # PCE coefficients of a
+xinit = [ x0; zeros(Float64,L) ] # PCE coefficients of initial condition
+
+t2 = Tensor(2, opq); # \langle \phi_i, \phi_j \rangle
+t3 = Tensor(3, opq); # \langle \phi_i \phi_j, \phi_k \rangle
+
+# Galerkin-projected random differential equation
+function ODEgalerkin(du,u,p,t)
+   du[:] = [ sum( p[j+1]*u[k+1]*t3.get([j,k,m])/t2.get([m,m]) for j=0:L for k=0:L) for m=0:L ]
+end
+
+probgalerkin = ODEProblem(ODEgalerkin,xinit,(0,tend),a)
+solgalerkin = solve(probgalerkin;saveat=0:Δt:tend)
+t, x = solgalerkin.t, solgalerkin.u;</code></pre><pre><code class="language-none">([0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09  …  2.91, 2.92, 2.93, 2.94, 2.95, 2.96, 2.97, 2.98, 2.99, 3.0], [[2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.9900252071385, 0.0009950126035692532, 2.4875315089174124e-7, 4.145885853203445e-11, 5.18235542414578e-15, 5.182372858830409e-19, 4.4463679915179475e-23], [1.9801006575270281, 0.001980100667935056, 9.900482838765526e-7, 3.3022172302461603e-10, 7.191588126714429e-14, 2.552297168272165e-16, -9.336413940907328e-19], [1.9702260956550872, 0.0029553391699344814, 2.2164991440241397e-6, 1.108778231932126e-9, 3.880756939524286e-13, 7.647076311529437e-16, -3.0601672035416215e-18], [1.9604012673415026, 0.003920802569373871, 3.92079565910784e-6, 2.614569329387374e-9, 1.2695719959132683e-12, 1.4309113331517722e-15, -5.331497886979387e-18], [1.9506259196896107, 0.004876564830716198, 6.095699691028394e-6, 5.080409655478233e-9, 3.1388591707103675e-12, 2.522646952235701e-15, -6.647819901734136e-18], [1.94089980108726, 0.005822699423080991, 8.734045035813635e-6, 8.73448754624683e-9, 6.524935783028917e-12, 4.675567394339299e-15, -5.8575412401594595e-18], [1.9312226612068097, 0.0067592793202444325, 1.1828737423618912e-5, 1.3800365033690686e-8, 1.2063344578682602e-11, 8.89217234192063e-15, -1.757291429632381e-18], [1.92159425100513, 0.0076863770006392875, 1.537275451872677e-5, 2.0496977845761823e-8, 2.0496172484610545e-11, 1.6541808253960652e-14, 6.9080784674465654e-18], [1.9120143227236033, 0.00860406444735494, 1.9359145919547074e-5, 2.9038635406367142e-8, 3.2672050608878766e-11, 2.93606683659633e-14, 2.1445495853653413e-17]  …  [0.47176823244752897, 0.06864220151584116, 0.004993736418114501, 0.0002421945024010764, 8.809905417026421e-6, 2.56366688100802e-7, 6.2003759830381115e-9], [0.4694494907227624, 0.06853954831320269, 0.0050034034535676435, 0.0002434972451458334, 8.88772936168224e-6, 2.5952015845324614e-7, 6.2981009199958616e-9], [0.46714226194361325, 0.06843626325913324, 0.005012972845686217, 0.0002447984435509822, 8.965822463870267e-6, 2.6269707595728394e-7, 6.396916976475764e-9], [0.46484648838468107, 0.06833235513849441, 0.00502244476425078, 0.00024609805746849084, 9.04418265064778e-6, 2.658974600032164e-7, 6.496830428853433e-9], [0.462562112631329, 0.06822783265780334, 0.005031819383026442, 0.0002473960470448727, 9.122807836593206e-6, 2.691213288272223e-7, 6.597847538522161e-9], [0.460289077579685, 0.06812270444523286, 0.0050410968797628625, 0.0002486923727211862, 9.20169592380607e-6, 2.723686995113561e-7, 6.6999745518928595e-9], [0.45802732643664096, 0.06801697905061128, 0.005050277436194252, 0.00024998699523303493, 9.280844801907035e-6, 2.7563958798354944e-7, 6.803217700394112e-9], [0.455776802719853, 0.06791066494542264, 0.005059361238039373, 0.00025127987561056775, 9.360252348037884e-6, 2.789340090176107e-7, 6.907583200472148e-9], [0.45353745025774184, 0.0678037705228065, 0.005068348475001534, 0.00025257097517847863, 9.439916426861515e-6, 2.8225197623322443e-7, 7.013077253590828e-9], [0.4513092131894926, 0.06769630409755806, 0.005077239340768596, 0.0002538602555560064, 9.51983489056194e-6, 2.8559350209595174e-7, 7.1197060462316646e-9]])</code></pre><p>For later purposes we compute the expected value and the standard deviation at all time instants using PCE.</p><pre><code class="language-julia"># an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
+mean_pce = [ mean(x_, opq) for x_ in x]
+std_pce = [ std(x_, opq) for x_ in x]</code></pre><pre><code class="language-none">301-element Array{Float64,1}:
+ 0.0
+ 0.0009950126657575441
+ 0.001980101162958276
+ 0.0029553408323056947
+ 0.00392080649016589
+ 0.004876572450342803
+ 0.005822712524166966
+ 0.006759300020585329
+ 0.007686407746251844
+ 0.008604108005619072
+ ⋮
+ 0.06890642513277549
+ 0.06880511185673871
+ 0.06870317328016867
+ 0.06860061804932972
+ 0.06849745473268208
+ 0.06839369182089518
+ 0.06828933772686158
+ 0.06818440078571056
+ 0.0680788892548222</code></pre><p>We compare the solution from PCE to a Monte-Carlo-based solution. That means to solve the ordinary differential equation for many samples of <span>$\mathsf{a}$</span>. We first sample from the measure using <code>sampleMeasure</code>, and then generate samples of <span>$\mathsf{a}$</span> using <code>evaluatePCE</code>. After that we solve the ODE and store the results in <code>xmc</code>.</p><pre><code class="language-julia">using Statistics
+Nsmpl = 5000
+ξ = sampleMeasure(Nsmpl, opq)     # sample from Gaussian measure; effectively randn() here
+asmpl = evaluatePCE(a, ξ, opq)     # sample random variable with PCE coefficients a; effectively μ + σ*randn() here
+# or: asmpl = samplePCE(Nsmpl,a,opq)
+xmc = [ solve(ODEProblem((u,p,t)-&gt;aa*u,x0,(0,tend));saveat=0:Δt:tend).u for aa in asmpl]
+xmc = hcat(xmc...);</code></pre><pre><code class="language-none">301×5000 Array{Float64,2}:
+ 2.0       2.0       2.0       2.0       …  2.0       2.0       2.0
+ 1.98875   1.99056   1.9881    1.99209      1.98993   1.99065   1.98934
+ 1.97756   1.98116   1.97626   1.98421      1.97992   1.98134   1.97874
+ 1.96643   1.9718    1.9645    1.97637      1.96995   1.97208   1.96819
+ 1.95537   1.96249   1.95281   1.96855      1.96004   1.96285   1.9577
+ 1.94437   1.95323   1.94119   1.96077   …  1.95017   1.95368   1.94726
+ 1.93343   1.944     1.92963   1.95302      1.94035   1.94454   1.93689
+ 1.92255   1.93482   1.91815   1.94529      1.93059   1.93545   1.92656
+ 1.91174   1.92569   1.90673   1.9376       1.92087   1.9264    1.91629
+ 1.90098   1.9166    1.89538   1.92994      1.9112    1.91739   1.90608
+ ⋮                                       ⋱                      
+ 0.385104  0.502137  0.349954  0.628919     0.458265  0.508933  0.420044
+ 0.382938  0.499766  0.347872  0.626432     0.455959  0.506553  0.417805
+ 0.380783  0.497407  0.345801  0.623955     0.453664  0.504185  0.415578
+ 0.378641  0.495058  0.343743  0.621487  …  0.45138   0.501827  0.413363
+ 0.376511  0.49272   0.341697  0.61903      0.449108  0.49948   0.41116
+ 0.374393  0.490394  0.339664  0.616582     0.446848  0.497145  0.408969
+ 0.372286  0.488078  0.337642  0.614144     0.444599  0.49482   0.406789
+ 0.370192  0.485774  0.335633  0.611716     0.442361  0.492507  0.404621
+ 0.368109  0.48348   0.333635  0.609297  …  0.440134  0.490204  0.402464</code></pre><p>Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.</p><pre><code class="language-julia">[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
+  0.0           0.0
+ -9.27301e-6   -9.73211e-6
+ -1.84632e-5   -1.93893e-5
+ -2.75712e-5   -2.8972e-5
+ -3.65974e-5   -3.84807e-5
+ -4.55425e-5   -4.79158e-5
+ -5.4407e-5    -5.72778e-5
+ -6.31914e-5   -6.6567e-5
+ -7.18963e-5   -7.57839e-5
+ -8.05223e-5   -8.49289e-5
+  ⋮            
+ -0.000742137  -0.000932761
+ -0.000741395  -0.000932401
+ -0.000740647  -0.000932029
+ -0.000739891  -0.000931647
+ -0.000739128  -0.000931254
+ -0.000738359  -0.000930851
+ -0.000737582  -0.000930437
+ -0.000736799  -0.000930013
+ -0.000736009  -0.000929578</code></pre><p>Clearly, the accuracy of PCE deteriorates over time. Possible remedies are to increase the dimension of PCE, and to tweak the tolerances of the integrator.</p><p>Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.</p><pre><code class="language-julia">logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
+[ mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
+  1.11022e-16   1.11033e-16
+ -4.65728e-6   -4.88487e-6
+ -9.31457e-6   -9.76972e-6
+ -1.39719e-5   -1.46546e-5
+ -1.86292e-5   -1.95394e-5
+ -2.32864e-5   -2.44243e-5
+ -2.79437e-5   -2.93092e-5
+ -3.2601e-5    -3.41941e-5
+ -3.72582e-5   -3.90789e-5
+ -4.19155e-5   -4.39638e-5
+  ⋮            
+ -0.00135965   -0.00142656
+ -0.0013643    -0.00143145
+ -0.00136895   -0.00143633
+ -0.00137361   -0.00144122
+ -0.00137826   -0.00144611
+ -0.00138292   -0.00145099
+ -0.00138758   -0.00145588
+ -0.00139224   -0.00146076
+ -0.00139689   -0.00146565</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../chi_squared_k_greater1/">« Chi Squared, Several DOFs</a><a class="docs-footer-nextpage" href="../DCsOPF/">Optimal Power Flow »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 18 September 2020 13:26">Friday 18 September 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
