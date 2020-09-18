@@ -1,40 +1,44 @@
 ```@setup mysetup
 using PolyChaos
 d = 6
-op_gauss = GaussOrthoPoly(d, addQuadrature = true)
+myops = Dict()
+polynames = ["gaussian", "beta01", "uniform01", "logistic"]
+gaussian = GaussOrthoPoly(d);
+myops["gaussian"] = gaussian
+α, β = 1.3, 2.2
+beta01 = Beta01OrthoPoly(d,α,β);
+myops["beta01"] = beta01
+uniform01 = Uniform01OrthoPoly(d);
+myops["uniform01"] = uniform01
+logistic = LogisticOrthoPoly(d);
+myops["logistic"] = logistic;
+myops
 points, degrees = randn(10), 0:2:d
-[ evaluate(degree, points, op_gauss) for degree in degrees ]
+[ evaluate(degree,points,gaussian) for degree in degrees ]
 μ, σ = 2., 0.2
-pce_gauss = convert2affinePCE(μ, σ, op_gauss)
+pce_gaussian = convert2affinePCE(μ,σ,gaussian)
 a, b = -0.3, 1.2
-op_uniform = Uniform01OrthoPoly(d)
-convert2affinePCE(a, b, op_uniform)
-pce_uniform = convert2affinePCE(μ, σ, op_uniform; kind="μσ")
-α, β = 1.2, 3.4
-op_beta = Beta01OrthoPoly(d, α, β)
-convert2affinePCE(a, b, op_beta)
-pce_beta = convert2affinePCE(μ, σ, op_beta; kind="μσ")
+convert2affinePCE(a,b,uniform01)
+pce_uniform = convert2affinePCE(μ,σ,uniform01;kind="μσ")
+convert2affinePCE(a,b,beta01)
+pce_beta = convert2affinePCE(μ,σ,beta01; kind="μσ")
 a1, a2 = μ, sqrt(3)*σ/pi
-op_logistic = LogisticOrthoPoly(d)
-pce_logistic = convert2affinePCE(a1, a2, op_logistic)
-mean(pce_gauss, op_gauss), std(pce_gauss, op_gauss)
-mean(pce_uniform, op_uniform), std(pce_uniform, op_uniform)
-mean(pce_beta, op_beta), std(pce_beta, op_beta)
-mean(pce_logistic, op_beta), std(pce_logistic, op_beta)
+pce_logistic = convert2affinePCE(a1,a2,logistic)
+mean(pce_gaussian,myops["gaussian"]), std(pce_gaussian,myops["gaussian"])
+mean(pce_uniform,myops["uniform01"]), std(pce_uniform,myops["uniform01"])
+mean(pce_beta,myops["beta01"]), std(pce_beta,myops["beta01"])
+mean(pce_logistic,myops["logistic"]), std(pce_logistic,myops["logistic"])
 using Statistics
 N = 1000
-ξ_gauss = sampleMeasure(N, op_gauss)
-samples_gauss = evaluatePCE(pce_gauss, ξ_gauss, op_gauss)
-# samplePCE(N,pce_gauss,myops["gauss"])
-ξ_uniform = sampleMeasure(N, op_uniform)
-samples_uniform = evaluatePCE(pce_uniform, ξ_uniform, op_uniform)
-# samples_uniform = samplePCE(N,pce_uniform, op_uniform)
-ξ_beta = sampleMeasure(N, op_beta)
-samples_beta = evaluatePCE(pce_beta, ξ_beta, op_beta)
-# samples_beta = samplePCE(N, pce_beta, op_beta)
-ξ_logistic = sampleMeasure(N, op_logistic)
-samples_logistic = evaluatePCE(pce_logistic, ξ_logistic, op_logistic)
-# samples_logistic = samplePCE(N, pce_logistic, op_logistic)
+ξ_gaussian = sampleMeasure(N,myops["gaussian"])
+samples_gaussian = evaluatePCE(pce_gaussian,ξ_gaussian,myops["gaussian"])
+ξ_uniform = sampleMeasure(N,myops["uniform01"])
+samples_uniform = evaluatePCE(pce_uniform,ξ_uniform,myops["uniform01"])
+ξ_beta = sampleMeasure(N,myops["beta01"])
+samples_beta = evaluatePCE(pce_beta,ξ_beta,myops["beta01"])
+ξ_logistic = sampleMeasure(N,myops["logistic"])
+samples_logistic = evaluatePCE(pce_logistic,ξ_logistic,myops["logistic"])
+
 ```
 
 # [Common Random Variables](@id CommonRandomVariables)
@@ -46,22 +50,50 @@ That is, the PCE of a random variable $\mathsf{x}$ is given by
 ```
 where $x_i$ are the so-called PCE coefficients, and $\phi_i$ are the orthogonal polynomials that are orthogonal relative to the probability density function of $\mathsf{x}$.
 
-This tutorial walks you through the PCE of common random variables, namely Gaussian, Beta, Uniform, Logistic, and shows how they are implemented in `PolyChaos`.
+This tutorial walks you through the PCE of common random variables, namely Gaussian (`gaussian`), Beta (`beta01`), Uniform(`uniform01`), Logistic (`logistic`), and shows how they are implemented in `PolyChaos`.
 
 ## Construction of Basis
-Let's begin with the usual suspect, a Gaussian random variable.
-We construct the respective orthogonal polynomials of degree at most `d`
+
 ```@example mysetup
 using PolyChaos
-d = 6
-op_gauss = GaussOrthoPoly(d, addQuadrature = true)
 ```
-A quadrature rule is added by setting they keyword `addQuadrature = true` (which it is by default).
 
-Let's evaluate the Gaussian basis polynomials at some points for varying degrees.
+The orthogonal polynomials are constructed using the `OrthoPoly`-type (here of degree at most `d`). For canonical measures special constructors are implemented:
+
+
+```@example mysetup
+d = 6
+
+myops = Dict()
+polynames = ["gaussian", "beta01", "uniform01", "logistic"]
+
+# gaussian
+gaussian = GaussOrthoPoly(d);
+myops["gaussian"] = gaussian
+
+# beta01
+α, β = 1.3, 2.2
+beta01 = Beta01OrthoPoly(d,α,β);
+myops["beta01"] = beta01
+
+# uniform01
+uniform01 = Uniform01OrthoPoly(d);
+myops["uniform01"] = uniform01
+
+# logistic
+logistic = LogisticOrthoPoly(d);
+myops["logistic"] = logistic;
+
+myops
+```
+
+For example, let's evaluate the Gaussian basis polynomials at some points
+
+
 ```@example mysetup
 points, degrees = randn(10), 0:2:d
-[ evaluate(degree, points, op_gauss) for degree in degrees ]
+
+[ evaluate(degree,points,gaussian) for degree in degrees ]
 ```
 
 ## Finding PCE Coefficients
@@ -76,41 +108,43 @@ Given the Gaussian random variable $\mathsf{x} \sim \mathcal{N}(\mu, \sigma^2)$ 
 
 
 ```@example mysetup
+# Gaussian
 μ, σ = 2., 0.2
-pce_gauss = convert2affinePCE(μ, σ, op_gauss)
+pce_gaussian = convert2affinePCE(μ,σ,gaussian)
 ```
+
 
 ### Uniform
 Given the uniform random variable $\mathsf{x} \sim \mathcal{U}(a, b)$ with finite support $a<b$, the affine PCE coefficients are
 
+
 ```@example mysetup
 a, b = -0.3, 1.2
-op_uniform = Uniform01OrthoPoly(d)
-convert2affinePCE(a, b, op_uniform)
+convert2affinePCE(a,b,uniform01)
 ```
+
 
 Instead, if the expected value and standard deviation are known, the affine PCE coefficients of the uniform random variable are
 
+
 ```@example mysetup
-pce_uniform = convert2affinePCE(μ, σ, op_uniform; kind="μσ")
+pce_uniform = convert2affinePCE(μ,σ,uniform01;kind="μσ")
+# notice that the zero-order coefficient IS equivalent to the expected value μ
 ```
-Notice that the zero-order coefficient *is* equivalent to the expected value μ.
+
 
 ### Beta
 Given the Beta random variable $\mathsf{x} \sim \mathcal{B}(a, b, \alpha, \beta)$ with finite support $a<b$ and shape parameters $\alpha, \beta > 0$, the affine PCE coefficients are
 
 
 ```@example mysetup
-α, β = 1.2, 3.4
-op_beta = Beta01OrthoPoly(d, α, β)
-convert2affinePCE(a, b, op_beta)
+convert2affinePCE(a,b,beta01)
 ```
 
 Instead, if the expected value and standard deviation are known, the affine PCE coefficients of the uniform random variable are
 
-
 ```@example mysetup
-pce_beta = convert2affinePCE(μ, σ, op_beta; kind="μσ")
+pce_beta = convert2affinePCE(μ,σ,beta01; kind="μσ")
 ```
 
 ### Logistic
@@ -124,35 +158,40 @@ the affine PCE coefficients of the uniform random variable are
 
 ```@example mysetup
 a1, a2 = μ, sqrt(3)*σ/pi
-op_logistic = LogisticOrthoPoly(d)
-pce_logistic = convert2affinePCE(a1, a2, op_logistic)
+pce_logistic = convert2affinePCE(a1,a2,logistic)
 ```
+
 
 ## Moments
 It is a key feature of PCE to compute moments from the PCE coefficients alone; no sampling is required.
 
 ### Gaussian
 
+
 ```@example mysetup
-mean(pce_gauss, op_gauss), std(pce_gauss, op_gauss)
+mean(pce_gaussian,myops["gaussian"]), std(pce_gaussian,myops["gaussian"])
 ```
 
 ### Uniform
 
+
 ```@example mysetup
-mean(pce_uniform, op_uniform), std(pce_uniform, op_uniform)
+mean(pce_uniform,myops["uniform01"]), std(pce_uniform,myops["uniform01"])
 ```
+
 
 ### Beta
 
+
 ```@example mysetup
-mean(pce_beta, op_beta), std(pce_beta, op_beta)
+mean(pce_beta,myops["beta01"]), std(pce_beta,myops["beta01"])
 ```
 
 ### Logistic
 
+
 ```@example mysetup
-mean(pce_logistic, op_beta), std(pce_logistic, op_beta)
+mean(pce_logistic,myops["logistic"]), std(pce_logistic,myops["logistic"])
 ```
 
 ## Sampling
@@ -168,32 +207,36 @@ Both steps are combined in the function `samplePCE()`.
 
 
 ```@example mysetup
+using Statistics
 N = 1000
-ξ_gauss = sampleMeasure(N, op_gauss)
-samples_gauss = evaluatePCE(pce_gauss, ξ_gauss, op_gauss);
-# samplePCE(N,pce_gauss,myops["gauss"])
+ξ_gaussian = sampleMeasure(N,myops["gaussian"])
+samples_gaussian = evaluatePCE(pce_gaussian,ξ_gaussian,myops["gaussian"])
+# samplePCE(N,pce_gaussian,myops["gaussian"])
 ```
+
 
 ### Uniform
 
+
 ```@example mysetup
-ξ_uniform = sampleMeasure(N, op_uniform)
-samples_uniform = evaluatePCE(pce_uniform, ξ_uniform, op_uniform);
-# samples_uniform = samplePCE(N,pce_uniform, op_uniform)
-```
+ξ_uniform = sampleMeasure(N,myops["uniform01"])
+samples_uniform = evaluatePCE(pce_uniform,ξ_uniform,myops["uniform01"])
+# samples_uniform = samplePCE(N,pce_uniform,myops["uniform01"])
 
 ### Beta
 
+
 ```@example mysetup
-ξ_beta = sampleMeasure(N, op_beta)
-samples_beta = evaluatePCE(pce_beta, ξ_beta, op_beta);
-# samples_beta = samplePCE(N, pce_beta, op_beta)
+ξ_beta = sampleMeasure(N,myops["beta01"])
+samples_beta = evaluatePCE(pce_beta,ξ_beta,myops["beta01"])
+# samples_beta = samplePCE(N,pce_beta,myops["beta01"])
 ```
 
 ### Logistic
 
+
 ```@example mysetup
-ξ_logistic = sampleMeasure(N, op_logistic)
-samples_logistic = evaluatePCE(pce_logistic, ξ_logistic, op_logistic);
-# samples_logistic = samplePCE(N, pce_logistic, op_logistic)
+ξ_logistic = sampleMeasure(N,myops["logistic"])
+samples_logistic = evaluatePCE(pce_logistic,ξ_logistic,myops["logistic"])
+# samples_logistic = samplePCE(N,pce_logistic,myops["logistic"])
 ```
