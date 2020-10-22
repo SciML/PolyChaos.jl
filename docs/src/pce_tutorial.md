@@ -222,6 +222,8 @@ samples_gaussian = evaluatePCE(pce_gaussian,ξ_gaussian,myops["gaussian"])
 ξ_uniform = sampleMeasure(N,myops["uniform01"])
 samples_uniform = evaluatePCE(pce_uniform,ξ_uniform,myops["uniform01"])
 # samples_uniform = samplePCE(N,pce_uniform,myops["uniform01"])
+```
+
 
 ### Beta
 
