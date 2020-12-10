@@ -1,5 +1,4 @@
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://timueh.github.io/PolyChaos.jl/stable)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://timueh.github.io/PolyChaos.jl/dev)
 [![Build Status](https://travis-ci.org/timueh/PolyChaos.jl.svg?branch=master)](https://travis-ci.org/timueh/PolyChaos.jl)
 [![codecov](https://codecov.io/gh/timueh/PolyChaos.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/timueh/PolyChaos.jl)
 [![Coverage Status](https://coveralls.io/repos/github/timueh/PolyChaos.jl/badge.svg?branch=master)](https://coveralls.io/github/timueh/PolyChaos.jl?branch=master)
