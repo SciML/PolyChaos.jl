@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/timueh/PolyChaos.jl.svg?branch=master)](https://travis-ci.org/timueh/PolyChaos.jl)
 [![codecov](https://codecov.io/gh/timueh/PolyChaos.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/timueh/PolyChaos.jl)
 [![Coverage Status](https://coveralls.io/repos/github/timueh/PolyChaos.jl/badge.svg?branch=master)](https://coveralls.io/github/timueh/PolyChaos.jl?branch=master)
-[![DOI](https://zenodo.org/badge/165908711.svg)](https://zenodo.org/badge/latestdoi/165908711)
-
+[![Code DOI](https://zenodo.org/badge/165908711.svg)](https://zenodo.org/badge/latestdoi/165908711)
+[![Paper@arXiv](https://img.shields.io/badge/arXiv-2004.03970-green.svg)](https://arxiv.org/abs/2004.03970)
 
 
 
@@ -38,3 +38,23 @@ integrate(x -> 6x^5, opq)
 
 
 For more information please visit the [documentation](https://timueh.github.io/PolyChaos.jl/stable/).
+
+## Citing
+
+If you like `PolyChaos.jl`, consider citing our paper
+
+```
+@ARTICLE{2020arXiv200403970M,
+       author = {{M{\"u}hlpfordt}, Tillmann and {Zahn}, Frederik and {Hagenmeyer}, Veit and {Faulwasser}, Timm},
+        title = "{PolyChaos.jl -- A Julia Package for Polynomial Chaos in Systems and Control}",
+      journal = {arXiv e-prints},
+     keywords = {Electrical Engineering and Systems Science - Systems and Control, Mathematics - Numerical Analysis, Mathematics - Optimization and Control},
+         year = 2020,
+        month = apr,
+          eid = {arXiv:2004.03970},
+        pages = {arXiv:2004.03970},
+archivePrefix = {arXiv},
+       eprint = {2004.03970},
+ primaryClass = {eess.SY},
+}
+```
