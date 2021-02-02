@@ -48,63 +48,63 @@ asmpl = evaluatePCE(a, ξ, opq)     # sample random variable with PCE coefficien
 xmc = [ solve(ODEProblem((u,p,t)-&gt;aa*u,x0,(0,tend));saveat=0:Δt:tend).u for aa in asmpl]
 xmc = hcat(xmc...);</code></pre><pre><code class="language-none">301×5000 Array{Float64,2}:
  2.0       2.0       2.0       2.0       …  2.0       2.0       2.0
- 1.9902    1.99016   1.98972   1.99118      1.99064   1.99027   1.99234
- 1.98045   1.98036   1.97949   1.98239      1.98133   1.98058   1.98471
- 1.97074   1.97061   1.96931   1.97365      1.97206   1.97094   1.97711
- 1.96108   1.96091   1.95919   1.96494      1.96283   1.96135   1.96954
- 1.95147   1.95126   1.94912   1.95627   …  1.95364   1.9518    1.96199
- 1.94191   1.94166   1.9391    1.94764      1.9445    1.94231   1.95448
- 1.93239   1.9321    1.92913   1.93905      1.9354    1.93285   1.947
- 1.92292   1.92259   1.91921   1.93049      1.92635   1.92345   1.93954
- 1.9135    1.91313   1.90935   1.92198      1.91733   1.91409   1.93211
+ 1.99003   1.98982   1.99054   1.98977      1.99044   1.99021   1.99002
+ 1.9801    1.97968   1.98113   1.97958      1.98092   1.98046   1.98008
+ 1.97023   1.9696    1.97176   1.96945      1.97145   1.97076   1.9702
+ 1.96041   1.95957   1.96243   1.95938      1.96202   1.96111   1.96036
+ 1.95063   1.9496    1.95315   1.94935   …  1.95264   1.9515    1.95057
+ 1.9409    1.93967   1.94391   1.93938      1.9433    1.94195   1.94084
+ 1.93123   1.92979   1.93472   1.92945      1.93401   1.93244   1.93115
+ 1.9216    1.91997   1.92556   1.91958      1.92476   1.92297   1.92151
+ 1.91201   1.91019   1.91646   1.90976      1.91555   1.91355   1.91191
  ⋮                                       ⋱                      
- 0.476452  0.473488  0.444049  0.54997      0.508444  0.481244  0.652276
- 0.474117  0.471158  0.441766  0.547544     0.506064  0.478902  0.649778
- 0.471793  0.468839  0.439495  0.545128     0.503696  0.476572  0.64729
- 0.469481  0.466531  0.437236  0.542723  …  0.501339  0.474252  0.644811
- 0.46718   0.464235  0.434988  0.540329     0.498994  0.471944  0.642342
- 0.464891  0.46195   0.432752  0.537945     0.496659  0.469647  0.639882
- 0.462612  0.459676  0.430527  0.535572     0.494335  0.467362  0.637431
- 0.460345  0.457414  0.428314  0.533209     0.492022  0.465087  0.63499
- 0.458089  0.455162  0.426112  0.530857  …  0.489719  0.462824  0.632558</code></pre><p>Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.</p><pre><code class="language-julia">[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
-  0.0          0.0
- -4.15048e-6   6.6504e-6
- -8.25303e-6   1.32513e-5
- -1.2308e-5    1.98028e-5
- -1.63158e-5   2.63054e-5
- -2.02768e-5   3.27592e-5
- -2.41915e-5   3.91644e-5
- -2.80601e-5   4.55214e-5
- -3.18832e-5   5.18305e-5
- -3.56611e-5   5.80917e-5
-  ⋮            
- -0.000209244  0.000650358
- -0.00020863   0.000650168
- -0.000208015  0.000649972
- -0.000207399  0.000649769
- -0.000206783  0.000649559
- -0.000206167  0.000649342
- -0.00020555   0.000649119
- -0.000204932  0.00064889
- -0.000204314  0.000648654</code></pre><p>Clearly, the accuracy of PCE deteriorates over time. Possible remedies are to increase the dimension of PCE, and to tweak the tolerances of the integrator.</p><p>Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.</p><pre><code class="language-julia">logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
+ 0.464619  0.450446  0.500961  0.447155     0.49336   0.476926  0.463823
+ 0.462302  0.448152  0.498592  0.444867     0.491001  0.474591  0.461508
+ 0.459997  0.44587   0.496233  0.442591     0.488653  0.472267  0.459204
+ 0.457703  0.4436    0.493886  0.440326  …  0.486316  0.469954  0.456911
+ 0.455421  0.441341  0.49155   0.438073     0.483991  0.467652  0.45463
+ 0.45315   0.439094  0.489225  0.435832     0.481676  0.465362  0.452361
+ 0.45089   0.436858  0.486911  0.433601     0.479373  0.463083  0.450102
+ 0.448642  0.434633  0.484608  0.431383     0.477081  0.460815  0.447855
+ 0.446405  0.43242   0.482316  0.429175  …  0.474799  0.458558  0.44562</code></pre><p>Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.</p><pre><code class="language-julia">[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
+ 0.0           0.0
+ 1.41556e-5   -2.86655e-6
+ 2.81671e-5   -5.69906e-6
+ 4.20357e-5   -8.49789e-6
+ 5.57624e-5   -1.12633e-5
+ 6.93485e-5   -1.39956e-5
+ 8.27948e-5   -1.66952e-5
+ 9.61026e-5   -1.93622e-5
+ 0.000109273  -2.19971e-5
+ 0.000122307  -2.46e-5
+ ⋮            
+ 0.000942494  -0.000159613
+ 0.000940947  -0.000159318
+ 0.000939391  -0.000159023
+ 0.000937826  -0.000158728
+ 0.000936252  -0.000158431
+ 0.00093467   -0.000158134
+ 0.00093308   -0.000157836
+ 0.000931481  -0.000157537
+ 0.000929875  -0.000157238</code></pre><p>Clearly, the accuracy of PCE deteriorates over time. Possible remedies are to increase the dimension of PCE, and to tweak the tolerances of the integrator.</p><p>Finally, we compare whether the samples follow a log-normal distribution, and compare the result to the analytic mean and standard deviation.</p><pre><code class="language-julia">logx_pce = [ log.(evaluatePCE(x_,ξ,opq)) for x_ in x]
 [ mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]</code></pre><pre><code class="language-none">301×2 Array{Float64,2}:
-  1.11022e-16  1.11033e-16
- -2.08727e-6   3.33762e-6
- -4.17456e-6   6.67525e-6
- -6.26185e-6   1.00129e-5
- -8.34913e-6   1.33505e-5
- -1.04364e-5   1.66881e-5
- -1.25237e-5   2.00257e-5
- -1.46109e-5   2.33633e-5
- -1.66982e-5   2.6701e-5
- -1.87855e-5   3.00386e-5
-  ⋮            
- -0.000609205  0.000974406
- -0.000611288  0.000977741
- -0.000613372  0.000981076
- -0.000615457  0.000984412
- -0.000617543  0.000987749
- -0.000619629  0.000991085
- -0.000621717  0.000994423
- -0.000623804  0.00099776
- -0.000625892  0.0010011</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../chi_squared_k_greater1/">« Chi Squared, Several DOFs</a><a class="docs-footer-nextpage" href="../DCsOPF/">Optimal Power Flow »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 28 January 2021 21:22">Thursday 28 January 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 1.11022e-16   1.11033e-16
+ 7.114e-6     -1.44184e-6
+ 1.4228e-5    -2.88367e-6
+ 2.1342e-5    -4.3255e-6
+ 2.8456e-5    -5.76734e-6
+ 3.557e-5     -7.20918e-6
+ 4.2684e-5    -8.65103e-6
+ 4.9798e-5    -1.00929e-5
+ 5.6912e-5    -1.15347e-5
+ 6.4026e-5    -1.29766e-5
+ ⋮            
+ 0.00207756   -0.000421194
+ 0.00208468   -0.000422639
+ 0.0020918    -0.000424083
+ 0.00209891   -0.000425526
+ 0.00210603   -0.000426969
+ 0.00211314   -0.000428412
+ 0.00212026   -0.000429854
+ 0.00212737   -0.000431296
+ 0.00213449   -0.000432738</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../chi_squared_k_greater1/">« Chi Squared, Several DOFs</a><a class="docs-footer-nextpage" href="../DCsOPF/">Optimal Power Flow »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 2 February 2021 07:16">Tuesday 2 February 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
