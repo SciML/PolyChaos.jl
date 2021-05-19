@@ -244,7 +244,7 @@ end
 evaluatePCE(x::AbstractVector{<:Real},ξ::Real,α::AbstractVector{<:Real},β::AbstractVector{<:Real}) = evaluatePCE(x,[ξ],α,β)
 evaluatePCE(x::AbstractVector{<:Real},ξ::AbstractVector{<:Real},op::AbstractOrthoPoly) = evaluatePCE(x,ξ,op.α,op.β)
 
-function evaluatePCE(x::AbstractVector{<:Real},ξ::Matrix{<:Real},α::AbstractVector{<:AbstractVector{<:Real}},β::AbstractVector{<:AbstractVector{<:Real}},ind::AbstractMatrix{Int})
+function evaluatePCE(x::AbstractVector{<:Real},ξ::AbstractMatrix{<:Real},α::AbstractVector{<:AbstractVector{<:Real}},β::AbstractVector{<:AbstractVector{<:Real}},ind::AbstractMatrix{Int})
     Nsmpl = size(ξ,1)
     _checkNumberOfSamples(Nsmpl)
     !(length(α) == length(β) == size(ξ,2) == size(ind,2)) && throw(InconsistencyError("inconsistent number of coefficients"))
@@ -256,7 +256,7 @@ function evaluatePCE(x::AbstractVector{<:Real},ξ::Matrix{<:Real},α::AbstractVe
     end
     ϕ*x
 end
-function evaluatePCE(x::AbstractVector{<:Real},ξ::Matrix{<:Real},mOP::MultiOrthoPoly)
+function evaluatePCE(x::AbstractVector{<:Real},ξ::AbstractMatrix{<:Real},mOP::MultiOrthoPoly)
     a,b = coeffs(mOP)
     evaluatePCE(x,ξ,a,b,mOP.ind)
 end
