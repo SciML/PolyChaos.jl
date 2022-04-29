@@ -36,5 +36,4 @@ makedocs(
 deploydocs(
     repo = "github.com/SciML/PolyChaos.jl.git",
     target = "build",
-    push_preview = true
 )
