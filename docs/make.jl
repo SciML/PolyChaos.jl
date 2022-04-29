@@ -9,7 +9,7 @@ makedocs(
                          canonical="https://polychaos.sciml.ai/stable/"),
     modules = [PolyChaos],
     authors = "tillmann.muehlpfordt@kit.edu",
-    doctest = true,
+    doctest = false,
     pages = Any[
         "index.md",
         "type_hierarchy.md",
