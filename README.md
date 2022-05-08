@@ -36,7 +36,7 @@ integrate(x -> 6x^5, opq)
 ```
 
 
-For more information please visit the [documentation](https://timueh.github.io/PolyChaos.jl/stable/).
+For more information please visit the [documentation](https://polychaos.sciml.ai/stable).
 
 ## Citing
 
