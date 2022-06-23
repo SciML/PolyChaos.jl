@@ -58,66 +58,98 @@ which returns an array of dimensions `(mop.dim,size(x,1))`.
     - `size(x) = (N,p)`, where `N` is the number of points
     - `size(a)==size(b)=p`.
 """
-function evaluate(n::Int,x::AbstractArray{<:Real},a::AbstractVector{<:Real},b::AbstractVector{<:Real})
-    @assert n >= 0 "Degree n has to be non-negative (currently n=$n)."
+function evaluate(n::Int, x::AbstractArray{<:Real}, a::AbstractVector{<:Real},
+                  b::AbstractVector{<:Real})
+    @assert n>=0 "Degree n has to be non-negative (currently n=$n)."
     # if length(a)==0 warn("Length of a is 0.") end
-    @assert length(a) == length(b) "Inconsistent number of recurrence coefficients."
-    @assert n <= length(a) "Specified degree is $n, but you only provided $(length(a)) coefficients."
+    @assert length(a)==length(b) "Inconsistent number of recurrence coefficients."
+    @assert n<=length(a) "Specified degree is $n, but you only provided $(length(a)) coefficients."
     # recurrence relation for orthogonal polynomials
     nx = length(x)
     pminus, p = zeros(nx), ones(nx)
-    if n==0
-        if nx==1
+    if n == 0
+        if nx == 1
             return first(p)
         else
             return p
         end
     end
-    pplus = (x .- first(a)).*p .- first(b)*pminus
+    pplus = (x .- first(a)) .* p .- first(b) * pminus
     for k in 2:n
         pminus = p
         p = pplus
-        @inbounds pplus = (x .- a[k]).*p .- b[k]*pminus
+        @inbounds pplus = (x .- a[k]) .* p .- b[k] * pminus
     end
     nx == 1 ? first(pplus) : pplus
 end
-evaluate(n::Int,x::Real,a::AbstractVector{<:Real},b::AbstractVector{<:Real}) = evaluate(n,[x],a,b)
-evaluate(n::Int,x::AbstractVector{<:Real},op::AbstractOrthoPoly) = evaluate(n,x,op.α,op.β)
-evaluate(n::Int,x::Real,op::AbstractOrthoPoly) = evaluate(n,[x],op)
+function evaluate(n::Int, x::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
+    evaluate(n, [x], a, b)
+end
+function evaluate(n::Int, x::AbstractVector{<:Real}, op::AbstractOrthoPoly)
+    evaluate(n, x, op.α, op.β)
+end
+evaluate(n::Int, x::Real, op::AbstractOrthoPoly) = evaluate(n, [x], op)
 
 # univariate + several bases
-function evaluate(ns,x::AbstractArray{<:Real},a::AbstractVector{<:Real},b::AbstractVector{<:Real})
-    hcat(map(i->evaluate(i,x,a,b),ns)...)
+function evaluate(ns, x::AbstractArray{<:Real}, a::AbstractVector{<:Real},
+                  b::AbstractVector{<:Real})
+    hcat(map(i -> evaluate(i, x, a, b), ns)...)
 end
-evaluate(ns,x::Real,a::AbstractVector{<:Real},b::AbstractVector{<:Real}) = evaluate(ns,[x],a,b)
+function evaluate(ns, x::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
+    evaluate(ns, [x], a, b)
+end
 
-evaluate(ns,x::AbstractVector{<:Real},op::AbstractOrthoPoly) = evaluate(ns,x,op.α,op.β)
-evaluate(ns,x::Real,op::AbstractOrthoPoly) = evaluate(ns,[x],op)
-evaluate(x::AbstractVector{<:Real},op::AbstractOrthoPoly) = evaluate(collect(0:op.deg),x,op)
-evaluate(x::Real,op::AbstractOrthoPoly) = evaluate([x],op)
+evaluate(ns, x::AbstractVector{<:Real}, op::AbstractOrthoPoly) = evaluate(ns, x, op.α, op.β)
+evaluate(ns, x::Real, op::AbstractOrthoPoly) = evaluate(ns, [x], op)
+function evaluate(x::AbstractVector{<:Real}, op::AbstractOrthoPoly)
+    evaluate(collect(0:(op.deg)), x, op)
+end
+evaluate(x::Real, op::AbstractOrthoPoly) = evaluate([x], op)
 
 # multivariate
-function evaluate(n::AbstractVector{<:Int},x::AbstractMatrix{<:Real},a::AbstractVector{<:AbstractVector{<:Real}},b::AbstractVector{<:AbstractVector{<:Real}})
-    @assert length(n) == size(x,2) "number of univariate bases (= $(length(n))) inconsistent with columns points x (= $(size(x,2)))"
-    val = ones(Float64,size(x,1))
+function evaluate(n::AbstractVector{<:Int}, x::AbstractMatrix{<:Real},
+                  a::AbstractVector{<:AbstractVector{<:Real}},
+                  b::AbstractVector{<:AbstractVector{<:Real}})
+    @assert length(n)==size(x, 2) "number of univariate bases (= $(length(n))) inconsistent with columns points x (= $(size(x,2)))"
+    val = ones(Float64, size(x, 1))
     for i in 1:length(n)
-        @inbounds val = val.*evaluate(n[i],x[:,i],a[i],b[i])
+        @inbounds val = val .* evaluate(n[i], x[:, i], a[i], b[i])
     end
     return val
 end
-evaluate(n::AbstractVector{<:Int},x::AbstractVector{<:Real},a::AbstractVector{<:AbstractVector{<:Real}},b::AbstractVector{<:AbstractVector{<:Real}}) = evaluate(n,reshape(x,1,length(x)),a,b)
-evaluate(n::AbstractVector{<:Int},x::AbstractMatrix{<:Real},op::MultiOrthoPoly) = evaluate(n,x,coeffs(op)...)
-evaluate(n::AbstractVector{<:Int},x::AbstractVector{<:Real},op::MultiOrthoPoly) = evaluate(n,reshape(x,1,length(x)),op)
+function evaluate(n::AbstractVector{<:Int}, x::AbstractVector{<:Real},
+                  a::AbstractVector{<:AbstractVector{<:Real}},
+                  b::AbstractVector{<:AbstractVector{<:Real}})
+    evaluate(n, reshape(x, 1, length(x)), a, b)
+end
+function evaluate(n::AbstractVector{<:Int}, x::AbstractMatrix{<:Real}, op::MultiOrthoPoly)
+    evaluate(n, x, coeffs(op)...)
+end
+function evaluate(n::AbstractVector{<:Int}, x::AbstractVector{<:Real}, op::MultiOrthoPoly)
+    evaluate(n, reshape(x, 1, length(x)), op)
+end
 
 # using multi-index + multivariate
-function evaluate(ind::AbstractMatrix{<:Int},x::AbstractMatrix{<:Real},a::AbstractVector{<:AbstractVector{<:Real}},b::AbstractVector{<:AbstractVector{<:Real}})
-    vals = map(i->evaluate(ind[i,:],x,a,b),Base.OneTo(size(ind,1)))
+function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractMatrix{<:Real},
+                  a::AbstractVector{<:AbstractVector{<:Real}},
+                  b::AbstractVector{<:AbstractVector{<:Real}})
+    vals = map(i -> evaluate(ind[i, :], x, a, b), Base.OneTo(size(ind, 1)))
     hcat(vals...) |> transpose |> Matrix
 end
 
-evaluate(ind::AbstractMatrix{<:Int},x::AbstractMatrix{<:Real},op::MultiOrthoPoly) = evaluate(ind,x,coeffs(op)...)
-evaluate(x::AbstractMatrix{<:Real},mop::MultiOrthoPoly) = evaluate(mop.ind,x,mop)
+function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractMatrix{<:Real}, op::MultiOrthoPoly)
+    evaluate(ind, x, coeffs(op)...)
+end
+evaluate(x::AbstractMatrix{<:Real}, mop::MultiOrthoPoly) = evaluate(mop.ind, x, mop)
 
-evaluate(ind::AbstractMatrix{<:Int},x::AbstractVector{<:Real},a::AbstractVector{<:AbstractVector{<:Real}},b::AbstractVector{<:AbstractVector{<:Real}}) = evaluate(ind,reshape(x,1,length(x)),a,b)
-evaluate(ind::AbstractMatrix{<:Int},x::AbstractVector{<:Real},op::MultiOrthoPoly) = evaluate(ind,reshape(x,1,length(x)),coeffs(op)...)
-evaluate(x::AbstractVector{<:Real},mop::MultiOrthoPoly) = evaluate(mop.ind,reshape(x,1,length(x)),mop)
+function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractVector{<:Real},
+                  a::AbstractVector{<:AbstractVector{<:Real}},
+                  b::AbstractVector{<:AbstractVector{<:Real}})
+    evaluate(ind, reshape(x, 1, length(x)), a, b)
+end
+function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractVector{<:Real}, op::MultiOrthoPoly)
+    evaluate(ind, reshape(x, 1, length(x)), coeffs(op)...)
+end
+function evaluate(x::AbstractVector{<:Real}, mop::MultiOrthoPoly)
+    evaluate(mop.ind, reshape(x, 1, length(x)), mop)
+end
