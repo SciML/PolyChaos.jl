@@ -1,11 +1,11 @@
-export  coeffs,
-        nw,
-        dim,
-        deg,
-        multi2uni,
-        getentry,
-        issymmetric,
-        integrate
+export coeffs,
+       nw,
+       dim,
+       deg,
+       multi2uni,
+       getentry,
+       issymmetric,
+       integrate
 
 dim(op::AbstractOrthoPoly) = op.deg + 1
 dim(mop::MultiOrthoPoly) = mop.dim
@@ -23,7 +23,7 @@ nw(mop::MultiOrthoPoly)
 ```
 returns nodes and weights in matrix form
 """
-nw(quad::typeof(EmptyQuad())) = Array{Float64}(undef,0,2)
+nw(quad::typeof(EmptyQuad())) = Array{Float64}(undef, 0, 2)
 
 function nw(quad::AbstractQuad)
     [quad.nodes quad.weights]
@@ -32,13 +32,13 @@ end
 nw(op::AbstractOrthoPoly) = nw(op.quad)
 
 function nw(quads::Vector{<:AbstractQuad})
-    nodes = [ quad.nodes for quad in quads]
-    weights = [ quad.weights for quad in quads]
+    nodes = [quad.nodes for quad in quads]
+    weights = [quad.weights for quad in quads]
     return nodes, weights
 end
 
 function nw(ops::AbstractVector)
-    quad = [ op.quad for op in ops ]
+    quad = [op.quad for op in ops]
     nw(quad)
 end
 
@@ -57,13 +57,12 @@ function coeffs(op::AbstractOrthoPoly)
 end
 
 function coeffs(op::AbstractVector)
-    a = [ p.α for p in op]
-    b = [ p.β for p in op]
+    a = [p.α for p in op]
+    b = [p.β for p in op]
     return a, b
 end
 
 coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
-
 
 """
 ```
@@ -84,12 +83,14 @@ julia> integrate(x -> 6x^5, opq)
 - function ``f`` is assumed to return a scalar.
 - interval of integration is "hidden" in `nodes`.
 """
-function integrate(f::Function, nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real})
+function integrate(f::Function, nodes::AbstractVector{<:Real},
+                   weights::AbstractVector{<:Real})
     dot(weights, f.(nodes))
 end
 
 function integrate(f::Function, quad::AbstractQuad)
-    typeof(quad) == typeof(EmptyQuad()) && throw(DomainError(quad, "supplied an empty quadrature"))
+    typeof(quad) == typeof(EmptyQuad()) &&
+        throw(DomainError(quad, "supplied an empty quadrature"))
     integrate(f, quad.nodes, quad.weights)
 end
 
@@ -110,23 +111,27 @@ function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
     l, p = size(ind) # p-variate basis
     m = length(a) # dimension of scalar product
     l -= 1 # (l+1)-dimensional basis
-    maximum(a) > l && throw(DomainError(a, "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
-    A = zeros(Int64,p,m)
+    maximum(a) > l && throw(DomainError(a,
+                      "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+    A = zeros(Int64, p, m)
     for (i, a_element) in enumerate(a)
         A[:, i] = ind[a_element + 1, :]
     end
     return A
 end
 
-function getentry(a::AbstractVector{<:Int}, T::SparseVector{<:Real,<:Int}, ind::AbstractMatrix{<:Int}, dim::Int)
+function getentry(a::AbstractVector{<:Int}, T::SparseVector{<:Real, <:Int},
+                  ind::AbstractMatrix{<:Int}, dim::Int)
     m = length(a)
-    l = size(ind,1)-1
+    l = size(ind, 1) - 1
     minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
-    maximum(a) > l && throw(DomainError(a, "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
-    m != dim && throw(DomainError(m, "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
+    maximum(a) > l && throw(DomainError(a,
+                      "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+    m != dim && throw(DomainError(m,
+                      "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
     # a .+= 1
     sort!(a)
 
-    sp_ind = 1 + reduce(+,[idx*l^(m-i) for (i,idx) in enumerate(a)])
+    sp_ind = 1 + reduce(+, [idx * l^(m - i) for (i, idx) in enumerate(a)])
     return T[sp_ind]
 end
