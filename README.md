@@ -1,13 +1,17 @@
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://polychaos.sciml.ai/stable)
-[![Build Status](https://travis-ci.org/timueh/PolyChaos.jl.svg?branch=master)](https://travis-ci.org/timueh/PolyChaos.jl)
-[![codecov](https://codecov.io/gh/timueh/PolyChaos.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/timueh/PolyChaos.jl)
-[![Coverage Status](https://coveralls.io/repos/github/timueh/PolyChaos.jl/badge.svg?branch=master)](https://coveralls.io/github/timueh/PolyChaos.jl?branch=master)
+# PolyChaos -- Orthogonal Polynomials, Quadrature, and Polynomial Chaos
+
+[![Join the chat at https://julialang.zulipchat.com #sciml-bridged](https://img.shields.io/static/v1?label=Zulip&message=chat&color=9558b2&labelColor=389826)](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://polychaos.sciml.ai/stable)
+[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/dev/modules/PolyChaos/)
+
+[![codecov](https://codecov.io/gh/SciML/PolyChaos.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/PolyChaos.jl)
+[![Build Status](https://github.com/SciML/PolyChaos.jl/workflows/CI/badge.svg)](https://github.com/SciML/PolyChaos.jl/actions?query=workflow%3ACI)
+
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
+
 [![Code DOI](https://zenodo.org/badge/165908711.svg)](https://zenodo.org/badge/latestdoi/165908711)
 [![Paper@arXiv](https://img.shields.io/badge/arXiv-2004.03970-green.svg)](https://arxiv.org/abs/2004.03970)
-
-
-
-# PolyChaos -- Orthogonal Polynomials, Quadrature, and Polynomial Chaos
 
 A Julia package to construct orthogonal polynomials, their quadrature rules, and use it with polynomial chaos expansions.
 
