@@ -30,13 +30,13 @@ However, a cornerstone principle of PolyChaos is to provide all the functionalit
 The package requires `Julia 1.3` or newer.
 In `Julia` switch to the package manager
 ```julia
-julia> ]
-(v1.03 pkg> add PolyChaos
+using Pkg
+Pkg.add("PolyChaos")
 ```
 This will install PolyChaos and its dependencies.
 Once that is done, load the package:
 ```julia
-julia> using PolyChaos
+using PolyChaos
 ```
 That's it.
 
@@ -78,25 +78,18 @@ The code base of `PolyChaos` is partially based on Walter Gautschi's [Matlab sui
 For the theory of polynomial chaos expansion we mainly consulted T. J. Sullivan. *Introduction to Uncertainty Quantification*. Springer International Publishing Switzerland. 2015.
 
 ## Contributing
-We are always looking for contributors.
-If you are interested, just get in touch: tillmann [dot] muehlpfordt [at] kit [dot] edu.
 
-Or just fork and/or star the repository:
-
-Julia's package manager works nicely with Github: simply install the hosted package via `Pkg.clone` and the [repository's URL](https://help.github.com/articles/which-remote-url-should-i-use/).
-A fork is created with
-
-```julia
-Pkg.clone("https://github.com/timueh/PolyChaos.jl")
-```
-The fork will replace the original package.
-
-Call
-```julia
-Pkg.dir("PolyChaos")
-```
-to figure out where the package was cloned to.
-Go to that location and figure out what branch you are on via `git branch`.
+- Please refer to the
+  [SciML ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac/blob/master/README.md)
+  for guidance on PRs, issues, and other matters relating to contributing to SciML.
+- See the [SciML Style Guide](https://github.com/SciML/SciMLStyle) for common coding practices and other style decisions.
+- There are a few community forums:
+    - The #diffeq-bridged and #sciml-bridged channels in the
+      [Julia Slack](https://julialang.org/slack/)
+    - The #diffeq-bridged and #sciml-bridged channels in the
+      [Julia Zulip](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
+    - On the [Julia Discourse forums](https://discourse.julialang.org)
+    - See also [SciML Community page](https://sciml.ai/community/)
 
 ## Citing
 If you found the software useful and applied it to your own research, we'd appreciate a citation.
