@@ -14,16 +14,23 @@
 
 A Julia package to construct orthogonal polynomials, their quadrature rules, and use it with polynomial chaos expansions.
 
+## Tutorials and Documentation
+
+For information on using the package,
+[see the stable documentation](https://docs.sciml.ai/PolyChaos/stable/). Use the
+[in-development documentation](https://docs.sciml.ai/PolyChaos/dev/) for the version of
+the documentation, which contains the unreleased features.
+
 The package requires `Julia 1.3` or newer.
 In `Julia` switch to the package manager
 ```julia
-julia> ]
-(v1.3) pkg> add PolyChaos
+using Pkg
+Pkg.add("PolyChaos")
 ```
 This will install PolyChaos and its dependencies.
 Once that is done, load the package:
 ```julia
-julia> using PolyChaos
+using PolyChaos
 ```
 That's it.
 
@@ -39,7 +46,7 @@ integrate(x -> 6x^5, opq)
 ```
 
 
-For more information please visit the [documentation](https://polychaos.sciml.ai/stable).
+For more information please visit the [documentation](https://docs.sciml.ai/PolyChaos/stable).
 
 ## Citing
 
