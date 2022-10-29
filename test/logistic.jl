@@ -26,8 +26,8 @@ function hrhermite(t)
     exp(-t^2)
 end
 
-AB = [[0.0 3.0]; [3.0 6.0]; [6.0 9.0]; [9.0 Inf]]
-;
+AB = [[0.0 3.0]; [3.0 6.0]; [6.0 9.0]; [9.0 Inf]];
+
 quads = [n -> quadgp(hrhermite, AB[i, 1], AB[i, 2], n; quadrature = fejer)
          for i in 1:size(AB, 1)]
 α, β = mcdiscretization(40, quads, Nmax = 400, gaussquad = false, discretization = lanczos,
