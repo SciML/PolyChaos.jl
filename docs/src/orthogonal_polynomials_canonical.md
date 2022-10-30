@@ -193,7 +193,7 @@ Suppose we have $p$ systems of univariate monic orthogonal polynomials,
 each system being orthogonal relative to the weights $w^{(1)}, w^{(2)}, \dots, w^{(p)}$ with supports $\mathcal{W}^{(1)}, \mathcal{W}^{(2)}, \dots, \mathcal{W}^{(p)}$.
 Also, let $d^{(i)}$ be the maximum degree of the $i$-th system of univariate orthogonal polynomials.
 We would like to construct a $p$-variate monic basis $\{ \psi_k \}_{k \geq 0}$ with $\psi: \mathbb{R}^p \rightarrow \mathbb{R}$ of degree at most $0 \leq d \leq \min_{i=1,\dots,k}\{ d^{(i)}\}$.
-Further, this basis shall be orthogonal relative to the product measure $w: \mathcal{W} = \mathcal{W}^{(1)} \otimes \mathcal{W}^{(2)} \mathcal{W}^{(1)} \cdots \otimes \mathcal{W}^{(p)} \rightarrow \mathbb{R}_{\geq 0}$ given by
+Further, this basis shall be orthogonal relative to the product measure $w: \mathcal{W} = \mathcal{W}^{(1)} \otimes \mathcal{W}^{(2)} \otimes \cdots \otimes \mathcal{W}^{(p)} \rightarrow \mathbb{R}_{\geq 0}$ given by
 ```math
 w(t) = \prod_{i=1}^{p} w^{(i)}(t_i),
 ```
