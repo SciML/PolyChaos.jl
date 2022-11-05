@@ -1,11 +1,11 @@
 export computeTensorizedSP
 
-function computeTensorizedSP(m::Int,
+function computeTensorizedSP(m::Integer,
                              α::AbstractVector{<:AbstractVector{<:Real}},
                              β::AbstractVector{<:AbstractVector{<:Real}},
                              nodes::AbstractVector{<:AbstractVector{<:Real}},
                              weights::AbstractVector{<:AbstractVector{<:Real}},
-                             ind::AbstractMatrix{<:Int};
+                             ind::AbstractMatrix{<:Integer};
                              issymmetric::BitArray = falses(length(α)))
     m < 1 && throw(DomainError(m, "`dimension` has to be positive"))
     l, p = size(ind)
@@ -18,19 +18,19 @@ function computeTensorizedSP(m::Int,
     end
     return T
 end
-function computeTensorizedSP(m::Int, op::AbstractVector, ind::AbstractMatrix{<:Int})
+function computeTensorizedSP(m::Integer, op::AbstractVector, ind::AbstractMatrix{<:Integer})
     α, β = coeffs(op)
     nodes, weights = nw(op)
     computeTensorizedSP(m, α, β, nodes, weights, ind; issymmetric = issymmetric.(op))
 end
 
-function computeTensorizedSP(m::Int, mop::MultiOrthoPoly)
+function computeTensorizedSP(m::Integer, mop::MultiOrthoPoly)
     any([typeof(op.quad) == typeof(EmptyQuad()) for op in mop.uni]) &&
         throw(InconsistencyError("at least one quadrature rule missing"))
     computeTensorizedSP(m, mop.uni, mop.ind)
 end
 
-function computeTensorizedSP(m::Int, op::AbstractOrthoPoly)
+function computeTensorizedSP(m::Integer, op::AbstractOrthoPoly)
     typeof(op.quad) == typeof(EmptyQuad()) &&
         throw(InconsistencyError("no quadrature rule provided"))
     computeTensorizedSP(m, [op], calculateMultiIndices(1, deg(op)))
