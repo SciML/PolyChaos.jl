@@ -1,14 +1,14 @@
 export computeSP,
        computeSP2
 
-function computeSP(a_::AbstractVector{<:Int},
+function computeSP(a_::AbstractVector{<:Integer},
                    α::AbstractVector{<:AbstractVector{<:Real}},
                    β::AbstractVector{<:AbstractVector{<:Real}},
                    nodes::AbstractVector{<:AbstractVector{<:Real}},
                    weights::AbstractVector{<:AbstractVector{<:Real}},
-                   ind::Matrix{<:Int};
+                   ind::AbstractMatrix{<:Integer};
                    issymmetric::BitArray = falses(length(α)),
-                   zerotol::Float64 = 1e-10)
+                   zerotol::AbstractFloat = 1e-10)
     minimum(a_) < 0 && throw(DomainError(minimum(a_), "no negative degrees allowed"))
     l, p = size(ind) # p-variate basis
     p == 1 && computeSP(a_, α[1], β[1], nodes[1], weights[1]; issymmetric = issymmetric[1])
@@ -42,29 +42,32 @@ function computeSP(a_::AbstractVector{<:Int},
     return val
 end
 
-function computeSP(a::AbstractVector{<:Int}, op::AbstractVector, ind::Matrix{<:Int})
+function computeSP(a::AbstractVector{<:Integer}, op::AbstractVector,
+                   ind::AbstractMatrix{<:Integer})
     α, β = coeffs(op)
     nodes, weights = nw(op)
     computeSP(a, α, β, nodes, weights, ind; issymmetric = issymmetric.(op))
 end
 
-computeSP(a::AbstractVector{<:Int}, mop::MultiOrthoPoly) = computeSP(a, mop.uni, mop.ind)
+function computeSP(a::AbstractVector{<:Integer}, mop::MultiOrthoPoly)
+    computeSP(a, mop.uni, mop.ind)
+end
 
 """
 __Univariate__
 ```
-computeSP(a::AbstractVector{<:Int},α::AbstractVector{<:Real},β::AbstractVector{<:Real},nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};issymmetric::Bool=false)
-computeSP(a::AbstractVector{<:Int},op::AbstractOrthoPoly;issymmetric=issymmetric(op))
+computeSP(a::AbstractVector{<:Integer},α::AbstractVector{<:Real},β::AbstractVector{<:Real},nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};issymmetric::Bool=false)
+computeSP(a::AbstractVector{<:Integer},op::AbstractOrthoPoly;issymmetric=issymmetric(op))
 ```
 __Multivariate__
 ```
-computeSP( a::AbstractVector{<:Int},
+computeSP( a::AbstractVector{<:Integer},
            α::AbstractVector{<:AbstractVector{<:Real}},β::AbstractVector{<:AbstractVector{<:Real}},
            nodes::AbstractVector{<:AbstractVector{<:Real}},weights::AbstractVector{<:AbstractVector{<:Real}},
-           ind::Matrix{<:Int};
+           ind::AbstractMatrix{<:Integer};
            issymmetric::BitArray=falses(length(α)))
-computeSP(a::AbstractVector{<:Int},op::AbstractVector,ind::Matrix{<:Int})
-computeSP(a::AbstractVector{<:Int},mOP::MultiOrthoPoly)
+computeSP(a::AbstractVector{<:Integer},op::AbstractVector,ind::AbstractMatrix{<:Integer})
+computeSP(a::AbstractVector{<:Integer},mOP::MultiOrthoPoly)
 ```
 
 Computes the scalar product
@@ -89,7 +92,7 @@ The function is dispatched to facilitate its use with `AbstractOrthoPoly` and it
     because `\\phi_0 = 1`.
     - It is checked whether enough quadrature points are supplied to solve the integral exactly.
 """
-function computeSP(a_::AbstractVector{<:Int}, α::AbstractVector{<:Real},
+function computeSP(a_::AbstractVector{<:Integer}, α::AbstractVector{<:Real},
                    β::AbstractVector{<:Real}, nodes::AbstractVector{<:Real},
                    weights::AbstractVector{<:Real}; issymmetric::Bool = false)
     minimum(a_) < 0 && throw(DomainError(minimum(a_), "no negative degrees allowed"))
@@ -123,13 +126,13 @@ function computeSP(a_::AbstractVector{<:Int}, α::AbstractVector{<:Real},
     end
 end
 
-function computeSP(a::AbstractVector{<:Int}, op::AbstractOrthoPoly)
+function computeSP(a::AbstractVector{<:Integer}, op::AbstractOrthoPoly)
     computeSP(a, op.α, op.β, op.quad.nodes, op.quad.weights; issymmetric = issymmetric(op))
 end
 
 """
-    computeSP2(n::Int,β::AbstractVector{<:Real})
-    computeSP2(n::Int,op::AbstractOrthoPoly) = computeSP2(n,op.β)
+    computeSP2(n::Integer,β::AbstractVector{<:Real})
+    computeSP2(n::Integer,op::AbstractOrthoPoly) = computeSP2(n,op.β)
     computeSP2(op::AbstractOrthoPoly) = computeSP2(op.deg,op.β)
 
 Computes the `n` *regular* scalar products aka 2-norms of the orthogonal polynomials, namely
@@ -142,7 +145,7 @@ Whenever there exists an analytic expressions for `β`, this function should be 
 
 The function is multiply dispatched to facilitate its use with `AbstractOrthoPoly`.
 """
-function computeSP2(n::Int, β::AbstractVector{<:Real})
+function computeSP2(n::Integer, β::AbstractVector{<:Real})
     n < 0 &&
         throw(DomainError(n, "can only compute scalar products for non-negative degrees"))
     length(β) < n + 1 && throw(InconsistencyError("inconsistent length of β"))
@@ -154,5 +157,5 @@ function computeSP2(n::Int, β::AbstractVector{<:Real})
     end
     return s
 end
-computeSP2(n::Int, op::AbstractOrthoPoly) = computeSP2(n, op.β)
+computeSP2(n::Integer, op::AbstractOrthoPoly) = computeSP2(n, op.β)
 computeSP2(op::AbstractOrthoPoly) = computeSP2(op.deg, op.β)
