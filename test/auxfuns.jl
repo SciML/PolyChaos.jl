@@ -67,7 +67,7 @@ nodes, weights = SVector(op.quad.nodes...), SVector(op.quad.weights...)
 
 myfun(t) = t^2
 
-@test integrate(myfun, op) == integrate(myfun, nodes, weights)
+@test integrate(myfun, op) ≈ integrate(myfun, nodes, weights)
 
 n_multi = 4
 mop = MultiOrthoPoly([op for i in 1:n_multi], max_degree)
