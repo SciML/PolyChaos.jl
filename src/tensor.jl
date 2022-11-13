@@ -11,8 +11,8 @@ function computeTensorizedSP(m::Integer,
     l, p = size(ind)
     l -= 1
     T = spzeros(reduce(+, [l^i for i in 0:m]))
-    for tensor_ind in collect(with_replacement_combinations(0:l, m))
-        index = 1 + reduce(+, [idx * l^(m - i) for (i, idx) in enumerate(tensor_ind)])
+    for tensor_ind in with_replacement_combinations(0:l, m)
+        index = 1 + evalpoly(l, reverse!(tensor_ind))
         T[index] = computeSP(tensor_ind, α, β, nodes, weights, ind;
                              issymmetric = issymmetric)
     end
