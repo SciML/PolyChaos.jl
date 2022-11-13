@@ -29,13 +29,13 @@ function computeTensorizedSP(m::Integer, op::AbstractVector, ind::AbstractMatrix
 end
 
 function computeTensorizedSP(m::Integer, mop::MultiOrthoPoly)
-    any([typeof(op.quad) == typeof(EmptyQuad()) for op in mop.uni]) &&
+    any(op.quad isa EmptyQuad for op in mop.uni) &&
         throw(InconsistencyError("at least one quadrature rule missing"))
     computeTensorizedSP(m, mop.uni, mop.ind)
 end
 
 function computeTensorizedSP(m::Integer, op::AbstractOrthoPoly)
-    typeof(op.quad) == typeof(EmptyQuad()) &&
+    op.quad isa EmptyQuad &&
         throw(InconsistencyError("no quadrature rule provided"))
     computeTensorizedSP(m, [op], calculateMultiIndices(1, deg(op)))
 end
