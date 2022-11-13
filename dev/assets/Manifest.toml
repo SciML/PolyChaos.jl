@@ -1007,7 +1007,7 @@ version = "0.4.3"
 deps = ["AdaptiveRejectionSampling", "Combinatorics", "Distributions", "FFTW", "GaussQuadrature", "LinearAlgebra", "QuadGK", "SparseArrays", "SpecialFunctions", "StaticArrays", "Statistics", "Test"]
 path = "/home/runner/work/PolyChaos.jl/PolyChaos.jl"
 uuid = "8d666b04-775d-5f6e-b778-5ac7c70f65a3"
-version = "0.2.8"
+version = "0.2.9"
 
 [[deps.Polyester]]
 deps = ["ArrayInterface", "BitTwiddlingConvenienceFunctions", "CPUSummary", "IfElse", "ManualMemory", "PolyesterWeave", "Requires", "Static", "StrideArraysCore", "ThreadingUtilities"]
