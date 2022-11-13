@@ -10,7 +10,11 @@ function computeTensorizedSP(m::Integer,
     m < 1 && throw(DomainError(m, "`dimension` has to be positive"))
     l, p = size(ind)
     l -= 1
-    T = spzeros(reduce(+, [l^i for i in 0:m]))
+    s = 1
+    for _ in 1:m
+        s = muladd(s, l, 1)
+    end
+    T = spzeros(s)
     for tensor_ind in with_replacement_combinations(0:l, m)
         index = 1 + evalpoly(l, reverse!(tensor_ind))
         T[index] = computeSP(tensor_ind, α, β, nodes, weights, ind;
