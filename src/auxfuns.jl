@@ -130,8 +130,8 @@ function getentry(a::AbstractVector{<:Int}, T::SparseVector{<:Real, <:Int},
     m != dim && throw(DomainError(m,
                       "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
     # a .+= 1
-    sort!(a)
+    sort!(a; rev = true)
 
-    sp_ind = 1 + reduce(+, [idx * l^(m - i) for (i, idx) in enumerate(a)])
+    sp_ind = 1 + evalpoly(l, a)
     return T[sp_ind]
 end
