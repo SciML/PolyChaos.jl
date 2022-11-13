@@ -23,7 +23,7 @@ nw(mop::MultiOrthoPoly)
 ```
 returns nodes and weights in matrix form
 """
-nw(quad::typeof(EmptyQuad())) = Array{Float64}(undef, 0, 2)
+nw(::EmptyQuad) = Array{Float64}(undef, 0, 2)
 
 function nw(quad::AbstractQuad)
     [quad.nodes quad.weights]
@@ -89,7 +89,7 @@ function integrate(f::Function, nodes::AbstractVector{<:Real},
 end
 
 function integrate(f::Function, quad::AbstractQuad)
-    typeof(quad) == typeof(EmptyQuad()) &&
+    quad isa EmptyQuad &&
         throw(DomainError(quad, "supplied an empty quadrature"))
     integrate(f, quad.nodes, quad.weights)
 end
