@@ -125,7 +125,7 @@ function JacobiOrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int = deg
 end
 
 function OrthoPoly(μ::JacobiMeasure, deg::Int; Nrec::Int = deg + 1, addQuadrature::Bool = true)
-    JacobiOrthoPoly(deg, μ.ashapeParamter, μ.bshapeParameter; Nrec=Nrec, addQuadrature=addQuadrature)
+    JacobiOrthoPoly(deg, μ.ashapeParameter, μ.bshapeParameter; Nrec=Nrec, addQuadrature=addQuadrature)
 end
 
 struct LaguerreOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
@@ -221,8 +221,8 @@ end
 
 struct MeixnerPollaczekOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
-    α::V  # recurrence coefficients
-    β::V  # recurrence coefficients
+    α::V              # recurrence coefficients
+    β::V              # recurrence coefficients
     measure::M
     quad::Q
 end
@@ -352,7 +352,7 @@ function GammaOrthoPoly(deg::Int, shape::Real, rate::Real; Nrec::Int = deg + 1,
                                                                                          quadrature)
 end
 
-function OrthoPoly(μ::GammaOrthoPoly, deg::Int; Nrec::Int = deg + 1, addQuadrature::Bool = true)
+function OrthoPoly(μ::GammaMeasure, deg::Int; Nrec::Int = deg + 1, addQuadrature::Bool = true)
     GammaOrthoPoly(deg, μ.shapeParameter, μ.rateParameter; Nrec=Nrec, addQuadrature=addQuadrature)
 end
 
