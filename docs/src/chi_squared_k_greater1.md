@@ -66,7 +66,7 @@ y_m \langle \phi_m, \phi_m \rangle = \sum_{i=1}^k \sum_{j_1=0}^n \sum_{j_2=0}^n 
 ```
 
 Hence, knowing the scalars $\langle \phi_m, \phi_m \rangle$, and $\langle \phi_{j_1} \phi_{j_2}, \phi_m \rangle$, the PCE coefficients $y_k$ can be obtained immediately.
-From the PCE coefficients we can get the moments and compare them to the closed-form expressions.
+From the PCE coefficients, we can get the moments and compare them to the closed-form expressions.
 
 __Notice:__ A maximum degree of 2 suffices to get the *exact* solution with PCE.
 In other words, increasing the maximum degree to values greater than 2 introduces nothing but computational overhead (and numerical errors, possibly).
@@ -138,7 +138,7 @@ Let's plot the probability density function to compare results.
 We first draw samples from the measure with the help of `sampleMeasure()`, and then evaluate the basis at these samples and multiply times the PCE coefficients.
 The latter stop is done using `evaluatePCE()`.
 Both steps are combined in the function `samplePCE()`.
-Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{t^{t/2-1}\mathrm{e}^{-t/2}}{2^{k/2} \, \Gamma(k/2)}$ of the chi-squared distribution with one degree of freedom.
+Finally, we compare the result against the analytical PDF $\rho(t) = \frac{t^{t/2-1}\mathrm{e}^{-t/2}}{2^{k/2} \, \Gamma(k/2)}$ of the chi-squared distribution with one degree of freedom.
 
 ```@example mysetup
 using Plots

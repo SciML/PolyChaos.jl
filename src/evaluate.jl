@@ -11,7 +11,7 @@ evaluate(n::Int,x::Real,op::AbstractOrthoPoly)
 ```
 
 Evaluate the `n`-th univariate basis polynomial at point(s) `x`
-The function is multiply dispatched to facilitate its use with the composite type `AbstractOrthoPoly`
+The function is multiple-dispatched to facilitate its use with the composite type `AbstractOrthoPoly`
 
 If several basis polynomials (stored in `ns`) are to be evaluated at points `x`, then call
 

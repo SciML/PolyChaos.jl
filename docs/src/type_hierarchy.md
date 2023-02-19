@@ -44,7 +44,7 @@ What are the relevant fields?
 
 ### Measure
 
-It all begins with a measure, more specifically absolutely continuous measures.
+It all begins with a measure, more specifically, absolutely continuous measures.
 What are the fields of such a type `Measure`?
 
 | Field                   | Meaning                                                                                           |
@@ -244,11 +244,11 @@ AbstractOrthoPoly
 └─ OrthoPoly
 ```
 
-It mirrors the type tree from `AbstractMeasure`: there is a generica (univariate) type `OrthoPoly`, a multivariate extension `MultiOrthoPoly` for product measures, and several univariate canonical orthogonal polynomials.
+It mirrors the type tree from `AbstractMeasure`: there is a generic (univariate) type `OrthoPoly`, a multivariate extension `MultiOrthoPoly` for product measures, and several univariate canonical orthogonal polynomials.
 
 ## OrthoPoly
 
-Given an absolutely continuous measure we are wondering what are the monic polynomials $\phi_i: \Omega \rightarrow \mathbb{R}$ that are orthogonal relative to this very measure?
+Given an absolutely continuous measure, we are wondering what are the monic polynomials $\phi_i: \Omega \rightarrow \mathbb{R}$ that are orthogonal relative to this very measure?
 Mathematically this reads
 
 ```math
@@ -270,8 +270,8 @@ They can be constructed using the type `OrthoPoly`, which has the fields
 | `meas::AbstractMeasure` | Underlying measure                  |
 
 The purpose of `name` is obvious.
-The integer `deg` stands for the maxium degree of the polynomials.
-Rather than storing the polynomials $\phi_i$ themselves we store the recurrence coefficients `α`, `β` that characterize the system of orthogonal polynomials.
+The integer `deg` stands for the maximum degree of the polynomials.
+Rather than storing the polynomials $\phi_i$ themselves, we store the recurrence coefficients `α`, `β` that characterize the system of orthogonal polynomials.
 These recurrence coefficients are the single most important piece of information for the orthogonal polynomials.
 For several common measures, there exist analytic formulae.
 These are built-in to `PolyChaos` and should be used whenever possible.

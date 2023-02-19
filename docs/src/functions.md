@@ -3,7 +3,7 @@
 !!! note
     
     The core interface of all essential functions are *not* dependent on specialized types such as `AbstractOrthoPoly`.
-    Having said that, for exactly those essential functions there exist overloaded functions that accept specialized types such as `AbstractOrthoPoly` as arguments.
+    Having said that, for exactly those essential functions, there exist overloaded functions that accept specialized types such as `AbstractOrthoPoly` as arguments.
     
     Too abstract?
     For example, the function `evaluate` that evaluates a polynomial of degree `n` at points `x` has the core interface
@@ -19,7 +19,7 @@
         evaluate(n::Int64,x::Vector{<:Real},op::AbstractOrthoPoly)
     ```
     
-    So fret not upon the encounter of multiply-dispatched versions of the same thing. It's there to simplify your life.
+    So fret not upon the encounter of multiple-dispatched versions of the same thing. It's there to simplify your life.
     
     The idea of this approach is to make it simpler for others to copy and paste code snippets and use them in their own work.
 
@@ -56,7 +56,7 @@ mcdiscretization
 
 ## Show Orthogonal Polynomials
 
-To get a human-readable output of the orthognoal polynomials there is the function `showpoly`
+To get a human-readable output of the orthogonal polynomials, there is the function `showpoly`
 
 ```@docs
 showpoly

@@ -12,7 +12,7 @@ end
 """
     stieltjes(N::Int,nodes_::AbstractVector{<:Real},weights_::AbstractVector{<:Real};removezeroweights::Bool=true)
 
-Stieltjes procedure---Given the nodes and weights the function
+Stieltjes procedure---Given the nodes and weights, the function
 generates the first`N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
 
@@ -54,7 +54,7 @@ end
 """
     lanczos(N::Int,nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};removezeroweights::Bool=true)
 
-Lanczos procedure---given the nodes and weights the function
+Lanczos procedure---given the nodes and weights, the function
 generates the first `N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
 

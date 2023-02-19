@@ -89,7 +89,7 @@ Theorem 1.17 states that: If $\mathrm{d} \lambda$ is symmetric, then
 \pi_k(-t; \mathrm{d} \lambda) = (-1)^k \pi_k(t; \mathrm{d} \lambda), \quad k=0,1, \dots,
 ```
 
-hence the parity of $k$ decides whether $\pi_k$ is even/odd.
+hence, the parity of $k$ decides whether $\pi_k$ is even/odd.
 
 !!! note
     
@@ -101,8 +101,8 @@ The fact that orthogonal polynomials can be represented in terms of a three-term
 The importance of the three-term recurrence relation is difficult to overestimate. It provides
 
   - efficient means of evaluating polynomials (and derivatives),
-  - zeros of orthogonal polynomials by means of a eigenvalues of a symmetric, tridiagonal matrix
-  - acces to quadrature rules,
+  - zeros of orthogonal polynomials by means of the eigenvalues of a symmetric, tridiagonal matrix
+  - access to quadrature rules,
   - normalization constants to create orthonormal polynomials.
 
 Theorem 1.27 states:

@@ -52,7 +52,7 @@ We formalize the numbering of the generators (superscript $g$), loads (superscri
 \mathcal{N}^g = \{ 1, 3\}, \, \mathcal{N}^d = \{ 2, 4\}, \, \mathcal{N}^{br} = \{ 1, 2, 3, 4, 5 \}.
 ```
 
-With each generator we associate a linear cost with cost coefficient $c_i$ for all $i \in \mathcal{N}^g$.
+With each, we associate a linear cost with cost coefficient $c_i$ for all $i \in \mathcal{N}^g$.
 Each generator must adhere to its engineering limits given by $(\underline{p}_i^g , \overline{p}_i^g )$ for all $i \in \mathcal{N}^g$.
 Also, each line is constrained by its limits $(\underline{p}_i^{br}, \overline{p}_i^{br})$ for all $i \in \mathcal{N}^{br}$.
 
@@ -63,7 +63,7 @@ We concisely write
 \mathsf{p}_i^d \sim \mathsf{U}(\mu_i, \sigma_i) \quad \forall i \in \mathcal{N}^d.
 ```
 
-For simplicity we consider DC conditions.
+For simplicity, we consider DC conditions.
 Hence, energy balance reads
 
 ```math
@@ -98,7 +98,7 @@ using PolyChaos, JuMP, MosekTools, LinearAlgebra
 ```
 
 Let's define system-specific quantities such as the incidence matrix and the branch flow parameters.
-From these we can compute the PTDF matrix $\Psi$ (assuming the slack is at bus 1).
+From these, we can compute the PTDF matrix $\Psi$ (assuming the slack is at bus 1).
 
 ```@example mysetup
 A = [-1 1 0 0; -1 0 1 0; -1 0 0 1; 0 1 -1 0; 0 0 -1 1] # incidence matrix
@@ -136,7 +136,7 @@ d[2, [1, 3]] = convert2affinePCE(2.0, 0.2, mop.uni[2], kind = "μσ")
 ```
 
 Now, let's put it all into an optimization problem, specifically a second-order cone program.
-To build the second-order cone constraints we define a helper function `buildSOC`.
+To build the second-order cone constraints, we define a helper function `buildSOC`.
 
 ```@example mysetup
 function buildSOC(x::Vector, mop::MultiOrthoPoly)
@@ -181,7 +181,7 @@ For instance, we can look at the moments of the generated power:
 p_moments = [[mean(psol[i, :], mop) var(psol[i, :], mop)] for i in 1:Ng]
 ```
 
-Simiarly, we can study the moments for the branch flows:
+Similarly, we can study the moments for the branch flows:
 
 ```@example mysetup
 pbr_moments = [[mean(plsol[i, :], mop) var(plsol[i, :], mop)] for i in 1:Nl]

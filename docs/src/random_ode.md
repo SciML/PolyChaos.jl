@@ -82,7 +82,7 @@ As the solution to the random differential equation is itself a random variable,
 The question is how to obtain the unknown PCE coefficients $x_i(t)$ from the known PCE coefficients $a_i$ relative to the orthogonal basis polynomials $\phi_i$.
 This can be done using Galerkin projection, which is nothing else than projecting onto the orthogonal basis.
 Think of a three-dimensional space, in which you have placed some three-dimensional object.
-If you know project the silhouett of the object onto every axis of the three-dimensional space, then you are doing a Galerkin projection.
+If you know project the silhouette of the object onto every axis of the three-dimensional space, then you are doing a Galerkin projection.
 With PCE the concept is equivalent, but the imagination has a harder time.
 The first step for Galerkin projection is to insert the PCEs
 
@@ -146,7 +146,7 @@ solgalerkin = solve(probgalerkin; saveat = 0:Δt:tend)
 t, x = solgalerkin.t, solgalerkin.u;
 ```
 
-For later purposes we compute the expected value and the standard deviation at all time instants using PCE.
+For later purposes, we compute the expected value and the standard deviation at all time instants using PCE.
 
 ```@example mysetup
 # an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
@@ -157,7 +157,7 @@ std_pce = [std(x_, opq) for x_ in x]
 We compare the solution from PCE to a Monte-Carlo-based solution.
 That means to solve the ordinary differential equation for many samples of $\mathsf{a}$.
 We first sample from the measure using `sampleMeasure`, and then generate samples of $\mathsf{a}$ using `evaluatePCE`.
-After that we solve the ODE and store the results in `xmc`.
+After that, we solve the ODE and store the results in `xmc`.
 
 ```@example mysetup
 using Statistics
