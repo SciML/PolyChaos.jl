@@ -15,6 +15,7 @@ export r_scale,
        rm_compute
 """
     r_scale(c::Real,β::AbstractVector{<:Real},α::AbstractVector{<:Real})
+
 Given the recursion coefficients `(α,β)` for a system of orthogonal polynomials that are orthogonal with respect to some positive weight ``m(t)``,
 this function returns the recursion coefficients `(α_,β_)` for the scaled measure ``c m(t)`` for some positive ``c``.
 """
@@ -26,6 +27,7 @@ end
 
 """
     rm_compute(weight::Function,lb::Real,ub::Real,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis)
+
 Given a positive `weight` function with domain `(lb,ub)`, i.e. a function ``w: [lb, ub ] \\rightarrow \\mathbb{R}_{\\geq 0}``,
 this function creates `Npoly` recursion coefficients `(α,β)`.
 
@@ -81,6 +83,7 @@ end
 
 """
     rm_logistic(N::Int)
+
 Creates `N` recurrence coefficients for monic polynomials that are orthogonal
 on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\mathrm{e}^{-t})^2}``
 """
@@ -93,6 +96,7 @@ end
 """
     rm_hermite(N::Int,mu::Real)
     rm_hermite(N::Int)
+
 Creates `N` recurrence coefficients for monic generalized Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = |t|^{2 \\mu} \\mathrm{e}^{-t^2}``
 
@@ -109,6 +113,7 @@ rm_hermite(N::Int) = rm_hermite(N, 0.0)
 
 """
     rm_hermite_prob(N::Int)
+
 Creates `N` recurrence coefficients for monic probabilists' Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{-0.5t^2}``
 """
@@ -122,6 +127,7 @@ end
 """
     rm_laguerre(N::Int,a::Real)
     rm_laguerre(N::Int)
+
 Creates `N` recurrence coefficients for monic generalized Laguerre polynomials
 that are orthogonal on ``(0,\\infty)`` relative to ``w(t) = t^a \\mathrm{e}^{-t}``.
 
@@ -143,6 +149,7 @@ end
     rm_jacobi(N::Int,a::Real,b::Real)
     rm_jacobi(N::Int,a::Real)
     rm_jacobi(N::Int)
+
 Creates `N` recurrence coefficients for monic Jacobi polynomials
 that are orthogonal on ``(-1,1)`` relative to ``w(t) = (1-t)^a (1+t)^b``.
 
@@ -209,11 +216,11 @@ rm_legendre01(N::Int) = rm_jacobi01(N)
     rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
     rm_meixner_pollaczek(N::Int,lambda::Real)
 
- Creates `N` recurrence coefficients for monic
- Meixner-Pollaczek polynomials with parameters λ and ϕ. These are orthogonal on
- ``[-\\infty,\\infty]`` relative to the weight function ``w(t)=(2 \\pi)^{-1} \\exp{(2 \\phi-\\pi)t} |\\Gamma(\\lambda+ i t)|^2``.
+Creates `N` recurrence coefficients for monic
+Meixner-Pollaczek polynomials with parameters λ and ϕ. These are orthogonal on
+``[-\\infty,\\infty]`` relative to the weight function ``w(t)=(2 \\pi)^{-1} \\exp{(2 \\phi-\\pi)t} |\\Gamma(\\lambda+ i t)|^2``.
 
- The call `rm_meixner_pollaczek(n,lambda)` is the same as `rm_meixner_pollaczek(n,lambda,pi/2)`.
+The call `rm_meixner_pollaczek(n,lambda)` is the same as `rm_meixner_pollaczek(n,lambda,pi/2)`.
 """
 function rm_meixner_pollaczek(N::Int, lambda::Real, phi::Real)
     @assert N >= 0&&lambda > 0.0 && phi > 0.0 "parameter(s) out of range"

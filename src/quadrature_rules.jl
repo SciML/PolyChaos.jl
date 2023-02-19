@@ -9,6 +9,7 @@ export fejer,
        lobatto
 """
     fejer(N::Int)
+
 Fejer's first quadrature rule.
 """
 function fejer(N::Int)
@@ -22,6 +23,7 @@ end
 
 """
     fejer2(n::Int)
+
 Fejer's second quadrature rule according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 """
 function fejer2(n::Int)
@@ -36,6 +38,7 @@ end
 
 """
     clenshaw_curtis(n::Int)
+
 Clenshaw-Curtis quadrature according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 """
 function clenshaw_curtis(n::Int)
@@ -55,6 +58,7 @@ end
 
 """
     quadgp(weight::Function,lb::Real,ub::Real,N::Int=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
+
 general purpose quadrature based on Gautschi, "Orthogonal Polynomials: Computation and Approximation", Section 2.2.2, pp. 93-95
 
 Compute the `N`-point quadrature rule for `weight` with support (`lb`, `ub`).
@@ -106,6 +110,7 @@ golubwelsch(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}) = golubwelsch(op.�
     gauss(α::AbstractVector{<:Real},β::AbstractVector{<:Real})
     gauss(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
     gauss(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
+
 Gauss quadrature rule, also known as Golub-Welsch algorithm
 
 `gauss()` generates the `N` Gauss quadrature nodes and weights for a given weight function.
@@ -113,10 +118,12 @@ The weight function is represented by the `N` recurrence coefficients for the mo
 with respect to the weight function.
 
 !!! note
+
     The function `gauss` accepts at most `N = length(α) - 1` quadrature points,
-        hence providing at most an `(length(α) - 1)`-point quadrature rule.
+    hence providing at most an `(length(α) - 1)`-point quadrature rule.
 
 !!! note
+
     If no `N` is provided, then `N = length(α) - 1`.
 """
 function gauss(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
@@ -139,6 +146,7 @@ gauss(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}) = gauss(op.α, op.β)
     radau(α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real)
     radau(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
     radau(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
+
 Gauss-Radau quadrature rule.
 Given a weight function encoded by the recurrence coefficients `(α,β)`for the associated
 orthogonal polynomials, the function generates the
@@ -148,10 +156,12 @@ node `end0` (typically at one of the end points of the support
 interval of w, or outside thereof).
 
 !!! note
+
     The function `radau` accepts at most `N = length(α) - 2` as an input,
-        hence providing at most an `(length(α) - 1)`-point quadrature rule.
+    hence providing at most an `(length(α) - 1)`-point quadrature rule.
 
 !!! note
+
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
 function radau(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, end0::Real)
@@ -184,6 +194,7 @@ end
     lobatto(α::AbstractVector{<:Real},β::AbstractVector{<:Real},endl::Real,endr::Real)
     lobatto(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
     lobatto(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
+
 Gauss-Lobatto quadrature rule.
 Given a weight function encoded by the recurrence coefficients for the associated
 orthogonal polynomials, the function generates
@@ -194,10 +205,12 @@ points of the support interval, or points to the left
 resp. to the right thereof).
 
 !!! note
+
     The function `radau` accepts at most `N = length(α) - 3` as an input,
     hence providing at most an `(length(α) - 1)`-point quadrature rule.
 
 !!! note
+
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
 function lobatto(N::Int, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real}, endl::Real,

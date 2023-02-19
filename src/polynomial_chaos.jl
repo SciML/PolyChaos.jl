@@ -41,6 +41,7 @@ function _checkNumberOfSamples(n::Int)
 end
 """
     calculateAffinePCE(α::AbstractVector{<:Real})
+
 Computes the affine PCE coefficients ``x_0`` and ``x_1`` from recurrence coefficients ``\alpha``.
 """
 function calculateAffinePCE(α::AbstractVector{<:Real})
@@ -61,10 +62,13 @@ end
 ```
 convert2affinePCE(mu::Real, sigma::Real, op::AbstractCanonicalOrthoPoly; kind::String)
 ```
+
 Computes the affine PCE coefficients ``x_0`` and ``x_1`` from
+
 ```math
 X = a_1 + a_2 \\Xi = x_0 + x_1 \\phi_1(\\Xi),
 ```
+
 where ``\\phi_1(t) = t-\\alpha_0`` is the first-order monic basis polynomial.
 
 Works for subtypes of AbstractCanonicalOrthoPoly. The keyword `kind in ["lbub", "μσ"]`
@@ -142,27 +146,32 @@ end
 
 """
 __Univariate__
+
 ```
 sampleMeasure(n::Int,name::String,w::Function,dom::Tuple{<:Real,<:Real},symm::Bool,d::Dict;method::String="adaptiverejection")
 sampleMeasure(n::Int,m::Measure;method::String="adaptiverejection")
 sampleMeasure(n::Int,op::AbstractOrthoPoly;method::String="adaptiverejection")
 ```
+
 Draw `n` samples from the measure `m` described by its
-- `name`
-- weight function `w`,
-- domain `dom`,
-- symmetry property `symm`,
-- and, if applicable, parameters stored in the dictionary `d`.
-By default an adaptive rejection sampling method is used (from [AdaptiveRejectionSampling.jl](https://github.com/mauriciogtec/AdaptiveRejectionSampling.jl)),
-unless it is a common random variable for which [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is used.
+
+  - `name`
+  - weight function `w`,
+  - domain `dom`,
+  - symmetry property `symm`,
+  - and, if applicable, parameters stored in the dictionary `d`.
+    By default an adaptive rejection sampling method is used (from [AdaptiveRejectionSampling.jl](https://github.com/mauriciogtec/AdaptiveRejectionSampling.jl)),
+    unless it is a common random variable for which [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is used.
 
 The function is dispatched to accept `AbstractOrthoPoly`.
 
 __Multivariate__
+
 ```
 sampleMeasure(n::Int,m::ProductMeasure;method::Vector{String}=["adaptiverejection" for i=1:length(m.name)])
 sampleMeasure(n::Int,mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
 ```
+
 Multivariate extension which provides array of samples with `n` rows and
 as many columns as the multimeasure has univariate measures.
 """
@@ -234,10 +243,13 @@ end
 
 """
     evaluatePCE(x::AbstractVector{<:Real},ξ::AbstractVector{<:Real},α::AbstractVector{<:Real},β::AbstractVector{<:Real})
+
 Evaluation of polynomial chaos expansion
+
 ```math
 \\mathsf{x} = \\sum_{i=0}^{L} x_i \\phi_i{\\xi_j},
 ```
+
 where `L+1 = length(x)` and ``x_j`` is the ``j``th sample where ``j=1,\\dots,m``
 with `m = length(ξ)`.
 """
@@ -291,13 +303,16 @@ end
 
 """
 __Univariate__
+
 ```
 samplePCE(n::Int,x::AbstractVector{<:Real},op::AbstractOrthoPoly;method::String="adaptiverejection")
 ```
+
 Combines [`sampleMeasure`](@ref) and [`evaluatePCE`](@ref), i.e. it first draws `n` samples
 from the measure, then evaluates the PCE for those samples.
 
 __Multivariate__
+
 ```
 samplePCE(n::Int,x::AbstractVector{<:Real},mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
 ```
@@ -322,13 +337,17 @@ end
 
 """
 __Univariate__
+
 ```
 mean(x::AbstractVector,op::AbstractOrthoPoly)
 ```
+
 __Multivariate__
+
 ```
 mean(x::AbstractVector,mop::MultiOrthoPoly)
 ```
+
 compute mean of random variable with PCE `x`
 """
 mean(x::AbstractVector, op::AbstractOrthoPoly) = x[1] * computeSP2(0, op.β)
@@ -340,15 +359,19 @@ end
 
 """
 __Univariate__
+
 ```
 var(x::AbstractVector,op::AbstractOrthoPoly)
 var(x::AbstractVector,t2::Tensor)
 ```
+
 __Multivariate__
+
 ```
 var(x::AbstractVector,mop::MultiOrthoPoly)
 var(x::AbstractVector,t2::Tensor)
 ```
+
 compute variance of random variable with PCE `x`
 """
 function var(x::AbstractVector, op::AbstractOrthoPoly)
@@ -369,13 +392,17 @@ end
 
 """
 __Univariate__
+
 ```
 std(x::AbstractVector,op::AbstractOrthoPoly)
 ```
+
 __Multivariate__
+
 ```
 std(x::AbstractVector,mop::MultiOrthoPoly)
 ```
+
 compute standard deviation of random variable with PCE `x`
 """
 std(x::AbstractVector, op::AbstractOrthoPoly) = sqrt(var(x, op))
