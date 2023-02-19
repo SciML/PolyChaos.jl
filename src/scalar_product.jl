@@ -55,11 +55,14 @@ end
 
 """
 __Univariate__
+
 ```
 computeSP(a::AbstractVector{<:Integer},α::AbstractVector{<:Real},β::AbstractVector{<:Real},nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};issymmetric::Bool=false)
 computeSP(a::AbstractVector{<:Integer},op::AbstractOrthoPoly;issymmetric=issymmetric(op))
 ```
+
 __Multivariate__
+
 ```
 computeSP( a::AbstractVector{<:Integer},
            α::AbstractVector{<:AbstractVector{<:Real}},β::AbstractVector{<:AbstractVector{<:Real}},
@@ -71,9 +74,11 @@ computeSP(a::AbstractVector{<:Integer},mOP::MultiOrthoPoly)
 ```
 
 Computes the scalar product
+
 ```math
 \\langle \\phi_{a_1},\\phi_{a_2},\\cdots,\\phi_{a_n} \\rangle,
 ```
+
 where `n = length(a)`.
 This requires to provide the recurrence coefficients `(α,β)` and the quadrature rule
 `(nodes,weights)`, as well as the multi-index `ind`.
@@ -85,12 +90,16 @@ Mathematically, this follows from Fubini's theorem.
 The function is dispatched to facilitate its use with `AbstractOrthoPoly` and its quadrature rule `Quad`.
 
 !!! note
-    - Zero entries of ``a`` are removed automatically to simplify computations, which follows from
+
+      - Zero entries of ``a`` are removed automatically to simplify computations, which follows from
+
     ```math
     \\langle \\phi_i, \\phi_j, \\phi_0,\\cdots,\\phi_0 \\rangle = \\langle \\phi_i, \\phi_j \\rangle,
     ```
+
     because `\\phi_0 = 1`.
-    - It is checked whether enough quadrature points are supplied to solve the integral exactly.
+
+      - It is checked whether enough quadrature points are supplied to solve the integral exactly.
 """
 function computeSP(a_::AbstractVector{<:Integer}, α::AbstractVector{<:Real},
                    β::AbstractVector{<:Real}, nodes::AbstractVector{<:Real},
@@ -136,9 +145,11 @@ end
     computeSP2(op::AbstractOrthoPoly) = computeSP2(op.deg,op.β)
 
 Computes the `n` *regular* scalar products aka 2-norms of the orthogonal polynomials, namely
+
 ```math
 \\|ϕ_i\\|^2 = \\langle \\phi_i,\\phi_i\\rangle \\quad \\forall i \\in \\{ 0,\\dots,n \\}.
 ```
+
 Notice that only the values of `β` of the recurrence coefficients `(α,β)` are required.
 The computation is based on equation (1.3.7) from Gautschi, W. "Orthogonal Polynomials: Computation and Approximation".
 Whenever there exists an analytic expressions for `β`, this function should be used.

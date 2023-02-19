@@ -11,6 +11,7 @@ end
 
 """
     stieltjes(N::Int,nodes_::AbstractVector{<:Real},weights_::AbstractVector{<:Real};removezeroweights::Bool=true)
+
 Stieltjes procedure---Given the nodes and weights the function
 generates the first`N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
@@ -52,6 +53,7 @@ end
 
 """
     lanczos(N::Int,nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};removezeroweights::Bool=true)
+
 Lanczos procedure---given the nodes and weights the function
 generates the first `N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
@@ -96,17 +98,20 @@ end
 
 """
     mcdiscretization(N::Int,quads::Vector{},discretemeasure::AbstractMatrix{<:Real}=zeros(0,2);discretization::Function=stieltjes,Nmax::Integer=300,ε::Float64=1e-8,gaussquad::Bool=false)
+
 This routine returns ``N`` recurrence coefficients of the polynomials that are
 orthogonal relative to a weight function ``w`` that
 is decomposed as a sum of ``m`` weights ``w_i`` with domains ``[a_i,b_i]`` for ``i=1,\\dots,m``,
+
 ```math
 w(t) = \\sum_{i}^{m} w_i(t) \\quad \\text{with } \\operatorname{dom}(w_i) = [a_i, b_i].
 ```
+
 For each weight ``w_i`` and its domain ``[a_i, b_i]`` the function `mcdiscretization()`
 expects a quadrature rule of the form
-    nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real} = my_quad_i(N::Int)
+nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real} = my_quad_i(N::Int)
 all of which are stacked in the parameter `quad`
-    quad = [ my_quad_1, ..., my_quad_m ]
+quad = [ my_quad_1, ..., my_quad_m ]
 If the weight function has a discrete part (specified by `discretemeasure`)
 it is added on to the discretized continuous weight function.
 

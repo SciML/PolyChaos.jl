@@ -101,6 +101,7 @@ end
 
 """
     notebook2markdown(fname::String)
+
 Workflow to get markdown file from Julia notebook
 """
 function notebook2markdown(fname::String)
@@ -113,6 +114,7 @@ end
 
 """
     notebook2markdown_repl(fname::String;envname::String="mysetup")
+
 Workflow to get REPL-based markdown file from Julia notebook
 """
 function notebook2markdown_repl(fname::String; envname::String = "mysetup")
