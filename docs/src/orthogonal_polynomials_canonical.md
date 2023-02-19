@@ -30,7 +30,7 @@ Hence, every system of $n$ univariate monic orthogonal polynomials $\{ \pi_k \}_
 
 The so-called *classical* or *canonical* orthogonal polynomials are polynomials named after famous mathematicians who each discovered a special family of orthogonal polynomials, for example [Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials) or [Jacobi polynomials](https://en.wikipedia.org/wiki/Jacobi_polynomials).
 For *classical* orthogonal polynomials there exist closed-form expressions of---among others---the recurrence coefficients.
-Also quadrature rules for *classical* orthogonal polynomials are well-studied (with dedicated packages such as [FastGaussQuadrature.jl](https://github.com/ajt60gaibb/FastGaussQuadrature.jl).
+Also quadrature rules for *classical* orthogonal polynomials are well-studied (with dedicated packages such as [FastGaussQuadrature.jl](https://github.com/JuliaApproximation/FastGaussQuadrature.jl).
 However, more often than not these *classical* orthogonal polynomials are neither monic nor orthogonal, hence not normalized in any sense.
 For example, there is a distinction between the [*probabilists'* Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials#Definition) and the [*physicists'* Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials#Definition).
 The difference is in the weight function $w(t)$ relative to which the polynomials are orthogonal:

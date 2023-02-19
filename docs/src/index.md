@@ -30,7 +30,7 @@ However, a cornerstone principle of PolyChaos is to provide all the functionalit
     
       - a self-contained introduction to orthogonal polynomials, quadrature rules and/or polynomial chaos expansions. We assume the user brings some experience to the table. However, over time we will focus on strengthening the tutorial charater of the package.
       - a symbolic toolbox
-      - a replacement for [FastGaussQuadrature.jl](https://github.com/ajt60gaibb/FastGaussQuadrature.jl)
+      - a replacement for [FastGaussQuadrature.jl](https://github.com/JuliaApproximation/FastGaussQuadrature.jl)
 
 ## Installation
 
