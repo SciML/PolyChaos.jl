@@ -9,6 +9,9 @@ include("pages.jl")
 
 makedocs(sitename = "PolyChaos.jl",
          clean = true, doctest = false, linkcheck = true,
+         linkcheck_ignore = [
+             "https://www.sciencedirect.com/science/article/pii/S235246771830105X",
+         ],
          strict = [
              :doctest,
              :linkcheck,
