@@ -106,8 +106,8 @@ rec2coeff(α, β) = rec2coeff(length(α), α, β)
 showpoly(coeffs::Vector{<:Real};sym::String,digits::Integer)
 ```
 
-Show the monic polynomial with coefficients `coeffs` in a human readable way.
-They keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
+Show the monic polynomial with coefficients `coeffs` in a human-readable way.
+The keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
 
 ```jldoctest
 julia> using PolyChaos
@@ -209,7 +209,7 @@ showbasis(α::Vector{<:Real},β::Vector{<:Real};sym::String,digits::Integer)
 ```
 
 Show all basis polynomials given the recurrence coefficients `α`, `β`.
-They keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
+The keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
 
 ```jldoctest
 julia> using PolyChaos

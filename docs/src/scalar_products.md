@@ -49,7 +49,7 @@ The integrand is a polynomial (possibly multivariate) that can be solved exactly
 
 !!! note
     
-    To simplify notation we drop the integration interval.
+    To simplify notation, we drop the integration interval.
     It is clear from the context.
 
 ## Univariate Polynomials
@@ -65,7 +65,7 @@ s_α, s_β = 2.1, 3.2
 opq = Beta01OrthoPoly(deg, s_α, s_β; Nrec = n, addQuadrature = true)
 ```
 
-By setting `addQuadrature = true` (which is default), an $n$-point Gauss quadrature rule is create relative to the underlying measure `opq.measure`, where $n$ is the number of recurrence coefficients stored in `opq.α` and `opq.β`.
+By setting `addQuadrature = true` (which is default), an $n$-point Gauss quadrature rule is created relative to the underlying measure `opq.measure`, where $n$ is the number of recurrence coefficients stored in `opq.α` and `opq.β`.
 
 To compute the squared norms
 
@@ -125,8 +125,8 @@ normsq == [t2.get([i, i]) for i in 0:(dim(opq) - 1)]
 ### Arbitrary Weights
 
 Of course, the type `OrthoPoly` can be constructed for arbitrary weights $w(t)$.
-In this case we have to compute the orthogonal basis and the respective quadrature rule.
-Let's re-work the above example by hand.
+In this case, we have to compute the orthogonal basis and the respective quadrature rule.
+Let's re-work the above example manually.
 
 ```@example mysetup
 using SpecialFunctions
@@ -166,7 +166,7 @@ norm(T - my_T)
 
 ## Multivariate Polynomials
 
-For multivariate polynomials the syntax for `Tensor` is very much alike, except that we are dealing with the type `MultiOrthoPoly` now.
+For multivariate polynomials, the syntax for `Tensor` is very much alike, except that we are dealing with the type `MultiOrthoPoly` now.
 
 ```@example mysetup
 mop = MultiOrthoPoly([opq, my_opq], deg)
@@ -185,7 +185,7 @@ The encoding is given by the multi-index `mop.ind`
 mop.ind
 ```
 
-To cross-check the results we can distribute the multi-index back to its univariate indices with the help of `findUnivariateIndices`.
+To cross-check the results, we can distribute the multi-index back to its univariate indices with the help of `findUnivariateIndices`.
 
 ```@example mysetup
 ind_opq = findUnivariateIndices(1, mop.ind)

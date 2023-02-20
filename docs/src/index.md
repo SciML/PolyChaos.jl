@@ -4,8 +4,8 @@ using PolyChaos
 
 # Overview
 
-PolyChaos is a collection of numerical routines for orthogonal polynomials written in the [Julia](https://julialang.org/) programming language.
-Starting from some non-negative weight (aka an absolutely continuous nonnegative measure), PolyChaos allows
+PolyChaos is a collection of numerical routines for orthogonal polynomials, written in the [Julia](https://julialang.org/) programming language.
+Starting from some non-negative weight (aka an absolutely continuous non-negative measure), PolyChaos allows
 
   - to compute the coefficients for the monic three-term recurrence relation,
   - to evaluate the orthogonal polynomials at arbitrary points,
@@ -20,7 +20,7 @@ These routines allow
   - to compute moments,
   - to compute the tensors of scalar products.
 
-PolyChaos contains several *canonical* orthogonal polynomials such as Jacobi or Hermite polynomials.
+PolyChaos contains several *canonical* orthogonal polynomials, such as Jacobi or Hermite polynomials.
 For these, closed-form expressions and state-of-the art quadrature rules are used whenever possible.
 However, a cornerstone principle of PolyChaos is to provide all the functionality for user-specific, arbitrary weights.
 
@@ -28,14 +28,14 @@ However, a cornerstone principle of PolyChaos is to provide all the functionalit
     
     What PolyChaos is not (at least currently):
     
-      - a self-contained introduction to orthogonal polynomials, quadrature rules and/or polynomial chaos expansions. We assume the user brings some experience to the table. However, over time we will focus on strengthening the tutorial charater of the package.
+      - a self-contained introduction to orthogonal polynomials, quadrature rules and polynomial chaos expansions. We assume the user brings some experience to the table. However, over time we will focus on strengthening the tutorial character of the package.
       - a symbolic toolbox
-      - a replacement for [FastGaussQuadrature.jl](https://github.com/ajt60gaibb/FastGaussQuadrature.jl)
+      - a replacement for [FastGaussQuadrature.jl](https://github.com/JuliaApproximation/FastGaussQuadrature.jl)
 
 ## Installation
 
 The package requires `Julia 1.3` or newer.
-In `Julia` switch to the package manager
+To install PolyChaos.jl, use the Julia package manager:
 
 ```julia
 using Pkg
@@ -90,7 +90,7 @@ In case you are unfamiliar with orthogonal polynomials, perhaps [this background
 
 The code base of `PolyChaos` is partially based on Walter Gautschi's [Matlab suite of programs for generating orthogonal polynomials and related quadrature rules](https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html), with much of the theory presented in his book *Orthogonal Polynomials: Computation and Approximation* published in 2004 by the Oxford University Press.
 
-For the theory of polynomial chaos expansion we mainly consulted T. J. Sullivan. *Introduction to Uncertainty Quantification*. Springer International Publishing Switzerland. 2015.
+For the theory of polynomial chaos expansion, we mainly consulted T. J. Sullivan. *Introduction to Uncertainty Quantification*. Springer International Publishing Switzerland. 2015.
 
 ## Contributing
 
@@ -129,7 +129,7 @@ archivePrefix = {arXiv},
 }
 ```
 
-Of course you are more than welcome to partake in GitHub's gamification: starring and forking is much appreciated.
+Of course, you are more than welcome to partake in GitHub's gamification: starring and forking is much appreciated.
 
 Enjoy.
 

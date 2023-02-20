@@ -1,7 +1,7 @@
 # [Univariate Monic Orthogonal Polynomials](@id UnivariateMonicOrthogonalPolynomials)
 
 Univariate monic orthogonal polynomials make up the core building block of the package.
-These are real polynomials $\{ \pi_k \}_{k \geq 0}$, which are univariate $\pi_k: \mathbb{R} \rightarrow \mathbb{R}$ and orthogonal relative to a nonnegative weight function $w: \mathbb{R} \rightarrow \mathbb{R}_{\geq 0}$, and which have a leading coefficient equal to one:
+These are real polynomials $\{ \pi_k \}_{k \geq 0}$, which are univariate $\pi_k: \mathbb{R} \rightarrow \mathbb{R}$ and orthogonal relative to a non-negative weight function $w: \mathbb{R} \rightarrow \mathbb{R}_{\geq 0}$, and which have a leading coefficient equal to one:
 
 ```math
 \begin{aligned}
@@ -29,8 +29,8 @@ Hence, every system of $n$ univariate monic orthogonal polynomials $\{ \pi_k \}_
 ## Canonical Orthogonal Polynomials
 
 The so-called *classical* or *canonical* orthogonal polynomials are polynomials named after famous mathematicians who each discovered a special family of orthogonal polynomials, for example [Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials) or [Jacobi polynomials](https://en.wikipedia.org/wiki/Jacobi_polynomials).
-For *classical* orthogonal polynomials there exist closed-form expressions of---among others---the recurrence coefficients.
-Also quadrature rules for *classical* orthogonal polynomials are well-studied (with dedicated packages such as [FastGaussQuadrature.jl](https://github.com/ajt60gaibb/FastGaussQuadrature.jl).
+For *classical* orthogonal polynomials, there exist closed-form expressions of---among others---the recurrence coefficients.
+Also, quadrature rules for *classical* orthogonal polynomials are well-studied (with dedicated packages such as [FastGaussQuadrature.jl](https://github.com/JuliaApproximation/FastGaussQuadrature.jl)).
 However, more often than not these *classical* orthogonal polynomials are neither monic nor orthogonal, hence not normalized in any sense.
 For example, there is a distinction between the [*probabilists'* Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials#Definition) and the [*physicists'* Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials#Definition).
 The difference is in the weight function $w(t)$ relative to which the polynomials are orthogonal:
@@ -151,7 +151,7 @@ julia> my_meas = Measure("my_meas", w, supp, false, Dict())
 Measure("my_meas", w, (-1.0, 1.0), false, Dict{Any,Any}())
 ```
 
-Notice: it is advisable to define the weight such that an error is thrown for arguments outside of the support.
+Notice: it is advisable to define the weight such that an error is thrown for arguments outside the support.
 
 Now, we want to construct the univariate monic orthogonal polynomials up to degree `deg` relative to `my_meas`.
 The constructor is
@@ -175,7 +175,7 @@ symmetric:      false
 pars:   Dict{Any,Any}()
 ```
 
-By default, the recurrence coefficients are computed using the [Stieltjes procuedure](https://warwick.ac.uk/fac/sci/maths/research/grants/equip/grouplunch/1985Gautschi.pdf) with [Clenshaw-Curtis](https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature) quadrature (with `Nquad` nodes and weights).
+By default, the recurrence coefficients are computed using the [Stieltjes procedure](https://warwick.ac.uk/fac/sci/maths/research/grants/equip/grouplunch/1985Gautschi.pdf) with [Clenshaw-Curtis](https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature) quadrature (with `Nquad` nodes and weights).
 Hence, the choice of `Nquad` influences accuracy.
 
 ## [Multivariate Monic Orthogonal Polynomials](@id MultivariateMonicOrthogonalPolynomials)

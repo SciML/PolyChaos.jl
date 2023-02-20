@@ -44,7 +44,7 @@ samples_logistic = evaluatePCE(pce_logistic,ξ_logistic,myops["logistic"])
 # [Common Random Variables](@id CommonRandomVariables)
 
 Polynomial chaos expansion (PCE) is a Hilbert space technique for random variables with finite variance.
-Mathematically equivalent to Fourier series expansions for periodic signals, PCE allows to characterize a random variable in terms of its PCE coefficients (aka Fourier coefficients).
+Mathematically equivalent to Fourier series expansions for periodic signals, PCE allows characterizing a random variable in terms of its PCE coefficients (aka Fourier coefficients).
 That is, the PCE of a random variable $\mathsf{x}$ is given by
 
 ```math
@@ -61,7 +61,7 @@ This tutorial walks you through the PCE of common random variables, namely Gauss
 using PolyChaos
 ```
 
-The orthogonal polynomials are constructed using the `OrthoPoly`-type (here of degree at most `d`). For canonical measures special constructors are implemented:
+The orthogonal polynomials are constructed using the `OrthoPoly`-type (here of degree at most `d`). For canonical measures, special constructors are implemented:
 
 ```@example mysetup
 d = 6
@@ -147,7 +147,7 @@ pce_beta = convert2affinePCE(μ, σ, beta01; kind = "μσ")
 
 ### Logistic
 
-Given the logstic random variable $\mathsf{x} \sim \mathcal{L}(a_1,a_2)$ where $a_2>0$ with the probability density function
+Given the logistic random variable $\mathsf{x} \sim \mathcal{L}(a_1,a_2)$ where $a_2>0$ with the probability density function
 
 ```math
 \rho(t) = \frac{1}{4 a_2} \, \operatorname{sech}^2 \left(\frac{t-a_1}{2a_2}\right)

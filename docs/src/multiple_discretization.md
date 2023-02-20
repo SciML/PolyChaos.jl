@@ -102,7 +102,7 @@ print("Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes")
 
 Even worse!
 Well, we can factor out $\frac{1}{\sqrt{1-t^2}}$, making the integral amenable to a Gauss-Chebyshev rule.
-So, let's give it anothery try.
+So, let's give it another try.
 
 ```@example mysetup
 function quad_gausscheb(N, γ)
@@ -156,7 +156,7 @@ print("Discretization error:\t$(abs(int_exact-int_mc))\twith $(length(n)) nodes"
 ```
 
 Et voilà, no error with fewer nodes.
-(For this example, we'd need in fact just a single node.)
+(For this example, we'd need just a single node.)
 
 The function `mcdiscretization()` is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight $w$.
 Let's inspect the values of the recurrence coefficients a little more.

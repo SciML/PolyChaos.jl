@@ -67,7 +67,7 @@ y_m \langle \phi_m, \phi_m \rangle = \sum_{i=0}^n \sum_{j=0}^n x_i x_j \langle \
 ```
 
 Hence, knowing the scalars $\langle \phi_m, \phi_m \rangle$, and $\langle \phi_i \phi_j, \phi_m \rangle$, the PCE coefficients $y_k$ can be obtained immediately.
-From the PCE coefficients we can get the moments and compare them to the closed-form expressions.
+From the PCE coefficients, we can get the moments and compare them to the closed-form expressions.
 
 __Notice:__ A maximum degree of 2 suffices to get the *exact* solution with PCE.
 In other words, increasing the maximum degree to values greater than 2 introduces nothing but computational overhead (and numerical errors, possibly).
@@ -142,7 +142,7 @@ print("\t\t\terror = $(moms_analytic(k)[3]-myskew(y))\n")
 Let's plot the probability density function to compare results.
 We first draw samples from the measure with the help of `sampleMeasure()`, and then evaluate the basis at these samples and multiply times the PCE coefficients.
 The latter stop is done using `evaluatePCE()`.
-Finally, we compare the result agains the analytical PDF $\rho(t) = \frac{\mathrm{e}^{-0.5t}}{\sqrt{2 t} \, \Gamma(0.5)}$ of the chi-squared distribution with one degree of freedom.
+Finally, we compare the result against the analytical PDF $\rho(t) = \frac{\mathrm{e}^{-0.5t}}{\sqrt{2 t} \, \Gamma(0.5)}$ of the chi-squared distribution with one degree of freedom.
 
 ```@example mysetup
 using Plots

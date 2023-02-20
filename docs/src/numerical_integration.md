@@ -53,7 +53,7 @@ Uniform01Measure(PolyChaos.w_uniform01, (0.0, 1.0), true)
 ```
 
 Next, we need to compute the quadrature rule relative to the uniform measure.
-To do this we use the composite type `Quad`.
+To do this, we use the composite type `Quad`.
 
 ```jldoctest mylabel
 julia> quadRule1 = Quad(n - 1, measure)
@@ -72,7 +72,7 @@ julia> nw(quadRule1)
 
 This creates a quadrature rule `quadRule_1` relative to the measure `measure`.
 The function `nw()` prints the nodes and weights.
-To solve the integral we call `integrate()`
+To solve the integral, we call `integrate()`
 
 ```jldoctest mylabel
 julia> variant1 = integrate(f, quadRule1)
@@ -108,7 +108,7 @@ julia> coeffs(op)
  0.5  0.0631313
 ```
 
-Now, the quadrature rule can be constructed based on `op`, and the integral be solved.
+Now, the quadrature rule can be constructed based on `op`, and the integral to be solved.
 
 ```jldoctest mylabel
 julia> quadRule2 = Quad(n, op)
@@ -141,4 +141,4 @@ julia> 1 - cos(1) .- [variant0 variant1 variant0_revisited]
 
 with `variant0` and `variant0_revisited` being the same and more accurate than `variant1`.
 The increased accuracy is based on the fact that for `variant0` and `variant0_revisited` the quadrature rules are based on the recursion coefficients of the underlying orthogonal polynomials.
-The quadrature for `variant1` is based on an general-purpose method that can be significantly less accurate, see also [the next tutorial](@ref QuadratureRules).
+The quadrature for `variant1` is based on a general-purpose method that can be significantly less accurate, see also [the next tutorial](@ref QuadratureRules).

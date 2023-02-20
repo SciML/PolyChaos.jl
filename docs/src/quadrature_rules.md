@@ -39,7 +39,7 @@ print("error Clenshaw-Curtis:\t $(int_cc - int_exact)")
 
 # [Quadrature Rules](@id QuadratureRules)
 
-In this tutorial we investigate how recurrence coefficients of orthogonal polynomials lead to quadrature rules.
+In this tutorial, we investigate how recurrence coefficients of orthogonal polynomials lead to quadrature rules.
 
 We want to solve the integral
 
@@ -60,7 +60,7 @@ For the function $f$ we choose
 f(t) = t^2.
 ```
 
-To solve the integral we do the following:
+To solve the integral, we do the following:
 
  0. Choose number of nodes $N$;
  1. Generate recurrence coefficients;
@@ -103,7 +103,7 @@ Since Gauss quadrature has a degree of exactness of $2N-1$, the value of the int
 
 ## Gauss-Radau
 
-Gauss-Radau quadrature is a variant of Gauss quadrature that allows to specify a value of a node that *has to be included*.
+Gauss-Radau quadrature is a variant of Gauss quadrature that allows including a value of a node that *has to be included*.
 We choose to include the right end point $t = 1.0$.
 
 ```@example mysetup
@@ -156,7 +156,7 @@ print("error Fejer2:\t $(int_fej2 - int_exact)")
 
 ## Clenshaw-Curtis
 
-[Clenshaw-Curtis quadrature](https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature) is similar to Féjer's second rule, as in it includes the end points of the integration interval. For the same number of nodes it is also more accurate than Féjer's rules, generally speaking.
+[Clenshaw-Curtis quadrature](https://en.wikipedia.org/wiki/Clenshaw%E2%80%93Curtis_quadrature) is similar to Féjer's second rule, as in it includes the end points of the integration interval. For the same number of nodes, it is also more accurate than Féjer's rules, generally speaking.
 
 ```@example mysetup
 n_cc, w_cc = clenshaw_curtis(N)
