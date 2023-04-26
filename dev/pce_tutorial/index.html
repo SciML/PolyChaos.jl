@@ -33,9 +33,9 @@ myops</code></pre><pre class="documenter-example-output"><code class="nohighligh
 
 [evaluate(degree, points, gaussian) for degree in degrees]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4-element Vector{Vector{Float64}}:
  [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
- [-0.44384304089982696, -0.6770673017031459, -0.8246145843713885, -0.9622425151533677, -0.9739302425970968, -0.3315076314479768, 2.2419274645474734, -0.9869512200815513, -0.00047487740426266356, -0.34543840696679684]
- [-0.027631191445486536, 1.1666893378481622, 1.9784475502435515, 2.77488071858215, 2.844261087833627, -0.5640721644998454, -5.9414711018976325, 2.921877591146668, -1.9981002648744002, -0.49891867912505417]
- [5.559429934396666, -1.9986342842502327, -7.563662093836429, -13.322243768715857, -13.837037682787141, 8.67766312059356, 7.308291997451935, -14.415356741705875, 15.991449500513593, 8.308955990324932]</code></pre><h2 id="Finding-PCE-Coefficients"><a class="docs-heading-anchor" href="#Finding-PCE-Coefficients">Finding PCE Coefficients</a><a id="Finding-PCE-Coefficients-1"></a><a class="docs-heading-anchor-permalink" href="#Finding-PCE-Coefficients" title="Permalink"></a></h2><p>Having constructed the orthogonal bases, the question remains how to find the PCE coefficients for the common random variables. Every random variable can be characterized exactly by two PCE coefficients. For a Gaussian random variable, this is familiar: the mean and the variance suffice to describe a Gaussian random variable entirely. The same is true for any random variable of finite variance given the right basis. The function <code>convert2affinePCE</code> provides the first two PCE coefficients (hence the name affine) for the common random variables.</p><h3 id="Gaussian"><a class="docs-heading-anchor" href="#Gaussian">Gaussian</a><a id="Gaussian-1"></a><a class="docs-heading-anchor-permalink" href="#Gaussian" title="Permalink"></a></h3><p>Given the Gaussian random variable <span>$\mathsf{x} \sim \mathcal{N}(\mu, \sigma^2)$</span> with <span>$\sigma &gt; 0$</span>, the affine PCE coefficients are</p><pre><code class="language-julia hljs"># Gaussian
+ [-0.8469328408570068, -0.004093770199876667, -0.9996993511213684, 2.117802715935823, 0.5388813451006402, -0.9279523767102373, 0.10166442779703755, -0.7494034345460547, -0.6904349716215699, 3.2540902760041597]
+ [2.105026600350147, -1.983608160246044, 2.998196197117959, -5.986122520118144, -3.8651322763050855, 2.5729051202831275, -2.3963220553088513, 1.559219245893642, 1.238440336524358, -4.427257579631812]
+ [-8.459834871231212, 15.92611096034152, -14.986472156280628, 9.797921038684482, 22.371634389185818, -11.835345863158839, 17.706982598335962, -4.649397010679484, -2.477365551339226, -18.037718514241007]</code></pre><h2 id="Finding-PCE-Coefficients"><a class="docs-heading-anchor" href="#Finding-PCE-Coefficients">Finding PCE Coefficients</a><a id="Finding-PCE-Coefficients-1"></a><a class="docs-heading-anchor-permalink" href="#Finding-PCE-Coefficients" title="Permalink"></a></h2><p>Having constructed the orthogonal bases, the question remains how to find the PCE coefficients for the common random variables. Every random variable can be characterized exactly by two PCE coefficients. For a Gaussian random variable, this is familiar: the mean and the variance suffice to describe a Gaussian random variable entirely. The same is true for any random variable of finite variance given the right basis. The function <code>convert2affinePCE</code> provides the first two PCE coefficients (hence the name affine) for the common random variables.</p><h3 id="Gaussian"><a class="docs-heading-anchor" href="#Gaussian">Gaussian</a><a id="Gaussian-1"></a><a class="docs-heading-anchor-permalink" href="#Gaussian" title="Permalink"></a></h3><p>Given the Gaussian random variable <span>$\mathsf{x} \sim \mathcal{N}(\mu, \sigma^2)$</span> with <span>$\sigma &gt; 0$</span>, the affine PCE coefficients are</p><pre><code class="language-julia hljs"># Gaussian
 μ, σ = 2.0, 0.2
 pce_gaussian = convert2affinePCE(μ, σ, gaussian)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{Float64}:
  2.0
@@ -57,89 +57,89 @@ N = 1000
 ξ_gaussian = sampleMeasure(N, myops[&quot;gaussian&quot;])
 samples_gaussian = evaluatePCE(pce_gaussian, ξ_gaussian, myops[&quot;gaussian&quot;])
 # samplePCE(N,pce_gaussian,myops[&quot;gaussian&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 2.421826996483944
- 2.4481467971656006
- 2.0288881322278662
- 1.697917839250234
- 2.281815893265262
- 2.169812321973616
- 2.1678753269890683
- 2.095667676286797
- 1.9292108890136639
- 1.8806582475945908
+ 1.8283899365534824
+ 1.9550665293877785
+ 1.9818453085044012
+ 2.160013506146666
+ 2.07090287527193
+ 1.9888897272405568
+ 2.1691678531430556
+ 1.669929917540401
+ 2.0870545416307302
+ 2.123360291253101
  ⋮
- 2.0513491090078446
- 1.5870434022629831
- 2.2594810710521545
- 2.03938429466934
- 1.9187984930285
- 1.8803659701888402
- 1.8814391511801902
- 1.7474792408157374
- 2.184935203440236</code></pre><h3 id="Uniform-3"><a class="docs-heading-anchor" href="#Uniform-3">Uniform</a><a class="docs-heading-anchor-permalink" href="#Uniform-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_uniform = sampleMeasure(N, myops[&quot;uniform01&quot;])
+ 2.003234624899075
+ 1.9629684327494084
+ 1.8410939232234398
+ 2.026119246658713
+ 2.0781594962892402
+ 1.9955701123790024
+ 2.0939599165769023
+ 2.0971068991619695
+ 1.9236220676352018</code></pre><h3 id="Uniform-3"><a class="docs-heading-anchor" href="#Uniform-3">Uniform</a><a class="docs-heading-anchor-permalink" href="#Uniform-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_uniform = sampleMeasure(N, myops[&quot;uniform01&quot;])
 samples_uniform = evaluatePCE(pce_uniform, ξ_uniform, myops[&quot;uniform01&quot;])
 # samples_uniform = samplePCE(N,pce_uniform,myops[&quot;uniform01&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 2.0580840877194047
- 2.0490824717088256
- 1.9691550482700195
- 2.0510605353610663
- 1.8703702232264248
- 1.7314694566088296
- 1.761059873546861
- 1.7336024536438353
- 2.3456543655984468
- 1.9934637306442327
+ 2.30892048890492
+ 2.2799768371485833
+ 1.7777808152115209
+ 2.14670246572251
+ 1.7688375041742894
+ 1.9692157010721347
+ 2.061621153016811
+ 1.781098979896723
+ 2.0437314733747467
+ 1.8637384792332827
  ⋮
- 1.9303665736639586
- 1.8854265474639789
- 2.314369328973347
- 2.2203472866021956
- 1.888854096115362
- 1.7159342355465612
- 2.101723335086291
- 2.158053774875582
- 1.9955151185130406</code></pre><h3 id="Beta-3"><a class="docs-heading-anchor" href="#Beta-3">Beta</a><a class="docs-heading-anchor-permalink" href="#Beta-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_beta = sampleMeasure(N, myops[&quot;beta01&quot;])
+ 2.0303044988253194
+ 1.9629741824704903
+ 2.2354248665401295
+ 2.2457187973182164
+ 2.0722753482034575
+ 1.8863262624735904
+ 1.889383068819585
+ 2.058914405567843
+ 2.1416430024504853</code></pre><h3 id="Beta-3"><a class="docs-heading-anchor" href="#Beta-3">Beta</a><a class="docs-heading-anchor-permalink" href="#Beta-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_beta = sampleMeasure(N, myops[&quot;beta01&quot;])
 samples_beta = evaluatePCE(pce_beta, ξ_beta, myops[&quot;beta01&quot;])
 # samples_beta = samplePCE(N,pce_beta,myops[&quot;beta01&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 2.1626583139430413
- 1.809157741274599
- 2.165007188016568
- 1.9840196284089988
- 1.9337233737912451
- 2.145438354229171
- 2.4420561250502164
- 2.136405641749915
- 2.3918182310527762
- 2.2755362133265553
+ 1.9804967495908306
+ 2.005623618778897
+ 1.9106691000520415
+ 1.9618350192033989
+ 2.276061663180167
+ 1.8589186500532224
+ 2.3499251643050436
+ 1.8955460056694786
+ 2.3722593580339844
+ 1.8748535283414947
  ⋮
- 1.8331362284385966
- 1.9760179500105364
- 1.966920174878966
- 2.515291916405905
- 1.850128363138457
- 1.7799448265132547
- 1.7246921767525474
- 1.677360479145976
- 1.7668016152185766</code></pre><h3 id="Logistic-3"><a class="docs-heading-anchor" href="#Logistic-3">Logistic</a><a class="docs-heading-anchor-permalink" href="#Logistic-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_logistic = sampleMeasure(N, myops[&quot;logistic&quot;])
+ 1.685899250034733
+ 2.008811999670971
+ 1.8928268495158331
+ 1.7891097295933782
+ 2.160438717055281
+ 2.197216253339661
+ 1.7543973977410408
+ 2.460375582998403
+ 1.730691876773343</code></pre><h3 id="Logistic-3"><a class="docs-heading-anchor" href="#Logistic-3">Logistic</a><a class="docs-heading-anchor-permalink" href="#Logistic-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_logistic = sampleMeasure(N, myops[&quot;logistic&quot;])
 samples_logistic = evaluatePCE(pce_logistic, ξ_logistic, myops[&quot;logistic&quot;])
 # samples_logistic = samplePCE(N,pce_logistic,myops[&quot;logistic&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 2.191989573813476
- 1.9624304001466375
- 1.903265583383872
- 1.8669852764189294
- 2.0243699441533867
- 1.929869831602544
- 2.2283431876754487
- 1.7115504492432372
- 2.07402764761115
- 2.1645982409258693
+ 2.3206011084466596
+ 2.0476559248229327
+ 2.269779849064166
+ 1.689576982540816
+ 1.7751678279404064
+ 2.2040049698608035
+ 2.0007047609604816
+ 2.059571692259372
+ 2.0153659365801873
+ 2.0371930505396176
  ⋮
- 1.8908584091667315
- 2.0902016078329466
- 1.9793888440767122
- 2.0252452966247443
- 1.8974094362940765
- 2.075551871796679
- 1.6947077976859128
- 2.2282867192263054
- 1.9172817035702472</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../scalar_products/">« Computation of Scalar Products</a><a class="docs-footer-nextpage" href="../chi_squared_k1/">Chi Squared, One DOF »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Wednesday 26 April 2023 09:00">Wednesday 26 April 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 2.199451741753309
+ 1.9279423250178778
+ 1.980756085686353
+ 1.9156747214056835
+ 1.9850210759228348
+ 1.8088808855326854
+ 1.728024816202598
+ 1.6876041370832557
+ 1.7395911193399183</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../scalar_products/">« Computation of Scalar Products</a><a class="docs-footer-nextpage" href="../chi_squared_k1/">Chi Squared, One DOF »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Wednesday 26 April 2023 09:02">Wednesday 26 April 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
