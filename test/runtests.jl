@@ -1,3 +1,4 @@
+include("qa.jl")
 include("constructors.jl")
 include("quadrature.jl")
 include("recurrence_coefficients.jl")
