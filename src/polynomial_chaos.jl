@@ -21,7 +21,7 @@ function _createMethodVector(mop::MultiOrthoPoly, word::String = "adaptivereject
     _createMethodVector(mop.measure, word)
 end
 
-function _checkStandardDevation(σ::Real)
+function _checkStandardDeviation(σ::Real)
     σ < 0 && throw(DomainError(σ, "σ has to be non-negative"))
     σ < 1e-4 && @warn "σ is close to zero (σ = $σ)"
 end
@@ -79,7 +79,7 @@ function convert2affinePCE(a1::Real, a2::Real, α0::Real)
 end
 
 function convert2affinePCE(mu::Real, sigma::Real, op::GaussOrthoPoly)
-    _checkStandardDevation(sigma)
+    _checkStandardDeviation(sigma)
     convert2affinePCE(mu, sigma, first(op.α))
 end
 
@@ -90,7 +90,7 @@ function convert2affinePCE(par1::Real, par2::Real, op::Uniform01OrthoPoly;
         _checkBounds(par1, par2)
         par1, par2 - par1
     elseif kind == "μσ"
-        _checkStandardDevation(par2)
+        _checkStandardDeviation(par2)
         par1 - sqrt(3) * par2, 2 * sqrt(3) * par2
     end
     convert2affinePCE(a1, a2, first(op.α))
@@ -103,7 +103,7 @@ function convert2affinePCE(par1::Real, par2::Real, op::Uniform_11OrthoPoly;
         _checkBounds(par1, par2)
         0.5 * (par1 + par2), 0.5 * (par2 - par1)
     elseif kind == "μσ"
-        _checkStandardDevation(par2)
+        _checkStandardDeviation(par2)
         par1, sqrt(3) * par2
     end
     convert2affinePCE(a1, a2, first(op.α))
@@ -116,7 +116,7 @@ function convert2affinePCE(p1::Real, p2::Real, op::Beta01OrthoPoly; kind::String
         _checkBounds(p1, p2)
         a1, a2 = p1, p2 - p1
     elseif kind == "μσ"
-        _checkStandardDevation(p2)
+        _checkStandardDeviation(p2)
         a1, a2 = p1 - sqrt(α / β) * sqrt(1 + α + β) * p2,
                  (α + β) * sqrt((α + β + 1) / (α * β)) * p2
     end
@@ -128,7 +128,7 @@ function convert2affinePCE(p1::Real, p2::Real, op::GammaOrthoPoly)
 end
 
 function convert2affinePCE(p1::Real, p2::Real, op::LogisticOrthoPoly)
-    _checkStandardDevation(p2)
+    _checkStandardDeviation(p2)
     convert2affinePCE(p1, p2, first(op.α))
 end
 

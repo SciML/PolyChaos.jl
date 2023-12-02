@@ -21,7 +21,7 @@ op = genLaguerreOrthoPoly(d, 1.23, addQuadrature = false)
 opq = genLaguerreOrthoPoly(d, 1.23)
 mop = MultiOrthoPoly([op for i in 1:nunc], d)
 mopq = MultiOrthoPoly([opq for i in 1:nunc], d)
-@testset "dimenions" begin
+@testset "dimensions" begin
     @test isequal(PolyChaos.dim(op), d + 1)
     @test isequal(PolyChaos.dim(opq), d + 1)
     @test isequal(PolyChaos.dim(mop),
