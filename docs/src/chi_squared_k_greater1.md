@@ -111,7 +111,7 @@ Notice: there are more efficient ways to do this, but let's keep it simple.
 
 ```@example mysetup
 y = [sum(x[i][j1] * x[i][j2] * t3.get([j1 - 1, j2 - 1, m - 1]) / t2.get([m - 1, m - 1])
-         for i in 1:k, j1 in 1:L, j2 in 1:L) for m in 1:L]
+     for i in 1:k, j1 in 1:L, j2 in 1:L) for m in 1:L]
 ```
 
 Let's compare the moments via PCE to the closed-form expressions.
@@ -120,7 +120,7 @@ Let's compare the moments via PCE to the closed-form expressions.
 moms_analytic(k) = [k, sqrt(2k), sqrt(8 / k)]
 function myskew(y)
     e3 = sum(y[i] * y[j] * y[k] * t3.get([i - 1, j - 1, k - 1])
-             for i in 1:L, j in 1:L, k in 1:L)
+    for i in 1:L, j in 1:L, k in 1:L)
     μ = y[1]
     σ = std(y, mop)
     (e3 - 3 * μ * σ^2 - μ^3) / (σ^3)

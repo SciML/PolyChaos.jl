@@ -25,7 +25,7 @@ mopq = MultiOrthoPoly([opq for i in 1:nunc], d)
     @test isequal(PolyChaos.dim(op), d + 1)
     @test isequal(PolyChaos.dim(opq), d + 1)
     @test isequal(PolyChaos.dim(mop),
-                  factorial(d + nunc) / (factorial(d) * factorial(nunc)))
+        factorial(d + nunc) / (factorial(d) * factorial(nunc)))
 end
 
 @testset "degrees" begin
@@ -88,11 +88,13 @@ tensor_entries = computeTensorizedSP(tensor_dim, mop)
 my_getentry(row, entries) = getentry(row, tensor_entries, entries, tensor_dim)
 
 if VERSION >= VersionNumber("1.1.1")
-    @testset "getentry for StaticArrays" begin for row in eachrow(rand(0:(L - 1), L,
-                                                                       tensor_dim))
-        reference = my_getentry(Vector(row), mop.ind)
-        @test my_getentry(row, mop.ind) == reference
-        @test my_getentry(row, SMatrix{size(mop.ind)...}(mop.ind)) == reference
-        @test my_getentry(Vector(row), SMatrix{size(mop.ind)...}(mop.ind)) == reference
-    end end
+    @testset "getentry for StaticArrays" begin
+        for row in eachrow(rand(0:(L - 1), L,
+            tensor_dim))
+            reference = my_getentry(Vector(row), mop.ind)
+            @test my_getentry(row, mop.ind) == reference
+            @test my_getentry(row, SMatrix{size(mop.ind)...}(mop.ind)) == reference
+            @test my_getentry(Vector(row), SMatrix{size(mop.ind)...}(mop.ind)) == reference
+        end
+    end
 end

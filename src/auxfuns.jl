@@ -90,7 +90,7 @@ julia> integrate(x -> 6x^5, opq)
   - interval of integration is "hidden" in `nodes`.
 """
 function integrate(f::Function, nodes::AbstractVector{<:Real},
-                   weights::AbstractVector{<:Real})
+        weights::AbstractVector{<:Real})
     dot(weights, f.(nodes))
 end
 
@@ -119,7 +119,7 @@ function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
     m = length(a) # dimension of scalar product
     l -= 1 # (l+1)-dimensional basis
     maximum(a) > l && throw(DomainError(a,
-                      "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+        "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
     A = zeros(Int64, p, m)
     for (i, a_element) in enumerate(a)
         A[:, i] = ind[a_element + 1, :]
@@ -128,14 +128,14 @@ function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
 end
 
 function getentry(a::AbstractVector{<:Int}, T::SparseVector{<:Real, <:Int},
-                  ind::AbstractMatrix{<:Int}, dim::Int)
+        ind::AbstractMatrix{<:Int}, dim::Int)
     m = length(a)
     l = size(ind, 1) - 1
     minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
     maximum(a) > l && throw(DomainError(a,
-                      "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+        "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
     m != dim && throw(DomainError(m,
-                      "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
+        "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
     # a .+= 1
     sort!(a; rev = true)
 

@@ -13,7 +13,7 @@ struct Quad{T, V <: AbstractVector{<:T}} <: AbstractQuad{T}
             throw(InconsistencyError("inconsistent numbers of nodes and weights"))
         new{promote_type(eltype(nodes), eltype(weights)),
             promote_type(typeof(nodes), typeof(weights))}(lowercase(name), N, nodes,
-                                                          weights)
+            weights)
     end
 end
 
@@ -26,7 +26,7 @@ function Quad(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
     !(length(α) == length(β)) &&
         throw(InconsistencyError("inconsistent numbers of recurrence coefficients"))
     !(N <= length(α) - 1) && throw(DomainError(N,
-                      "requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"))
+        "requested number of quadrature points $N cannot be provided with $(length(α)) recurrence coefficients"))
     nodes, weights = gauss(N, α, β)
     Quad("golubwelsch", N, nodes, weights)
 end
@@ -52,7 +52,7 @@ Quad(op::AbstractOrthoPoly) = Quad(op.deg, op)
 
 # all-purpose constructor (last resort!)
 function Quad(N::Int, w::Function, dom::Tuple{<:Real, <:Real};
-              quadrature::Function = clenshaw_curtis)
+        quadrature::Function = clenshaw_curtis)
     N <= 0 && throw(DomainError(N, "number of quadrature points has to be positive"))
     nodes, weights = quadgp(w, dom[1], dom[2], N; quadrature = quadrature)
     Quad("quadgp", N, nodes, weights)

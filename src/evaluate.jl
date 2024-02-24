@@ -72,7 +72,7 @@ which returns an array of dimensions `(mop.dim,size(x,1))`.
       - `size(a)==size(b)=p`.
 """
 function evaluate(n::Int, x::AbstractArray{<:Real}, a::AbstractVector{<:Real},
-                  b::AbstractVector{<:Real})
+        b::AbstractVector{<:Real})
     @assert n>=0 "Degree n has to be non-negative (currently n=$n)."
     # if length(a)==0 warn("Length of a is 0.") end
     @assert length(a)==length(b) "Inconsistent number of recurrence coefficients."
@@ -105,7 +105,7 @@ evaluate(n::Int, x::Real, op::AbstractOrthoPoly) = evaluate(n, [x], op)
 
 # univariate + several bases
 function evaluate(ns, x::AbstractArray{<:Real}, a::AbstractVector{<:Real},
-                  b::AbstractVector{<:Real})
+        b::AbstractVector{<:Real})
     hcat(map(i -> evaluate(i, x, a, b), ns)...)
 end
 function evaluate(ns, x::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
@@ -121,8 +121,8 @@ evaluate(x::Real, op::AbstractOrthoPoly) = evaluate([x], op)
 
 # multivariate
 function evaluate(n::AbstractVector{<:Int}, x::AbstractMatrix{<:Real},
-                  a::AbstractVector{<:AbstractVector{<:Real}},
-                  b::AbstractVector{<:AbstractVector{<:Real}})
+        a::AbstractVector{<:AbstractVector{<:Real}},
+        b::AbstractVector{<:AbstractVector{<:Real}})
     @assert length(n)==size(x, 2) "number of univariate bases (= $(length(n))) inconsistent with columns points x (= $(size(x,2)))"
     val = ones(Float64, size(x, 1))
     for i in 1:length(n)
@@ -131,8 +131,8 @@ function evaluate(n::AbstractVector{<:Int}, x::AbstractMatrix{<:Real},
     return val
 end
 function evaluate(n::AbstractVector{<:Int}, x::AbstractVector{<:Real},
-                  a::AbstractVector{<:AbstractVector{<:Real}},
-                  b::AbstractVector{<:AbstractVector{<:Real}})
+        a::AbstractVector{<:AbstractVector{<:Real}},
+        b::AbstractVector{<:AbstractVector{<:Real}})
     evaluate(n, reshape(x, 1, length(x)), a, b)
 end
 function evaluate(n::AbstractVector{<:Int}, x::AbstractMatrix{<:Real}, op::MultiOrthoPoly)
@@ -144,8 +144,8 @@ end
 
 # using multi-index + multivariate
 function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractMatrix{<:Real},
-                  a::AbstractVector{<:AbstractVector{<:Real}},
-                  b::AbstractVector{<:AbstractVector{<:Real}})
+        a::AbstractVector{<:AbstractVector{<:Real}},
+        b::AbstractVector{<:AbstractVector{<:Real}})
     vals = map(i -> evaluate(ind[i, :], x, a, b), Base.OneTo(size(ind, 1)))
     hcat(vals...) |> transpose |> Matrix
 end
@@ -156,8 +156,8 @@ end
 evaluate(x::AbstractMatrix{<:Real}, mop::MultiOrthoPoly) = evaluate(mop.ind, x, mop)
 
 function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractVector{<:Real},
-                  a::AbstractVector{<:AbstractVector{<:Real}},
-                  b::AbstractVector{<:AbstractVector{<:Real}})
+        a::AbstractVector{<:AbstractVector{<:Real}},
+        b::AbstractVector{<:AbstractVector{<:Real}})
     evaluate(ind, reshape(x, 1, length(x)), a, b)
 end
 function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractVector{<:Real}, op::MultiOrthoPoly)

@@ -84,7 +84,7 @@ function convert2affinePCE(mu::Real, sigma::Real, op::GaussOrthoPoly)
 end
 
 function convert2affinePCE(par1::Real, par2::Real, op::Uniform01OrthoPoly;
-                           kind::String = "lbub")
+        kind::String = "lbub")
     kind = _checkKind(kind)
     a1, a2 = if kind == "lbub"
         _checkBounds(par1, par2)
@@ -97,7 +97,7 @@ function convert2affinePCE(par1::Real, par2::Real, op::Uniform01OrthoPoly;
 end
 
 function convert2affinePCE(par1::Real, par2::Real, op::Uniform_11OrthoPoly;
-                           kind::String = "lbub")
+        kind::String = "lbub")
     kind = _checkKind(kind)
     a1, a2 = if kind == "lbub"
         _checkBounds(par1, par2)
@@ -118,7 +118,7 @@ function convert2affinePCE(p1::Real, p2::Real, op::Beta01OrthoPoly; kind::String
     elseif kind == "μσ"
         _checkStandardDeviation(p2)
         a1, a2 = p1 - sqrt(α / β) * sqrt(1 + α + β) * p2,
-                 (α + β) * sqrt((α + β + 1) / (α * β)) * p2
+        (α + β) * sqrt((α + β + 1) / (α * β)) * p2
     end
     convert2affinePCE(a1, a2, first(op.α))
 end
@@ -176,7 +176,7 @@ Multivariate extension, which provides an array of samples with `n` rows and
 as many columns as the multimeasure has univariate measures.
 """
 function sampleMeasure(n::Int, w::Function, dom::Tuple{<:Real, <:Real};
-                       method::String = "adaptiverejection")
+        method::String = "adaptiverejection")
     _checkNumberOfSamples(n)
     method = lowercase(method)
 
@@ -222,13 +222,13 @@ end
 sampleMeasure(n::Int, meas::LogisticMeasure) = sampleMeasure(n, Logistic())
 
 function sampleMeasure(n::Int, meas::AbstractCanonicalMeasure;
-                       method::String = "adaptiverejection")
+        method::String = "adaptiverejection")
     @warn "ignoring keyword method; sampling from Distributions.jl instead"
     sampleMeasure(n, meas)
 end
 
 function sampleMeasure(n::Int, measure::ProductMeasure;
-                       method::Vector{String} = _createMethodVector(measure))
+        method::Vector{String} = _createMethodVector(measure))
     samples = Matrix{Float64}(undef, n, 0)
     for (k, unimeasure) in enumerate(measure.measures)
         samples = hcat(samples, sampleMeasure(n, unimeasure; method = method[k]))
@@ -237,7 +237,7 @@ function sampleMeasure(n::Int, measure::ProductMeasure;
 end
 
 function sampleMeasure(n::Int, mop::MultiOrthoPoly;
-                       method::Vector{String} = _createMethodVector(mop))
+        method::Vector{String} = _createMethodVector(mop))
     sampleMeasure(n, mop.measure; method = method)
 end
 
@@ -254,7 +254,7 @@ where `L+1 = length(x)` and ``x_j`` is the ``j``th sample where ``j=1,\\dots,m``
 with `m = length(ξ)`.
 """
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractVector{<:Real},
-                     α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
+        α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
     length(α) != length(β) &&
         throw(InconsistencyError("inconsistent number of recurrence coefficients"))
     Nsmpl = length(ξ)
@@ -271,17 +271,17 @@ function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractVector{<:Real},
     ϕ * x
 end
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::Real, α::AbstractVector{<:Real},
-                     β::AbstractVector{<:Real})
+        β::AbstractVector{<:Real})
     evaluatePCE(x, [ξ], α, β)
 end
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractVector{<:Real},
-                     op::AbstractOrthoPoly)
+        op::AbstractOrthoPoly)
     evaluatePCE(x, ξ, op.α, op.β)
 end
 
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractMatrix{<:Real},
-                     α::AbstractVector{<:AbstractVector{<:Real}},
-                     β::AbstractVector{<:AbstractVector{<:Real}}, ind::AbstractMatrix{Int})
+        α::AbstractVector{<:AbstractVector{<:Real}},
+        β::AbstractVector{<:AbstractVector{<:Real}}, ind::AbstractMatrix{Int})
     Nsmpl = size(ξ, 1)
     _checkNumberOfSamples(Nsmpl)
     !(length(α) == length(β) == size(ξ, 2) == size(ind, 2)) &&
@@ -296,7 +296,7 @@ function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractMatrix{<:Real},
     ϕ * x
 end
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractMatrix{<:Real},
-                     mOP::MultiOrthoPoly)
+        mOP::MultiOrthoPoly)
     a, b = coeffs(mOP)
     evaluatePCE(x, ξ, a, b, mOP.ind)
 end
@@ -318,19 +318,19 @@ samplePCE(n::Int,x::AbstractVector{<:Real},mop::MultiOrthoPoly;method::Vector{St
 ```
 """
 function samplePCE(n::Int, x::AbstractVector{<:Real}, op::AbstractOrthoPoly;
-                   method::String = "adaptiverejection")
+        method::String = "adaptiverejection")
     ξ = sampleMeasure(n, op; method = method)
     evaluatePCE(x, ξ, op)
 end
 
 function samplePCE(n::Int, x::AbstractVector{<:Real}, op::AbstractCanonicalOrthoPoly;
-                   method::String = "adaptiverejection")
+        method::String = "adaptiverejection")
     ξ = sampleMeasure(n, op)
     evaluatePCE(x, ξ, op)
 end
 
 function samplePCE(n::Int, x::AbstractVector{<:Real}, mop::MultiOrthoPoly;
-                   method::Vector{String} = _createMethodVector(mop))
+        method::Vector{String} = _createMethodVector(mop))
     ξ = sampleMeasure(n, mop; method = method)
     evaluatePCE(x, ξ, mop)
 end
