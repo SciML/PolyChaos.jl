@@ -167,7 +167,7 @@ Let's verify this by plotting the recurrence coefficients for several values of 
 ```@example mysetup
 Γ = 0:0.1:1;
 ab = [mcdiscretization(N,
-                       [n -> quad_gaussleg_mod(n, gam); n -> quad_gausscheb_mod(n, gam)])
+          [n -> quad_gaussleg_mod(n, gam); n -> quad_gausscheb_mod(n, gam)])
       for gam in Γ];
 bb = hcat([ab[i][2] for i in 1:length(Γ)]...);
 b_leg = rm_legendre(N)[2];

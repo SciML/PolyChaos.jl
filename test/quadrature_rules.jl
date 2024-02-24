@@ -10,29 +10,35 @@ nodes = ns[1]:ns[2]:ns[3]
 high = ns[3]
 tol = 1e-7
 
-@time @testset "Fejer" begin for n in nodes
-    myfile = open("dataQuadratureRules/fejer$n.txt")
-    αβref = parse.(Float64, readlines(myfile))
-    αβcom = fejer(n)
-    @test isapprox(norm(αβref - [αβcom[1]; αβcom[2]], Inf), 0.0; atol = tol)
-    close(myfile)
-end end
+@time @testset "Fejer" begin
+    for n in nodes
+        myfile = open("dataQuadratureRules/fejer$n.txt")
+        αβref = parse.(Float64, readlines(myfile))
+        αβcom = fejer(n)
+        @test isapprox(norm(αβref - [αβcom[1]; αβcom[2]], Inf), 0.0; atol = tol)
+        close(myfile)
+    end
+end
 
-@time @testset "Fejer2" begin for n in nodes
-    myfile = open("dataQuadratureRules/fejer2_$n.txt")
-    αβref = parse.(Float64, readlines(myfile))
-    αβcom = fejer2(n)
-    @test isapprox(norm(αβref - [αβcom[1]; αβcom[2]], Inf), 0.0; atol = tol)
-    close(myfile)
-end end
+@time @testset "Fejer2" begin
+    for n in nodes
+        myfile = open("dataQuadratureRules/fejer2_$n.txt")
+        αβref = parse.(Float64, readlines(myfile))
+        αβcom = fejer2(n)
+        @test isapprox(norm(αβref - [αβcom[1]; αβcom[2]], Inf), 0.0; atol = tol)
+        close(myfile)
+    end
+end
 
-@time @testset "Clenshaw Curtis" begin for n in nodes
-    myfile = open("dataQuadratureRules/cc$n.txt")
-    αβref = parse.(Float64, readlines(myfile))
-    αβcom = clenshaw_curtis(n)
-    @test isapprox(norm(αβref - [αβcom[1]; αβcom[2]], Inf), 0.0; atol = tol)
-    close(myfile)
-end end
+@time @testset "Clenshaw Curtis" begin
+    for n in nodes
+        myfile = open("dataQuadratureRules/cc$n.txt")
+        αβref = parse.(Float64, readlines(myfile))
+        αβcom = clenshaw_curtis(n)
+        @test isapprox(norm(αβref - [αβcom[1]; αβcom[2]], Inf), 0.0; atol = tol)
+        close(myfile)
+    end
+end
 
 @time @testset "Gauss" begin
     data1 = open("dataQuadratureRules/logHigh.txt")

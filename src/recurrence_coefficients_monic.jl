@@ -21,7 +21,7 @@ this function returns the recursion coefficients `(α_,β_)` for the scaled meas
 """
 function r_scale(c::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
     c <= 0 && throw(DomainError(c,
-                      "Measure can only be scaled by positive number (provided c=$c)"))
+        "Measure can only be scaled by positive number (provided c=$c)"))
     return a, [c * b[1]; b[2:end]]
 end
 
@@ -34,8 +34,8 @@ this function creates `Npoly` recursion coefficients `(α,β)`.
 The keyword `quadrature` specifies what quadrature rule is being used.
 """
 function rm_compute(weight::Function, lb::Real, ub::Real, Npoly::Int = 4, Nquad::Int = 10;
-                    quadrature::Function = clenshaw_curtis,
-                    discretization::Function = stieltjes)
+        quadrature::Function = clenshaw_curtis,
+        discretization::Function = stieltjes)
     @assert Npoly <= Nquad
     Npoly == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     n, w = quadgp(weight, lb, ub, Nquad; quadrature = quadrature)
@@ -51,10 +51,10 @@ function rm_compute(weight::Function, lb::Real, ub::Real, Npoly::Int = 4, Nquad:
 end
 
 function rm_compute(m::AbstractMeasure, Npoly::Int = 4, Nquad::Int = 10;
-                    quadrature::Function = clenshaw_curtis,
-                    discretization::Function = stieltjes)
+        quadrature::Function = clenshaw_curtis,
+        discretization::Function = stieltjes)
     rm_compute(m.w, m.dom[1], m.dom[2], Npoly, Nquad, quadrature = quadrature,
-               discretization = discretization)
+        discretization = discretization)
 end
 
 ##
@@ -139,7 +139,7 @@ function rm_laguerre(N::Int, a::Real)
     N == 1 && return [a + 1.0], [gamma(a + 1)]
     n = 1.0:(N - 1)
     return pushfirst!(map(x -> 2x + a + 1.0, n), a + 1.0),
-           pushfirst!(map(x -> x^2 + a * x, n), gamma(a + 1))
+    pushfirst!(map(x -> x^2 + a * x, n), gamma(a + 1))
 end
 function rm_laguerre(N::Int)
     rm_laguerre(N, 0.0)

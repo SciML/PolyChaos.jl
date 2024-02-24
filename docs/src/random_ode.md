@@ -138,7 +138,7 @@ t3 = Tensor(3, opq); # \langle \phi_i \phi_j, \phi_k \rangle
 # Galerkin-projected random differential equation
 function ODEgalerkin(du, u, p, t)
     du[:] = [sum(p[j + 1] * u[k + 1] * t3.get([j, k, m]) / t2.get([m, m]) for j in 0:L
-                 for k in 0:L) for m in 0:L]
+             for k in 0:L) for m in 0:L]
 end
 
 probgalerkin = ODEProblem(ODEgalerkin, xinit, (0, tend), a)
