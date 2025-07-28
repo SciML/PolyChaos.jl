@@ -78,13 +78,11 @@ combinations = Iterators.product([α, αs], [β, βs])
                    evaluate(mop.ind, x, a, b)
              for (a, b) in combinations]
         end
-        if VERSION >= VersionNumber("1.1.1")
-            for d in eachrow(mop.ind[1:3, :])
-                [@test evaluate(collect(d), x, a, b) == evaluate(collect(d), x, mop)
-                 for (a, b) in combinations]
-                [@test evaluate(d, x, a, b) == evaluate(collect(d), x, mop)
-                 for (a, b) in combinations]
-            end
+        for d in eachrow(mop.ind[1:3, :])
+            [@test evaluate(collect(d), x, a, b) == evaluate(collect(d), x, mop)
+             for (a, b) in combinations]
+            [@test evaluate(d, x, a, b) == evaluate(collect(d), x, mop)
+             for (a, b) in combinations]
         end
     end
 end

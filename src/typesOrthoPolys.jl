@@ -436,13 +436,8 @@ struct MultiOrthoPoly{M, Q, V <: AbstractVector} <: AbstractOrthoPoly{M, Q}
         measures = [op.measure for op in uniOrthoPolys]
         measure = ProductMeasure(w, measures)
 
-        names = if VERSION >= v"1.2.0"
-            [hasfield(typeof(op), :name) ? op.name : string(typeof(op))
-             for op in uniOrthoPolys]
-        else
-            [:name in fieldnames(typeof(op)) ? op.name : string(typeof(op))
-             for op in uniOrthoPolys]
-        end
+        names = [hasfield(typeof(op), :name) ? op.name : string(typeof(op))
+                 for op in uniOrthoPolys]
         ind = calculateMultiIndices(length(uniOrthoPolys), deg)
         dim = size(ind, 1)
 
