@@ -8,5 +8,6 @@ pipj(t, i, j) = gauss.w(t) * evaluate(i, t, gauss) * evaluate(j, t, gauss)
 op = OrthoPoly("uniform01", N)
 pipj(t, i, j) = op.w(t) * evaluate(i, t, op) * evaluate(j, t, op)
 for i in 0:N, j in 0:N
+
     display(quadqk(t -> op.w(t) * evaluate(i, t, op) * evaluate(j, t, op), 0, 1)[1])
 end

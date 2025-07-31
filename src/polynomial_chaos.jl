@@ -112,12 +112,14 @@ end
 function convert2affinePCE(p1::Real, p2::Real, op::Beta01OrthoPoly; kind::String = "lbub")
     kind = _checkKind(kind)
     α, β = op.measure.ashapeParameter, op.measure.bshapeParameter
-    a1, a2 = if kind == "lbub"
+    a1,
+    a2 = if kind == "lbub"
         _checkBounds(p1, p2)
         a1, a2 = p1, p2 - p1
     elseif kind == "μσ"
         _checkStandardDeviation(p2)
-        a1, a2 = p1 - sqrt(α / β) * sqrt(1 + α + β) * p2,
+        a1,
+        a2 = p1 - sqrt(α / β) * sqrt(1 + α + β) * p2,
         (α + β) * sqrt((α + β + 1) / (α * β)) * p2
     end
     convert2affinePCE(a1, a2, first(op.α))

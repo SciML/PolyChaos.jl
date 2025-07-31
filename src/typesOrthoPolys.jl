@@ -59,7 +59,8 @@ function OrthoPoly(name::String, deg::Int, measure::AbstractMeasure; Nrec = deg 
         discretization::Function = stieltjes, addQuadrature::Bool = true)
     _checkConsistency(deg, Nrec)
     name = lowercase(name)
-    α, β = rm_compute(measure, Nrec, Nquad, quadrature = quadrature,
+    α,
+    β = rm_compute(measure, Nrec, Nquad, quadrature = quadrature,
         discretization = discretization)
     OrthoPoly(name, deg, α, β, measure, addQuadrature = addQuadrature)
 end
@@ -346,7 +347,8 @@ end
 function Beta01OrthoPoly(deg::Int, shape_a::Real, shape_b::Real; Nrec::Int = deg + 1,
         addQuadrature::Bool = true)
     _checkConsistency(deg, Nrec)
-    α, β = r_scale(1 / beta(shape_a, shape_b),
+    α,
+    β = r_scale(1 / beta(shape_a, shape_b),
         rm_jacobi01(Nrec, shape_b - 1.0, shape_a - 1.0)...)
     quadrature = addQuadrature ? Quad(length(α) - 1, α, β) : EmptyQuad()
     Beta01OrthoPoly{promote_type(typeof(α), typeof(β)), Beta01Measure, typeof(quadrature)}(
