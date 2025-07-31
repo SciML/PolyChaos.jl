@@ -31,7 +31,6 @@ tol = 1e-6
 @testset "General constructor for Gaussian OrthoPoly" begin
     for quad in quads,
         disc in discs, deg in degs
-
         op = Uniform01OrthoPoly(deg)
         op1 = OrthoPoly("myuniform", deg, m; quadrature = quad, discretization = disc,
             Nquad = 100 * deg)
@@ -52,6 +51,7 @@ result = 1.0
 tol = 1e-8
 @testset "Last-resort-constructor for Quad using quadgp" begin
     for quad in quads, N in Ns
+
         op = OrthoPoly("myOP", N, m)
         NW = nw(Quad(N, m; quadrature = quad))
         @test isapprox(dot(myf.(NW[:, 1]), NW[:, 2]), result; atol = tol)
@@ -104,6 +104,7 @@ mop = MultiOrthoPoly(
 # @test_throws AssertionError Tensor(0,mop)
 @testset "Check tensor" begin
     for m in M, op in [opq, mop]
+
         tensor = Tensor(m, op)
         for ind in Iterators.product([collect(0:deg) for i in 1:m]...)
             @test isapprox(

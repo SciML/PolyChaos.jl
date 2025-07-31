@@ -13,6 +13,7 @@ densities = [w_legendre,
 
 @testset "Supports of densities" begin
     for ρ in densities, x in outliers
+
         @test_throws DomainError ρ(x)
     end
 end

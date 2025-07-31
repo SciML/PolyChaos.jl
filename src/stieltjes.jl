@@ -24,8 +24,9 @@ function stieltjes(
     tiny = 10 * floatmin()
     huge = 0.1 * floatmax()
     α, β = zeros(Float64, N), zeros(Float64, N)
-    nodes, weights = removezeroweights ? removeZeroWeights(nodes_, weights_) :
-                     (nodes_, weights_)
+    nodes,
+    weights = removezeroweights ? removeZeroWeights(nodes_, weights_) :
+              (nodes_, weights_)
     Ncap = length(nodes)
     @assert N > 0&&N <= Ncap "N is out of range."
     s0::Float64 = sum(weights)
@@ -70,8 +71,9 @@ function lanczos(N::Int, nodes::AbstractVector{<:Real}, weights::AbstractVector{
         removezeroweights::Bool = true)
     !(length(nodes) == length(weights) > 0) &&
         throw(InconsistencyError("inconsistent number of nodes and weights"))
-    nodes, weights = removezeroweights ? removeZeroWeights(nodes, weights) :
-                     (nodes, weights)
+    nodes,
+    weights = removezeroweights ? removeZeroWeights(nodes, weights) :
+              (nodes, weights)
     Ncap = length(nodes)
     (N <= 0 || N > Ncap) && throw(DomainError(N, "out of range"))
     p0 = copy(nodes)
@@ -167,11 +169,12 @@ function mcdiscretization(N::Int, quads::AbstractVector,
             @inbounds xx[(nn + 1):(nn + Mi)], ww[(nn + 1):(nn + Mi)] = x, w
         end
         if mp > 0
-            @inbounds xx[(Ntot + 1):(Ntot + mp)], ww[(Ntot + 1):(Ntot + mp)] = discretemeasure[
-                :,
-                1],
+            @inbounds xx[(Ntot + 1):(Ntot + mp)],
+            ww[(Ntot + 1):(Ntot + mp)] = discretemeasure[
+            :,
+            1],
             discretemeasure[:,
-                2]
+            2]
         end
         α, β = discretization(N, xx, ww; removezeroweights = removezeroweights)
     end

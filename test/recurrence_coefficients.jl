@@ -40,6 +40,7 @@ end
 @time for n in nodes
     @testset "Jacobi $n nodes" begin
         for al in albe, be in albe
+
             myfile = open("dataRecCoeffs/jac$(n)al$(al)be$(be).txt")
             αβref = parse.(Float64, readlines(myfile))
             αβcom = rm_jacobi(n, al, be)
@@ -55,6 +56,7 @@ end
 @time for n in nodes
     @testset "Jacobi01 $n nodes" begin
         for al in albe, be in albe
+
             myfile = open("dataRecCoeffs/jac01$(n)al$(al)be$(be).txt")
             αβref = parse.(Float64, readlines(myfile))
             αβcom = rm_jacobi01(n, al, be)
@@ -83,6 +85,7 @@ meipol = 0.1:0.2:2
 @time for n in nodes
     @testset "meixner_pollaczek $n nodes" begin
         for lambda in meipol, phi in meipol
+
             myfile = open("dataRecCoeffs/meixpol$(n)la$(lambda)phi$(phi).txt")
             αβref = parse.(Float64, readlines(myfile))
             αβcom = rm_meixner_pollaczek(n, lambda, phi)
