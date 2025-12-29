@@ -190,8 +190,8 @@ function sampleMeasure(n::Int, w::Function, dom::Tuple{<:Real, <:Real};
         # all purpose method but needs a solid envelope PDF
         throw(error("method $method not yet implemented"))
     elseif method == "inversecdf"
-        throw(error("method $method not yet implemented"))
-        # requires CDF and reliable root-finding method
+        # Inverse transform sampling using Chebyshev technology
+        return sampleInverseCDF(n, w, dom)
     else
         throw(error("method $method not implemented"))
     end
@@ -225,8 +225,14 @@ sampleMeasure(n::Int, meas::LogisticMeasure) = sampleMeasure(n, Logistic())
 
 function sampleMeasure(n::Int, meas::AbstractCanonicalMeasure;
         method::String = "adaptiverejection")
-    @warn "ignoring keyword method; sampling from Distributions.jl instead"
-    sampleMeasure(n, meas)
+    method = lowercase(method)
+    if method == "inversecdf"
+        # Use inverse CDF sampling for canonical measures if explicitly requested
+        return sampleInverseCDF(n, meas.w, meas.dom)
+    else
+        @warn "ignoring keyword method; sampling from Distributions.jl instead"
+        sampleMeasure(n, meas)
+    end
 end
 
 function sampleMeasure(n::Int, measure::ProductMeasure;
