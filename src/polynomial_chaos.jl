@@ -215,6 +215,7 @@ end
 
 sampleMeasure(n::Int, meas::GaussMeasure) = sampleMeasure(n, Normal())
 sampleMeasure(n::Int, meas::Uniform01Measure) = sampleMeasure(n, Uniform())
+sampleMeasure(n::Int, meas::Uniform_11Measure) = sampleMeasure(n, Uniform(-1, 1))
 function sampleMeasure(n::Int, meas::Beta01Measure)
     sampleMeasure(n, Beta(meas.ashapeParameter, meas.bshapeParameter))
 end
