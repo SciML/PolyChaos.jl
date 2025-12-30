@@ -8,7 +8,7 @@ function computeSP(a_::AbstractVector{<:Integer},
         weights::AbstractVector{<:AbstractVector{<:Real}},
         ind::AbstractMatrix{<:Integer};
         issymmetric::BitArray = falses(length(α)),
-        zerotol::AbstractFloat = 1e-10)
+        zerotol::AbstractFloat = 0.0)
     minimum(a_) < 0 && throw(DomainError(minimum(a_), "no negative degrees allowed"))
     l, p = size(ind) # p-variate basis
     p == 1 && computeSP(a_, α[1], β[1], nodes[1], weights[1]; issymmetric = issymmetric[1])
