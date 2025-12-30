@@ -69,3 +69,24 @@ names = [Beta01OrthoPoly, JacobiOrthoPoly, genHermiteOrthoPoly]
             atol = tol)
     end
 end
+
+# Issue #113: Test that computeTensorizedSP does not drop small values
+@testset "computeTensorizedSP preserves small values (issue #113)" begin
+    # Use high degree to get very small scalar product values
+    op = Uniform_11OrthoPoly(20, Nrec = 40)
+    t2 = Tensor(2, op)
+
+    # Get values via Tensor.get and computeSP2
+    l1 = [t2.get([i, i]) for i in 0:(op.deg)]
+    l2 = computeSP2(op)
+
+    # They should be equal - small values should not be dropped
+    @test l1 == l2
+
+    # Specifically check high-degree values that are less than 1e-10
+    # These should not be zero
+    @test l1[end] > 0
+    @test l2[end] > 0
+    @test l1[end - 1] > 0
+    @test l2[end - 1] > 0
+end
