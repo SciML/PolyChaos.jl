@@ -104,6 +104,43 @@ integrate(f::Function, op::AbstractOrthoPoly) = integrate(f, op.quad)
 
 """
 ```
+integrate(f::Function, mop::MultiOrthoPoly)
+```
+
+Integrate a multivariate function `f` using tensor product quadrature from a
+`MultiOrthoPoly`. The function `f` should accept the same number of arguments
+as there are univariate orthogonal polynomials in `mop`.
+
+For product measures, this computes the integral by evaluating `f` at all
+combinations of quadrature nodes and weighting by the product of the
+corresponding univariate weights.
+
+# Example
+```julia
+op1 = GaussOrthoPoly(3)
+op2 = Uniform01OrthoPoly(5)
+mop = MultiOrthoPoly([op1, op2], 3)
+
+# Integrate f(x,y) = x*y over the product measure
+integrate((x, y) -> x * y, mop)
+```
+"""
+function integrate(f::Function, mop::MultiOrthoPoly)
+    nodes, weights = nw(mop)
+    p = length(nodes)
+    any(isempty, nodes) && throw(DomainError(mop,
+        "one or more univariate orthogonal polynomials have empty quadrature; use addQuadrature=true"))
+    result = 0.0
+    for idx in Iterators.product([eachindex(n) for n in nodes]...)
+        node_vals = [nodes[d][idx[d]] for d in 1:p]
+        weight_prod = prod(weights[d][idx[d]] for d in 1:p)
+        result += weight_prod * f(node_vals...)
+    end
+    return result
+end
+
+"""
+```
 issymmetric(m::AbstractMeasure)
 issymmetric(op::AbstractOrthoPoly)
 ```
