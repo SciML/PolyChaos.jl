@@ -21,7 +21,7 @@ function _createMethodVector(mop::MultiOrthoPoly, word::String = "adaptivereject
     _createMethodVector(mop.measure, word)
 end
 
-function _checkStandardDevation(σ::Real)
+function _checkStandardDeviation(σ::Real)
     σ < 0 && throw(DomainError(σ, "σ has to be non-negative"))
     σ < 1e-4 && @warn "σ is close to zero (σ = $σ)"
 end
@@ -79,31 +79,31 @@ function convert2affinePCE(a1::Real, a2::Real, α0::Real)
 end
 
 function convert2affinePCE(mu::Real, sigma::Real, op::GaussOrthoPoly)
-    _checkStandardDevation(sigma)
+    _checkStandardDeviation(sigma)
     convert2affinePCE(mu, sigma, first(op.α))
 end
 
 function convert2affinePCE(par1::Real, par2::Real, op::Uniform01OrthoPoly;
-                           kind::String = "lbub")
+        kind::String = "lbub")
     kind = _checkKind(kind)
     a1, a2 = if kind == "lbub"
         _checkBounds(par1, par2)
         par1, par2 - par1
     elseif kind == "μσ"
-        _checkStandardDevation(par2)
+        _checkStandardDeviation(par2)
         par1 - sqrt(3) * par2, 2 * sqrt(3) * par2
     end
     convert2affinePCE(a1, a2, first(op.α))
 end
 
 function convert2affinePCE(par1::Real, par2::Real, op::Uniform_11OrthoPoly;
-                           kind::String = "lbub")
+        kind::String = "lbub")
     kind = _checkKind(kind)
     a1, a2 = if kind == "lbub"
         _checkBounds(par1, par2)
         0.5 * (par1 + par2), 0.5 * (par2 - par1)
     elseif kind == "μσ"
-        _checkStandardDevation(par2)
+        _checkStandardDeviation(par2)
         par1, sqrt(3) * par2
     end
     convert2affinePCE(a1, a2, first(op.α))
@@ -112,13 +112,15 @@ end
 function convert2affinePCE(p1::Real, p2::Real, op::Beta01OrthoPoly; kind::String = "lbub")
     kind = _checkKind(kind)
     α, β = op.measure.ashapeParameter, op.measure.bshapeParameter
-    a1, a2 = if kind == "lbub"
+    a1,
+    a2 = if kind == "lbub"
         _checkBounds(p1, p2)
         a1, a2 = p1, p2 - p1
     elseif kind == "μσ"
-        _checkStandardDevation(p2)
-        a1, a2 = p1 - sqrt(α / β) * sqrt(1 + α + β) * p2,
-                 (α + β) * sqrt((α + β + 1) / (α * β)) * p2
+        _checkStandardDeviation(p2)
+        a1,
+        a2 = p1 - sqrt(α / β) * sqrt(1 + α + β) * p2,
+        (α + β) * sqrt((α + β + 1) / (α * β)) * p2
     end
     convert2affinePCE(a1, a2, first(op.α))
 end
@@ -128,7 +130,7 @@ function convert2affinePCE(p1::Real, p2::Real, op::GammaOrthoPoly)
 end
 
 function convert2affinePCE(p1::Real, p2::Real, op::LogisticOrthoPoly)
-    _checkStandardDevation(p2)
+    _checkStandardDeviation(p2)
     convert2affinePCE(p1, p2, first(op.α))
 end
 
@@ -176,7 +178,7 @@ Multivariate extension, which provides an array of samples with `n` rows and
 as many columns as the multimeasure has univariate measures.
 """
 function sampleMeasure(n::Int, w::Function, dom::Tuple{<:Real, <:Real};
-                       method::String = "adaptiverejection")
+        method::String = "adaptiverejection")
     _checkNumberOfSamples(n)
     method = lowercase(method)
 
@@ -188,8 +190,8 @@ function sampleMeasure(n::Int, w::Function, dom::Tuple{<:Real, <:Real};
         # all purpose method but needs a solid envelope PDF
         throw(error("method $method not yet implemented"))
     elseif method == "inversecdf"
-        throw(error("method $method not yet implemented"))
-        # requires CDF and reliable root-finding method
+        # Inverse transform sampling using Chebyshev technology
+        return sampleInverseCDF(n, w, dom)
     else
         throw(error("method $method not implemented"))
     end
@@ -213,6 +215,7 @@ end
 
 sampleMeasure(n::Int, meas::GaussMeasure) = sampleMeasure(n, Normal())
 sampleMeasure(n::Int, meas::Uniform01Measure) = sampleMeasure(n, Uniform())
+sampleMeasure(n::Int, meas::Uniform_11Measure) = sampleMeasure(n, Uniform(-1, 1))
 function sampleMeasure(n::Int, meas::Beta01Measure)
     sampleMeasure(n, Beta(meas.ashapeParameter, meas.bshapeParameter))
 end
@@ -222,13 +225,19 @@ end
 sampleMeasure(n::Int, meas::LogisticMeasure) = sampleMeasure(n, Logistic())
 
 function sampleMeasure(n::Int, meas::AbstractCanonicalMeasure;
-                       method::String = "adaptiverejection")
-    @warn "ignoring keyword method; sampling from Distributions.jl instead"
-    sampleMeasure(n, meas)
+        method::String = "adaptiverejection")
+    method = lowercase(method)
+    if method == "inversecdf"
+        # Use inverse CDF sampling for canonical measures if explicitly requested
+        return sampleInverseCDF(n, meas.w, meas.dom)
+    else
+        @warn "ignoring keyword method; sampling from Distributions.jl instead"
+        sampleMeasure(n, meas)
+    end
 end
 
 function sampleMeasure(n::Int, measure::ProductMeasure;
-                       method::Vector{String} = _createMethodVector(measure))
+        method::Vector{String} = _createMethodVector(measure))
     samples = Matrix{Float64}(undef, n, 0)
     for (k, unimeasure) in enumerate(measure.measures)
         samples = hcat(samples, sampleMeasure(n, unimeasure; method = method[k]))
@@ -237,7 +246,7 @@ function sampleMeasure(n::Int, measure::ProductMeasure;
 end
 
 function sampleMeasure(n::Int, mop::MultiOrthoPoly;
-                       method::Vector{String} = _createMethodVector(mop))
+        method::Vector{String} = _createMethodVector(mop))
     sampleMeasure(n, mop.measure; method = method)
 end
 
@@ -254,7 +263,7 @@ where `L+1 = length(x)` and ``x_j`` is the ``j``th sample where ``j=1,\\dots,m``
 with `m = length(ξ)`.
 """
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractVector{<:Real},
-                     α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
+        α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
     length(α) != length(β) &&
         throw(InconsistencyError("inconsistent number of recurrence coefficients"))
     Nsmpl = length(ξ)
@@ -271,17 +280,17 @@ function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractVector{<:Real},
     ϕ * x
 end
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::Real, α::AbstractVector{<:Real},
-                     β::AbstractVector{<:Real})
+        β::AbstractVector{<:Real})
     evaluatePCE(x, [ξ], α, β)
 end
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractVector{<:Real},
-                     op::AbstractOrthoPoly)
+        op::AbstractOrthoPoly)
     evaluatePCE(x, ξ, op.α, op.β)
 end
 
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractMatrix{<:Real},
-                     α::AbstractVector{<:AbstractVector{<:Real}},
-                     β::AbstractVector{<:AbstractVector{<:Real}}, ind::AbstractMatrix{Int})
+        α::AbstractVector{<:AbstractVector{<:Real}},
+        β::AbstractVector{<:AbstractVector{<:Real}}, ind::AbstractMatrix{Int})
     Nsmpl = size(ξ, 1)
     _checkNumberOfSamples(Nsmpl)
     !(length(α) == length(β) == size(ξ, 2) == size(ind, 2)) &&
@@ -296,7 +305,7 @@ function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractMatrix{<:Real},
     ϕ * x
 end
 function evaluatePCE(x::AbstractVector{<:Real}, ξ::AbstractMatrix{<:Real},
-                     mOP::MultiOrthoPoly)
+        mOP::MultiOrthoPoly)
     a, b = coeffs(mOP)
     evaluatePCE(x, ξ, a, b, mOP.ind)
 end
@@ -318,19 +327,19 @@ samplePCE(n::Int,x::AbstractVector{<:Real},mop::MultiOrthoPoly;method::Vector{St
 ```
 """
 function samplePCE(n::Int, x::AbstractVector{<:Real}, op::AbstractOrthoPoly;
-                   method::String = "adaptiverejection")
+        method::String = "adaptiverejection")
     ξ = sampleMeasure(n, op; method = method)
     evaluatePCE(x, ξ, op)
 end
 
 function samplePCE(n::Int, x::AbstractVector{<:Real}, op::AbstractCanonicalOrthoPoly;
-                   method::String = "adaptiverejection")
+        method::String = "adaptiverejection")
     ξ = sampleMeasure(n, op)
     evaluatePCE(x, ξ, op)
 end
 
 function samplePCE(n::Int, x::AbstractVector{<:Real}, mop::MultiOrthoPoly;
-                   method::Vector{String} = _createMethodVector(mop))
+        method::Vector{String} = _createMethodVector(mop))
     ξ = sampleMeasure(n, mop; method = method)
     evaluatePCE(x, ξ, mop)
 end

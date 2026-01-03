@@ -152,16 +152,20 @@ We use `Mosek` to solve the problem; for academic use there are [free license](h
 model = Model(with_optimizer(Mosek.Optimizer))
 @variable(model, p[i in 1:Ng, j in 1:Npce], base_name="p")
 @constraint(model, energy_balance[j in 1:Npce],
-            sum(p[i, j] for i in 1:Ng) - sum(d[i, j] for i in 1:Nd)==0)
+    sum(p[i, j] for i in 1:Ng) - sum(d[i, j] for i in 1:Nd)==0)
 @constraint(model, con_pmax[i in 1:Ng],
-            [1 / λp[i] * (pmax[i] - mean(p[i, :], mop)); buildSOC(p[i, :], mop)] in SecondOrderCone())
+    [1 / λp[i] * (pmax[i] - mean(p[i, :], mop));
+     buildSOC(p[i, :], mop)] in SecondOrderCone())
 @constraint(model, con_pmin[i in 1:Ng],
-            [1 / λp[i] * (mean(p[i, :], mop) - pmin[i]); buildSOC(p[i, :], mop)] in SecondOrderCone())
+    [1 / λp[i] * (mean(p[i, :], mop) - pmin[i]);
+     buildSOC(p[i, :], mop)] in SecondOrderCone())
 pl = Ψ * (Cp * p + Cd * d)
 @constraint(model, con_plmax[i in 1:Nl],
-            [1 / λl[i] * (plmax[i] - mean(pl[1, :], mop)); buildSOC(pl[i, :], mop)] in SecondOrderCone())
+    [1 / λl[i] * (plmax[i] - mean(pl[1, :], mop));
+     buildSOC(pl[i, :], mop)] in SecondOrderCone())
 @constraint(model, con_plmin[i in 1:Nl],
-            [1 / λl[i] * (mean(pl[1, :], mop) - plmin[i]); buildSOC(pl[i, :], mop)] in SecondOrderCone())
+    [1 / λl[i] * (mean(pl[1, :], mop) - plmin[i]);
+     buildSOC(pl[i, :], mop)] in SecondOrderCone())
 @objective(model, Min, sum(mean(p[i, :], mop) * c[i] for i in 1:Ng))
 optimize!(model) # here we go
 ```

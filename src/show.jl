@@ -186,20 +186,20 @@ function showpoly(coeffs::Vector{<:Real}; sym::String = "x", digits::Integer = 2
 end
 
 function showpoly(d::Integer, α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
-                  digits::Integer = 2)
+        digits::Integer = 2)
     @assert d>=0 "degree has to be non-negative."
     d == 0 && return print("1\n")
     showpoly(rec2coeff(d, α, β)[end], sym = sym, digits = digits)
 end
 
 function showpoly(d::Range, α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
-                  digits::Integer = 2) where {Range <: OrdinalRange}
+        digits::Integer = 2) where {Range <: OrdinalRange}
     map(c -> showpoly(c, α, β; sym = sym, digits = digits), d)
     print()
 end
 
 function showpoly(d::Union{Integer, Range}, op::AbstractOrthoPoly; sym::String = "x",
-                  digits::Integer = 2) where {Range <: OrdinalRange}
+        digits::Integer = 2) where {Range <: OrdinalRange}
     showpoly(d, op.α, op.β; sym = sym, digits = digits)
 end
 
@@ -247,7 +247,7 @@ x^4 - 0.86x^2 + 0.09
 ```
 """
 function showbasis(α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
-                   digits::Integer = 2)
+        digits::Integer = 2)
     showpoly(0:length(α), α, β; sym = sym, digits = digits)
 end
 function showbasis(op::AbstractOrthoPoly; sym::String = "x", digits::Integer = 2)

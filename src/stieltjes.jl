@@ -18,13 +18,15 @@ corresponding discrete orthogonal polynomials.
 
 Set the Boolean `removezeroweights` to `true` if zero weights should be removed.
 """
-function stieltjes(N::Int, nodes_::AbstractVector{<:Real}, weights_::AbstractVector{<:Real};
-                   removezeroweights::Bool = true)
+function stieltjes(
+        N::Int, nodes_::AbstractVector{<:Real}, weights_::AbstractVector{<:Real};
+        removezeroweights::Bool = true)
     tiny = 10 * floatmin()
     huge = 0.1 * floatmax()
     α, β = zeros(Float64, N), zeros(Float64, N)
-    nodes, weights = removezeroweights ? removeZeroWeights(nodes_, weights_) :
-                     (nodes_, weights_)
+    nodes,
+    weights = removezeroweights ? removeZeroWeights(nodes_, weights_) :
+              (nodes_, weights_)
     Ncap = length(nodes)
     @assert N > 0&&N <= Ncap "N is out of range."
     s0::Float64 = sum(weights)
@@ -41,7 +43,7 @@ function stieltjes(N::Int, nodes_::AbstractVector{<:Real}, weights_::AbstractVec
         # s1 = sum( weights[ν]*p2[ν]^2 for ν=1:Ncap )
         # s2 = sum( weights[ν]*nodes[ν]*p2[ν]^2 for ν=1:Ncap )
         abs(s1) < tiny && throw(DomainError(tiny,
-                          "Underflow in stieltjes() for k=$k; try using `removeZeroWeights`"))
+            "Underflow in stieltjes() for k=$k; try using `removeZeroWeights`"))
         !(maximum(abs.(p2)) <= huge && abs(s2) <= huge) &&
             throw(DomainError(huge, "Overflow in stieltjes for k=$k"))
         @inbounds α[k + 1] = s2 / s1
@@ -66,11 +68,12 @@ reconstruction of Jacobi matrices from spectral data*,
 Numer. Math. 44 (1984), 317-335.
 """
 function lanczos(N::Int, nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real};
-                 removezeroweights::Bool = true)
+        removezeroweights::Bool = true)
     !(length(nodes) == length(weights) > 0) &&
         throw(InconsistencyError("inconsistent number of nodes and weights"))
-    nodes, weights = removezeroweights ? removeZeroWeights(nodes, weights) :
-                     (nodes, weights)
+    nodes,
+    weights = removezeroweights ? removeZeroWeights(nodes, weights) :
+              (nodes, weights)
     Ncap = length(nodes)
     (N <= 0 || N > Ncap) && throw(DomainError(N, "out of range"))
     p0 = copy(nodes)
@@ -133,10 +136,10 @@ For further information, please see W. Gautschi "Orthogonal Polynomials: Approxi
 and Computation", Section 2.2.4.
 """
 function mcdiscretization(N::Int, quads::AbstractVector,
-                          discretemeasure::AbstractMatrix{<:Real} = zeros(0, 2);
-                          discretization::Function = stieltjes, Nmax::Integer = 300,
-                          ε::Float64 = 1e-8, gaussquad::Bool = false,
-                          removezeroweights::Bool = false)
+        discretemeasure::AbstractMatrix{<:Real} = zeros(0, 2);
+        discretization::Function = stieltjes, Nmax::Integer = 300,
+        ε::Float64 = 1e-8, gaussquad::Bool = false,
+        removezeroweights::Bool = false)
     !(Nmax > 0 && Nmax > N) && throw(DomainError(Nmax, "invalid choice of Nmax=$Nmax"))
     ε <= 0 && throw(DomainError(ε, "invalid choice of ε"))
     discretization ∉ [stieltjes, lanczos] &&
@@ -166,10 +169,12 @@ function mcdiscretization(N::Int, quads::AbstractVector,
             @inbounds xx[(nn + 1):(nn + Mi)], ww[(nn + 1):(nn + Mi)] = x, w
         end
         if mp > 0
-            @inbounds xx[(Ntot + 1):(Ntot + mp)], ww[(Ntot + 1):(Ntot + mp)] = discretemeasure[:,
-                                                                                               1],
-                                                                               discretemeasure[:,
-                                                                                               2]
+            @inbounds xx[(Ntot + 1):(Ntot + mp)],
+            ww[(Ntot + 1):(Ntot + mp)] = discretemeasure[
+            :,
+            1],
+            discretemeasure[:,
+            2]
         end
         α, β = discretization(N, xx, ww; removezeroweights = removezeroweights)
     end

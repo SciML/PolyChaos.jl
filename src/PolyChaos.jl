@@ -26,6 +26,7 @@ include("auxfuns.jl")
 include("scalar_product.jl")
 include("tensor.jl")
 include("show.jl")
+include("sample.jl")
 include("polynomial_chaos.jl")
 
 end

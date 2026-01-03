@@ -116,7 +116,7 @@ With the tensors at hand, we can compute the Galerkin projection.
 
 ```@example mysetup
 y = [sum(x[i] * x[j] * t3.get([i - 1, j - 1, m - 1]) / t2.get([m - 1, m - 1])
-         for i in 1:L, j in 1:L) for m in 1:L]
+     for i in 1:L, j in 1:L) for m in 1:L]
 ```
 
 Let's compare the moments via PCE to the closed-form expressions.
@@ -125,7 +125,7 @@ Let's compare the moments via PCE to the closed-form expressions.
 moms_analytic(k) = [k, sqrt(2k), sqrt(8 / k)]
 function myskew(y)
     e3 = sum(y[i] * y[j] * y[k] * t3.get([i - 1, j - 1, k - 1])
-             for i in 1:L, j in 1:L, k in 1:L)
+    for i in 1:L, j in 1:L, k in 1:L)
     μ = y[1]
     σ = std(y, opq)
     (e3 - 3 * μ * σ^2 - μ^3) / (σ^3)

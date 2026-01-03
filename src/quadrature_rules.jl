@@ -18,7 +18,7 @@ function fejer(N::Int)
     θ = map(x -> (2x - 1) * pi / (2N), 1:N)
     M = N ÷ 2
     return cos.(θ),
-           map(x -> 2 / N * (1 - 2 * sum(cos(2 * n * x) / (4 * n^2 - 1) for n in 1:M)), θ)
+    map(x -> 2 / N * (1 - 2 * sum(cos(2 * n * x) / (4 * n^2 - 1) for n in 1:M)), θ)
 end
 
 """
@@ -66,7 +66,7 @@ The quadrature rule can be specified by the keyword `quadrature`.
 The keyword `bnd` sets the numerical value for infinity.
 """
 function quadgp(weight::Function, lb::Real, ub::Real, N::Int = 10;
-                quadrature::Function = clenshaw_curtis, bnd::Float64 = Inf)
+        quadrature::Function = clenshaw_curtis, bnd::Float64 = Inf)
     @assert lb<ub "inconsistent interval bounds"
     t_fej, w_fej = quadrature(N)
     t, w, d = zeros(Float64, N), zeros(Float64, N), zeros(Float64, N)
@@ -94,7 +94,7 @@ end
 # Quadrature rules based on recurrence coefficients
 
 function golubwelsch(α::AbstractVector{<:Real}, β::AbstractVector{<:Real},
-                     maxiter::Int = 30)
+        maxiter::Int = 30)
     N = length(α) - 1
     a, β0 = copy(α[1:N]), β[1]
     w = zero(a)
@@ -213,8 +213,9 @@ resp. to the right thereof).
 
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
 """
-function lobatto(N::Int, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real}, endl::Real,
-                 endr::Real)
+function lobatto(
+        N::Int, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real}, endl::Real,
+        endr::Real)
     α, β = copy(α_), copy(β_)
     @assert N>0 "only positive N allowed"
     @assert length(α)==length(β)>0 "inconsistent number of recurrence coefficients"
@@ -238,11 +239,11 @@ function lobatto(N::Int, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real
     gauss(N + 2, α, β)
 end
 function lobatto(α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, endl::Real,
-                 endr::Real)
+        endr::Real)
     lobatto(length(α) - 3, α, β, endl, endr)
 end
 function lobatto(N::Int, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, endl::Real,
-                 endr::Real)
+        endr::Real)
     lobatto(N, op.α, op.β, endl, endr)
 end
 function lobatto(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, endl::Real, endr::Real)

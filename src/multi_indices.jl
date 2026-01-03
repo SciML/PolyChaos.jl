@@ -28,6 +28,7 @@ function calculateMultiIndices(d::Int, n::Int)
     for k in 2:n
         L = P
         for j in 1:d, m in (L - pi[k, j] + 1):L
+
             P += 1
             inds[P, :] = inds[m, :]
             inds[P, j] = inds[P, j] + 1

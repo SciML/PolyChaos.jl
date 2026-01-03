@@ -90,7 +90,7 @@ julia> integrate(x -> 6x^5, opq)
   - interval of integration is "hidden" in `nodes`.
 """
 function integrate(f::Function, nodes::AbstractVector{<:Real},
-                   weights::AbstractVector{<:Real})
+        weights::AbstractVector{<:Real})
     dot(weights, f.(nodes))
 end
 
@@ -101,6 +101,43 @@ function integrate(f::Function, quad::AbstractQuad)
 end
 
 integrate(f::Function, op::AbstractOrthoPoly) = integrate(f, op.quad)
+
+"""
+```
+integrate(f::Function, mop::MultiOrthoPoly)
+```
+
+Integrate a multivariate function `f` using tensor product quadrature from a
+`MultiOrthoPoly`. The function `f` should accept the same number of arguments
+as there are univariate orthogonal polynomials in `mop`.
+
+For product measures, this computes the integral by evaluating `f` at all
+combinations of quadrature nodes and weighting by the product of the
+corresponding univariate weights.
+
+# Example
+```julia
+op1 = GaussOrthoPoly(3)
+op2 = Uniform01OrthoPoly(5)
+mop = MultiOrthoPoly([op1, op2], 3)
+
+# Integrate f(x,y) = x*y over the product measure
+integrate((x, y) -> x * y, mop)
+```
+"""
+function integrate(f::Function, mop::MultiOrthoPoly)
+    nodes, weights = nw(mop)
+    p = length(nodes)
+    any(isempty, nodes) && throw(DomainError(mop,
+        "one or more univariate orthogonal polynomials have empty quadrature; use addQuadrature=true"))
+    result = 0.0
+    for idx in Iterators.product([eachindex(n) for n in nodes]...)
+        node_vals = [nodes[d][idx[d]] for d in 1:p]
+        weight_prod = prod(weights[d][idx[d]] for d in 1:p)
+        result += weight_prod * f(node_vals...)
+    end
+    return result
+end
 
 """
 ```
@@ -119,7 +156,7 @@ function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
     m = length(a) # dimension of scalar product
     l -= 1 # (l+1)-dimensional basis
     maximum(a) > l && throw(DomainError(a,
-                      "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+        "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
     A = zeros(Int64, p, m)
     for (i, a_element) in enumerate(a)
         A[:, i] = ind[a_element + 1, :]
@@ -128,14 +165,14 @@ function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
 end
 
 function getentry(a::AbstractVector{<:Int}, T::SparseVector{<:Real, <:Int},
-                  ind::AbstractMatrix{<:Int}, dim::Int)
+        ind::AbstractMatrix{<:Int}, dim::Int)
     m = length(a)
     l = size(ind, 1) - 1
     minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
     maximum(a) > l && throw(DomainError(a,
-                      "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
+        "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"))
     m != dim && throw(DomainError(m,
-                      "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
+        "length $m of provided index $a is inconsistent with dimension $(dim) of multi-index"))
     # a .+= 1
     sort!(a; rev = true)
 
