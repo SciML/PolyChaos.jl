@@ -10,4 +10,4 @@ N = 10
 γ = 0.5
 quads = [n -> myquad(n, rm_chebyshev1, γ); n -> myquad(n, rm_legendre, 1 - γ)]
 
-α, β = mcdiscretization(N, quads; Nmax = 300, ε = 1e-7, gaussquad = true)
+α, β = mcdiscretization(N, quads; Nmax = 300, ε = 1.0e-7, gaussquad = true)

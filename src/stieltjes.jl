@@ -6,7 +6,7 @@ function removeZeroWeights(n::AbstractVector{<:Real}, w::AbstractVector{<:Real})
     # nw = sortrows(nw, by=x->x[1])
     nw = nw[inds, :]
     nw = sortslices(nw, dims = 1, by = x -> x[1])
-    nw[:, 1], nw[:, 2]
+    return nw[:, 1], nw[:, 2]
 end
 
 """
@@ -20,13 +20,14 @@ Set the Boolean `removezeroweights` to `true` if zero weights should be removed.
 """
 function stieltjes(
         N::Int, nodes_::AbstractVector{<:Real}, weights_::AbstractVector{<:Real};
-        removezeroweights::Bool = true)
+        removezeroweights::Bool = true
+    )
     tiny = 10 * floatmin()
     huge = 0.1 * floatmax()
     α, β = zeros(Float64, N), zeros(Float64, N)
     nodes,
-    weights = removezeroweights ? removeZeroWeights(nodes_, weights_) :
-              (nodes_, weights_)
+        weights = removezeroweights ? removeZeroWeights(nodes_, weights_) :
+        (nodes_, weights_)
     Ncap = length(nodes)
     @assert N > 0&&N <= Ncap "N is out of range."
     s0::Float64 = sum(weights)
@@ -42,15 +43,19 @@ function stieltjes(
         s2 = dot(nodes, weights .* p2 .^ 2)
         # s1 = sum( weights[ν]*p2[ν]^2 for ν=1:Ncap )
         # s2 = sum( weights[ν]*nodes[ν]*p2[ν]^2 for ν=1:Ncap )
-        abs(s1) < tiny && throw(DomainError(tiny,
-            "Underflow in stieltjes() for k=$k; try using `removeZeroWeights`"))
+        abs(s1) < tiny && throw(
+            DomainError(
+                tiny,
+                "Underflow in stieltjes() for k=$k; try using `removeZeroWeights`"
+            )
+        )
         !(maximum(abs.(p2)) <= huge && abs(s2) <= huge) &&
             throw(DomainError(huge, "Overflow in stieltjes for k=$k"))
         @inbounds α[k + 1] = s2 / s1
         @inbounds β[k + 1] = s1 / s0
         s0 = s1
     end
-    α, β
+    return α, β
 end
 
 """
@@ -67,13 +72,15 @@ W.B. Gragg and W.J. Harrod, *The numerically stable
 reconstruction of Jacobi matrices from spectral data*,
 Numer. Math. 44 (1984), 317-335.
 """
-function lanczos(N::Int, nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real};
-        removezeroweights::Bool = true)
+function lanczos(
+        N::Int, nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real};
+        removezeroweights::Bool = true
+    )
     !(length(nodes) == length(weights) > 0) &&
         throw(InconsistencyError("inconsistent number of nodes and weights"))
     nodes,
-    weights = removezeroweights ? removeZeroWeights(nodes, weights) :
-              (nodes, weights)
+        weights = removezeroweights ? removeZeroWeights(nodes, weights) :
+        (nodes, weights)
     Ncap = length(nodes)
     (N <= 0 || N > Ncap) && throw(DomainError(N, "out of range"))
     p0 = copy(nodes)
@@ -96,7 +103,7 @@ function lanczos(N::Int, nodes::AbstractVector{<:Real}, weights::AbstractVector{
             @inbounds p1[k] = tmp
         end
     end
-    @inbounds p0[Base.OneTo(N)], p1[Base.OneTo(N)]
+    return @inbounds p0[Base.OneTo(N)], p1[Base.OneTo(N)]
 end
 
 """
@@ -135,11 +142,13 @@ are available *for all* ``m`` weights ``w_i(t)`` with ``i = 1, \\dots, m``.
 For further information, please see W. Gautschi "Orthogonal Polynomials: Approximation
 and Computation", Section 2.2.4.
 """
-function mcdiscretization(N::Int, quads::AbstractVector,
+function mcdiscretization(
+        N::Int, quads::AbstractVector,
         discretemeasure::AbstractMatrix{<:Real} = zeros(0, 2);
         discretization::Function = stieltjes, Nmax::Integer = 300,
-        ε::Float64 = 1e-8, gaussquad::Bool = false,
-        removezeroweights::Bool = false)
+        ε::Float64 = 1.0e-8, gaussquad::Bool = false,
+        removezeroweights::Bool = false
+    )
     !(Nmax > 0 && Nmax > N) && throw(DomainError(Nmax, "invalid choice of Nmax=$Nmax"))
     ε <= 0 && throw(DomainError(ε, "invalid choice of ε"))
     discretization ∉ [stieltjes, lanczos] &&
@@ -170,11 +179,14 @@ function mcdiscretization(N::Int, quads::AbstractVector,
         end
         if mp > 0
             @inbounds xx[(Ntot + 1):(Ntot + mp)],
-            ww[(Ntot + 1):(Ntot + mp)] = discretemeasure[
-            :,
-            1],
-            discretemeasure[:,
-            2]
+                ww[(Ntot + 1):(Ntot + mp)] = discretemeasure[
+                    :,
+                    1,
+                ],
+                discretemeasure[
+                    :,
+                    2,
+                ]
         end
         α, β = discretization(N, xx, ww; removezeroweights = removezeroweights)
     end

@@ -1,5 +1,5 @@
 export calculateMultiIndices,
-       findUnivariateIndices
+    findUnivariateIndices
 
 function calculateMultiIndices(d::Int, n::Int)
     # d denotes dimension of random variables/number of sources of uncertainty,
@@ -64,5 +64,5 @@ function findUnivariateIndices(i::Int, ind::AbstractMatrix{Int})
     for deg_ in 1:deg
         myind[deg_] = findfirst(x -> x == deg_, col)
     end
-    pushfirst!(myind, 1)
+    return pushfirst!(myind, 1)
 end

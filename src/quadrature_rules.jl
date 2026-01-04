@@ -1,24 +1,23 @@
-
 export fejer,
-       fejer2,
-       clenshaw_curtis,
-       quadgp,
-       golubwelsch,
-       gauss,
-       radau,
-       lobatto
+    fejer2,
+    clenshaw_curtis,
+    quadgp,
+    golubwelsch,
+    gauss,
+    radau,
+    lobatto
 """
     fejer(N::Int)
 
 Fejer's first quadrature rule.
 """
 function fejer(N::Int)
-    @assert N>=1 "N has to be positive"
+    @assert N >= 1 "N has to be positive"
     N == 1 && return zeros(1), [2.0]
     θ = map(x -> (2x - 1) * pi / (2N), 1:N)
     M = N ÷ 2
     return cos.(θ),
-    map(x -> 2 / N * (1 - 2 * sum(cos(2 * n * x) / (4 * n^2 - 1) for n in 1:M)), θ)
+        map(x -> 2 / N * (1 - 2 * sum(cos(2 * n * x) / (4 * n^2 - 1) for n in 1:M)), θ)
 end
 
 """
@@ -65,9 +64,11 @@ Compute the `N`-point quadrature rule for `weight` with support (`lb`, `ub`).
 The quadrature rule can be specified by the keyword `quadrature`.
 The keyword `bnd` sets the numerical value for infinity.
 """
-function quadgp(weight::Function, lb::Real, ub::Real, N::Int = 10;
-        quadrature::Function = clenshaw_curtis, bnd::Float64 = Inf)
-    @assert lb<ub "inconsistent interval bounds"
+function quadgp(
+        weight::Function, lb::Real, ub::Real, N::Int = 10;
+        quadrature::Function = clenshaw_curtis, bnd::Float64 = Inf
+    )
+    @assert lb < ub "inconsistent interval bounds"
     t_fej, w_fej = quadrature(N)
     t, w, d = zeros(Float64, N), zeros(Float64, N), zeros(Float64, N)
     # transformation
@@ -93,14 +94,16 @@ end
 ####################################################
 # Quadrature rules based on recurrence coefficients
 
-function golubwelsch(α::AbstractVector{<:Real}, β::AbstractVector{<:Real},
-        maxiter::Int = 30)
+function golubwelsch(
+        α::AbstractVector{<:Real}, β::AbstractVector{<:Real},
+        maxiter::Int = 30
+    )
     N = length(α) - 1
     a, β0 = copy(α[1:N]), β[1]
     w = zero(a)
     special_eigenproblem!(a, copy(sqrt.(β)), w, maxiter)
     idx = sortperm(a)
-    a[idx], (β0 * w .^ 2)[idx]
+    return a[idx], (β0 * w .^ 2)[idx]
 end
 
 golubwelsch(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}) = golubwelsch(op.α, op.β)
@@ -128,11 +131,11 @@ with respect to the weight function.
 """
 function gauss(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
     N += 1
-    @assert N>0 "only positive N allowed"
-    @assert length(α)==length(β) "inconsistent number of recurrence coefficients"
+    @assert N > 0 "only positive N allowed"
+    @assert length(α) == length(β) "inconsistent number of recurrence coefficients"
     N0 = length(α)
-    @assert N0>=N "not enough recurrence coefficients"
-    @inbounds golubwelsch(α[1:N], β[1:N])
+    @assert N0 >= N "not enough recurrence coefficients"
+    return @inbounds golubwelsch(α[1:N], β[1:N])
 end
 
 gauss(α::AbstractVector{<:Real}, β::AbstractVector{<:Real}) = gauss(length(α) - 1, α, β)
@@ -166,9 +169,9 @@ interval of w, or outside thereof).
 """
 function radau(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, end0::Real)
     α_ = copy(α)
-    @assert N>0 "only positive N allowed"
-    @assert length(α_)==length(β)>0 "inconsistent number of recurrence coefficients"
-    @assert length(α_)>=N + 1 "not enough recurrence coefficients"
+    @assert N > 0 "only positive N allowed"
+    @assert length(α_) == length(β) > 0 "inconsistent number of recurrence coefficients"
+    @assert length(α_) >= N + 1 "not enough recurrence coefficients"
     p0 = 0.0
     p1 = 1.0
     for n in Base.OneTo(N)
@@ -177,16 +180,16 @@ function radau(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, e
         @inbounds p1 = (end0 - α_[n]) * p0 - β[n] * pm1
     end
     @inbounds α_[N + 1] = end0 - β[N + 1] * p0 / p1
-    gauss(N + 1, α_, β)
+    return gauss(N + 1, α_, β)
 end
 function radau(α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, end0::Real)
-    radau(length(α) - 2, α, β, end0)
+    return radau(length(α) - 2, α, β, end0)
 end
 function radau(N::Int, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, end0::Real)
-    radau(N, op.α, op.β, end0)
+    return radau(N, op.α, op.β, end0)
 end
 function radau(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, end0::Real)
-    radau(op.α, op.β, end0::Real)
+    return radau(op.α, op.β, end0::Real)
 end
 
 """
@@ -215,12 +218,13 @@ resp. to the right thereof).
 """
 function lobatto(
         N::Int, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real}, endl::Real,
-        endr::Real)
+        endr::Real
+    )
     α, β = copy(α_), copy(β_)
-    @assert N>0 "only positive N allowed"
-    @assert length(α)==length(β)>0 "inconsistent number of recurrence coefficients"
-    @assert endl<endr "inconsistent end points"
-    @assert length(α)>=N + 2 "not enough recurrence coefficients"
+    @assert N > 0 "only positive N allowed"
+    @assert length(α) == length(β) > 0 "inconsistent number of recurrence coefficients"
+    @assert endl < endr "inconsistent end points"
+    @assert length(α) >= N + 2 "not enough recurrence coefficients"
     p0l = 0.0
     p0r = 0.0
     p1l = 1.0
@@ -236,16 +240,20 @@ function lobatto(
     det = p1l * p0r - p1r * p0l
     @inbounds α[N + 2] = (endl * p1l * p0r - endr * p1r * p0l) / det
     @inbounds β[N + 2] = (endr - endl) * p1l * p1r / det
-    gauss(N + 2, α, β)
+    return gauss(N + 2, α, β)
 end
-function lobatto(α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, endl::Real,
-        endr::Real)
-    lobatto(length(α) - 3, α, β, endl, endr)
+function lobatto(
+        α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, endl::Real,
+        endr::Real
+    )
+    return lobatto(length(α) - 3, α, β, endl, endr)
 end
-function lobatto(N::Int, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, endl::Real,
-        endr::Real)
-    lobatto(N, op.α, op.β, endl, endr)
+function lobatto(
+        N::Int, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, endl::Real,
+        endr::Real
+    )
+    return lobatto(N, op.α, op.β, endl, endr)
 end
 function lobatto(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, endl::Real, endr::Real)
-    lobatto(op.α, op.β, endl, endr)
+    return lobatto(op.α, op.β, endl, endr)
 end

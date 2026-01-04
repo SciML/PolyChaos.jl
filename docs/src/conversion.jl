@@ -1,6 +1,6 @@
 function convertMathMode!(name::String)
     # expects markdown files as input
-    @assert getFileEnding(name)=="md" "no markdown file provided"
+    @assert getFileEnding(name) == "md" "no markdown file provided"
     lines = Vector{String}
     open(name) do file
         lines = readlines(file)
@@ -26,7 +26,7 @@ end
 
 function convertJuliaMode!(name::String, envname::String)
     # expects markdown files as input
-    @assert getFileEnding(name)=="md" "no markdown file provided"
+    @assert getFileEnding(name) == "md" "no markdown file provided"
     lines = Vector{String}
     open(name) do file
         lines = readlines(file)
@@ -46,7 +46,7 @@ end
 
 function removeComments!(name::String)
     # expects julia file as input, i.e. name = "xxx.jl"
-    @assert getFileEnding(name)=="jl" "no julia file provided"
+    @assert getFileEnding(name) == "jl" "no julia file provided"
     lines = Vector{String}
     open(name) do file
         lines = readlines(file)
@@ -62,12 +62,12 @@ function removeComments!(name::String)
             print(fout, lines[i] * "\n")
         end
     end
-    close(fout)
+    return close(fout)
 end
 
 function addSetupAndMakeMarkdown(name::String, envname::String = "mysetup")
     # expects julia file as input, i.e. name = "xxx.jl"
-    @assert getFileEnding(name)=="jl" "no julia file provided"
+    @assert getFileEnding(name) == "jl" "no julia file provided"
     newname = removeFileEnding(name)
     newname = "$(newname)_setup.md"
     # s = split(name,"")
@@ -105,11 +105,11 @@ end
 Workflow to get markdown file from Julia notebook
 """
 function notebook2markdown(fname::String)
-    @assert getFileEnding(fname)=="ipynb" "no ipynb file provided"
+    @assert getFileEnding(fname) == "ipynb" "no ipynb file provided"
     run(`jupyter-nbconvert --ClearOutputPreprocessor.enabled=True --inplace $fname --to markdown`) # ipynb to markdown
     # remove file ending (if any)
     name = removeFileEnding(fname)
-    file_text = convertMathMode!("$name.md")
+    return file_text = convertMathMode!("$name.md")
 end
 
 """
@@ -118,7 +118,7 @@ end
 Workflow to get REPL-based markdown file from Julia notebook
 """
 function notebook2markdown_repl(fname::String; envname::String = "mysetup")
-    @assert getFileEnding(fname)=="ipynb" "no ipynb file provided"
+    @assert getFileEnding(fname) == "ipynb" "no ipynb file provided"
     # remove file ending (if any)
     name = removeFileEnding(fname)
     # create ```setup mysetup ``` entry
@@ -139,19 +139,19 @@ function notebook2markdown_repl(fname::String; envname::String = "mysetup")
     rm(file_setup)
     fout = open(name * ".md", "w")
     [print(fout, line * "\n") for line in text]
-    close(fout)
+    return close(fout)
 end
 
 function removeFileEnding(name::String)
     s = split(name, "")
     dotindex = findfirst(x -> x == ".", s)
-    dotindex == nothing ? (return name) : (return name[1:(dotindex - 1)])
+    return dotindex == nothing ? (return name) : (return name[1:(dotindex - 1)])
 end
 
 function getFileEnding(name::String)
     s = split(name, "")
     dotindex = findfirst(x -> x == ".", s)
-    dotindex == nothing ? (return name) : (return lowercase(name[(dotindex + 1):end]))
+    return dotindex == nothing ? (return name) : (return lowercase(name[(dotindex + 1):end]))
 end
 
 # Workflow to get REPL-executed markdown file from Julia notebook

@@ -1,11 +1,15 @@
 using PolyChaos, LinearAlgebra
 
 function mytest(mOP::MultiOrthoPoly)
-    @time P = [computeSP([i, j, k], mOP)
-               for i in 0:(mOP.dim - 1), j in 0:(mOP.dim - 1), k in 0:(mOP.dim - 1)]
+    @time P = [
+        computeSP([i, j, k], mOP)
+            for i in 0:(mOP.dim - 1), j in 0:(mOP.dim - 1), k in 0:(mOP.dim - 1)
+    ]
     @time T = Tensor(dim, mOP)
-    P_ = [T.get([i, j, k])
-          for i in 0:(mOP.dim - 1), j in 0:(mOP.dim - 1), k in 0:(mOP.dim - 1)]
+    P_ = [
+        T.get([i, j, k])
+            for i in 0:(mOP.dim - 1), j in 0:(mOP.dim - 1), k in 0:(mOP.dim - 1)
+    ]
     @show norm(P - P_)
     return P_
 end

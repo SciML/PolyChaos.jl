@@ -4,16 +4,16 @@ deg = 4
 Nrec = 10
 
 function compare_quad(A::Quad, B::Quad)
-    (A.Nquad == B.Nquad) && (A.name == B.name) && (A.nodes == B.nodes) &&
+    return (A.Nquad == B.Nquad) && (A.name == B.name) && (A.nodes == B.nodes) &&
         (A.weights == B.weights)
 end
 
 function compare_quad(A::EmptyQuad, B::EmptyQuad)
-    true
+    return true
 end
 
 function compare_orthopoly(A, B)
-    (A.deg == B.deg) && compare_quad(A.quad, B.quad) && (A.measure == B.measure) &&
+    return (A.deg == B.deg) && compare_quad(A.quad, B.quad) && (A.measure == B.measure) &&
         (A.α == B.α) && (A.β == B.β)
 end
 

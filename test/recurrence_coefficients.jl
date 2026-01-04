@@ -8,7 +8,7 @@ ns = parse.(Int, readlines(myfile))
 nodes = ns[1]:ns[2]:ns[3]
 mus = 0.0:0.1:1
 albe = 0.0:0.2:2
-tol = 1e-9
+tol = 1.0e-9
 
 @time for n in nodes
     @testset "Hermite $n nodes" begin
@@ -90,8 +90,11 @@ meipol = 0.1:0.2:2
             αβref = parse.(Float64, readlines(myfile))
             αβcom = rm_meixner_pollaczek(n, lambda, phi)
             @test isapprox(norm(αβref - [αβcom[1]; αβcom[2]], Inf), 0.0; atol = tol)
-            αβcom = coeffs(MeixnerPollaczekOrthoPoly(
-                n - 1, lambda, phi, addQuadrature = false))
+            αβcom = coeffs(
+                MeixnerPollaczekOrthoPoly(
+                    n - 1, lambda, phi, addQuadrature = false
+                )
+            )
             @test isapprox(norm(αβref - [αβcom[:, 1]; αβcom[:, 2]], Inf), 0.0; atol = tol)
             close(myfile)
             @test rm_meixner_pollaczek(n, lambda) == rm_meixner_pollaczek(n, lambda, pi / 2)
