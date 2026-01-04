@@ -1,18 +1,18 @@
 export r_scale,
-       rm_logistic,
-       rm_laguerre,
-# rm_logisticsum,
-       rm_hermite,
-       rm_hermite_prob,
-       rm_laguerre,
-       rm_jacobi,
-       rm_jacobi01,
-# rm_hahn,
-       rm_meixner_pollaczek,
-       rm_legendre,
-       rm_legendre01,
-       rm_chebyshev1,
-       rm_compute
+    rm_logistic,
+    rm_laguerre,
+    # rm_logisticsum,
+    rm_hermite,
+    rm_hermite_prob,
+    rm_laguerre,
+    rm_jacobi,
+    rm_jacobi01,
+    # rm_hahn,
+    rm_meixner_pollaczek,
+    rm_legendre,
+    rm_legendre01,
+    rm_chebyshev1,
+    rm_compute
 """
     r_scale(c::Real,β::AbstractVector{<:Real},α::AbstractVector{<:Real})
 
@@ -20,8 +20,12 @@ Given the recursion coefficients `(α,β)` for a system of orthogonal polynomial
 this function returns the recursion coefficients `(α_,β_)` for the scaled measure ``c m(t)`` for some positive ``c``.
 """
 function r_scale(c::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
-    c <= 0 && throw(DomainError(c,
-        "Measure can only be scaled by positive number (provided c=$c)"))
+    c <= 0 && throw(
+        DomainError(
+            c,
+            "Measure can only be scaled by positive number (provided c=$c)"
+        )
+    )
     return a, [c * b[1]; b[2:end]]
 end
 
@@ -33,9 +37,11 @@ this function creates `Npoly` recursion coefficients `(α,β)`.
 
 The keyword `quadrature` specifies what quadrature rule is being used.
 """
-function rm_compute(weight::Function, lb::Real, ub::Real, Npoly::Int = 4, Nquad::Int = 10;
+function rm_compute(
+        weight::Function, lb::Real, ub::Real, Npoly::Int = 4, Nquad::Int = 10;
         quadrature::Function = clenshaw_curtis,
-        discretization::Function = stieltjes)
+        discretization::Function = stieltjes
+    )
     @assert Npoly <= Nquad
     Npoly == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     n, w = quadgp(weight, lb, ub, Nquad; quadrature = quadrature)
@@ -45,16 +51,20 @@ function rm_compute(weight::Function, lb::Real, ub::Real, Npoly::Int = 4, Nquad:
     # Gautschi, W. "Orthogonal Polynomials: Computation and Approximation"
     @assert lb < minimum(a)&&maximum(a) < ub "Not all recurrence coefficients α ($(minimum(a)),$(maximum(b))) are elements of the support s=($lb,$ub)."
     if length(b) >= 2
-        @assert 0 < minimum(b)&&maximum(b[2:end]) <= max(lb^2, ub^2) "Not all recurrence coefficients β are elements of the interval (0, max(lb^2,ub^2)) = (0,$(max(lb^2,ub^2))), namely ($(minimum(b)), $(maximum(b)))."
+        @assert 0 < minimum(b)&&maximum(b[2:end]) <= max(lb^2, ub^2) "Not all recurrence coefficients β are elements of the interval (0, max(lb^2,ub^2)) = (0,$(max(lb^2, ub^2))), namely ($(minimum(b)), $(maximum(b)))."
     end
     return a, b
 end
 
-function rm_compute(m::AbstractMeasure, Npoly::Int = 4, Nquad::Int = 10;
+function rm_compute(
+        m::AbstractMeasure, Npoly::Int = 4, Nquad::Int = 10;
         quadrature::Function = clenshaw_curtis,
-        discretization::Function = stieltjes)
-    rm_compute(m.w, m.dom[1], m.dom[2], Npoly, Nquad, quadrature = quadrature,
-        discretization = discretization)
+        discretization::Function = stieltjes
+    )
+    return rm_compute(
+        m.w, m.dom[1], m.dom[2], Npoly, Nquad, quadrature = quadrature,
+        discretization = discretization
+    )
 end
 
 ##
@@ -88,9 +98,9 @@ Creates `N` recurrence coefficients for monic polynomials that are orthogonal
 on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\mathrm{e}^{-t})^2}``
 """
 function rm_logistic(N::Int)
-    @assert N>=0 "parameter(s) out of range."
+    @assert N >= 0 "parameter(s) out of range."
     N == 0 && return Vector{Float64}(undef, 0), Vector{Float64}(undef, 0)
-    zeros(N), pushfirst!(map(k -> k^4 * pi^2 / (4 * k^2 - 1), Base.OneTo(N - 1)), 1.0)
+    return zeros(N), pushfirst!(map(k -> k^4 * pi^2 / (4 * k^2 - 1), Base.OneTo(N - 1)), 1.0)
 end
 
 """
@@ -118,7 +128,7 @@ Creates `N` recurrence coefficients for monic probabilists' Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{-0.5t^2}``
 """
 function rm_hermite_prob(N::Int)
-    @assert N>=0 "parameter(s) out of range."
+    @assert N >= 0 "parameter(s) out of range."
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     # return zeros(N), [sqrt(2*pi); collect(1.:N-1) ]
     return zeros(N), pushfirst!(collect(1.0:(N - 1)), sqrt(2 * pi))
@@ -139,10 +149,10 @@ function rm_laguerre(N::Int, a::Real)
     N == 1 && return [a + 1.0], [gamma(a + 1)]
     n = 1.0:(N - 1)
     return pushfirst!(map(x -> 2x + a + 1.0, n), a + 1.0),
-    pushfirst!(map(x -> x^2 + a * x, n), gamma(a + 1))
+        pushfirst!(map(x -> x^2 + a * x, n), gamma(a + 1))
 end
 function rm_laguerre(N::Int)
-    rm_laguerre(N, 0.0)
+    return rm_laguerre(N, 0.0)
 end
 
 """
@@ -161,9 +171,11 @@ function rm_jacobi(N::Int, a::Real, b::Real)
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     nu = (b - a) / (a + b + 2.0)
     mu::Real = a + b + 2.0 <= 128.0 ?
-               2^(a + b + 1) * ((gamma(a + 1) * gamma(b + 1)) / gamma(a + b + 2)) :
-               exp((a + b + 1) * log(2) +
-                   ((log(gamma(a + 1)) + log(gamma(b + 1))) - log(gamma(a + b + 2))))
+        2^(a + b + 1) * ((gamma(a + 1) * gamma(b + 1)) / gamma(a + b + 2)) :
+        exp(
+            (a + b + 1) * log(2) +
+            ((log(gamma(a + 1)) + log(gamma(b + 1))) - log(gamma(a + b + 2)))
+        )
     N == 1 && return [nu], [mu]
     n = 1:(N - 1)
     nab = map(x -> 2x + a + b, n)
@@ -171,7 +183,7 @@ function rm_jacobi(N::Int, a::Real, b::Real)
     B1 = map(x -> 4 * (x + a) * (x + b) * x * (x + a + b), n[2:(N - 1)])
     B2 = map(x -> (x^2.0) * (x + 1.0) * (x - 1.0), nab[2:(N - 1)])
     B3 = 4.0 * (a + 1) * (b + 1) / ((a + b + 2)^2 * (a + b + 3))
-    A, pushfirst!(pushfirst!(B1 ./ B2, B3), mu)
+    return A, pushfirst!(pushfirst!(B1 ./ B2, B3), mu)
 end
 
 rm_jacobi(N::Int, a::Real) = rm_jacobi(N, a, a)
@@ -191,7 +203,7 @@ function rm_jacobi01(N::Int, a::Real, b::Real)
     @assert N >= 0&&a > -1.0 && b > -1.0 "parameter(s) out of range"
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     c, d = rm_jacobi(N, a, b)
-    map(x -> (1 + x) / 2, c), pushfirst!(0.25 * d[2:N], d[1] / 2^(a + b + 1.0))
+    return map(x -> (1 + x) / 2, c), pushfirst!(0.25 * d[2:N], d[1] / 2^(a + b + 1.0))
 end
 rm_jacobi01(N::Int, a::Real) = rm_jacobi01(N, a, a)
 rm_jacobi01(N::Int) = rm_jacobi01(N, 0.0, 0.0)
@@ -241,7 +253,7 @@ end
 rm_meixner_pollaczek(N::Int, lambda::Real) = rm_meixner_pollaczek(N, lambda, pi / 2)
 
 function rm_chebyshev1(N::Int)
-    @assert N>=0 "N has to be non-negative"
+    @assert N >= 0 "N has to be non-negative"
     α = zeros(Float64, N)
     if N == 1
         return α, [pi]

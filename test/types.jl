@@ -27,16 +27,20 @@ quads = [fejer, fejer2, clenshaw_curtis]
 discs = [lanczos, stieltjes]
 degs = 1:5:20
 m = Uniform01Measure()
-tol = 1e-6
+tol = 1.0e-6
 @testset "General constructor for Gaussian OrthoPoly" begin
     for quad in quads,
-        disc in discs, deg in degs
+            disc in discs, deg in degs
         op = Uniform01OrthoPoly(deg)
-        op1 = OrthoPoly("myuniform", deg, m; quadrature = quad, discretization = disc,
-            Nquad = 100 * deg)
+        op1 = OrthoPoly(
+            "myuniform", deg, m; quadrature = quad, discretization = disc,
+            Nquad = 100 * deg
+        )
         @test isapprox(norm(coeffs(op) - coeffs(op1), Inf), 0; atol = tol)
-        op2 = OrthoPoly("myuniform", deg, t -> 1, (0.0, 1.0), true; quadrature = quad,
-            discretization = disc, Nquad = 100 * deg)
+        op2 = OrthoPoly(
+            "myuniform", deg, t -> 1, (0.0, 1.0), true; quadrature = quad,
+            discretization = disc, Nquad = 100 * deg
+        )
         @test isapprox(norm(coeffs(op) - coeffs(op2), Inf), 0; atol = tol)
     end
 end
@@ -48,7 +52,7 @@ Ns = 10:5:30
 m = Uniform01Measure()
 myf(t) = 6t^5
 result = 1.0
-tol = 1e-8
+tol = 1.0e-8
 @testset "Last-resort-constructor for Quad using quadgp" begin
     for quad in quads, N in Ns
 
@@ -67,9 +71,11 @@ end
 
 d = 5
 
-ops = [HermiteOrthoPoly(d),
+ops = [
+    HermiteOrthoPoly(d),
     Uniform01OrthoPoly(d),
-    Beta01OrthoPoly(d, 3.2, 5.34)]
+    Beta01OrthoPoly(d, 3.2, 5.34),
+]
 mop = MultiOrthoPoly(ops, d)
 
 is = 0:d
@@ -78,13 +84,18 @@ n = length(ops)
 x = [1.0, 2.0, 3.0]
 
 @testset "Evaluation of multivariate basis" begin
-    for ind in Iterators.product([collect(0:d)
-                                  for i in 1:n]...)
+    for ind in Iterators.product(
+            [
+                collect(0:d)
+                    for i in 1:n
+            ]...
+        )
         @test isapprox(
             prod(map(i -> evaluate(ind[i], x[i], ops[i]), 1:n)) -
-            evaluate([ind...], x, mop)[1],
+                evaluate([ind...], x, mop)[1],
             0;
-            atol = tol)
+            atol = tol
+        )
     end
 end
 
@@ -97,9 +108,10 @@ mop = MultiOrthoPoly(
     [
         GaussOrthoPoly(deg; Nrec = 3 * deg),
         LogisticOrthoPoly(deg; Nrec = 3 * deg),
-        Uniform01OrthoPoly(deg; Nrec = 3 * deg)
+        Uniform01OrthoPoly(deg; Nrec = 3 * deg),
     ],
-    deg)
+    deg
+)
 
 # @test_throws AssertionError Tensor(0,mop)
 @testset "Check tensor" begin
@@ -108,7 +120,8 @@ mop = MultiOrthoPoly(
         tensor = Tensor(m, op)
         for ind in Iterators.product([collect(0:deg) for i in 1:m]...)
             @test isapprox(
-                tensor.get(collect(ind)), computeSP(collect(ind), op); atol = tol)
+                tensor.get(collect(ind)), computeSP(collect(ind), op); atol = tol
+            )
         end
     end
 end
@@ -119,9 +132,10 @@ mop = MultiOrthoPoly(
     [
         GaussOrthoPoly(deg; Nrec = 3 * deg, addQuadrature = false),
         LogisticOrthoPoly(deg; Nrec = 3 * deg),
-        Uniform01OrthoPoly(deg; Nrec = 3 * deg)
+        Uniform01OrthoPoly(deg; Nrec = 3 * deg),
     ],
-    deg)
+    deg
+)
 
 @test_throws InconsistencyError Tensor(3, opq)
 @test_throws InconsistencyError Tensor(3, mop)

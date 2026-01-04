@@ -8,12 +8,14 @@ function show(measure::AbstractMeasure)
     for name in fieldnames(typeof(measure))
         println("$(string(name)):\t$(getfield(measure, name))")
     end
+    return
 end
 
 function show(productmeasure::ProductMeasure)
     for measure in productmeasure.measures
         show(measure)
     end
+    return
 end
 
 function show(op::AbstractOrthoPoly; showmeasure::Bool = true)
@@ -30,7 +32,7 @@ function show(op::AbstractOrthoPoly; showmeasure::Bool = true)
     print("β =")
     printstyled("\t\t$(op.β[1:n])")
     n < length(op.α) ? print("...\n") : print("\n")
-    if showmeasure
+    return if showmeasure
         print("\n")
         show(op.measure)
     end
@@ -47,10 +49,10 @@ function show(mop::MultiOrthoPoly; showmeasure::Bool = false)
     printstyled("\t\t$(mop.dim)\n")
     print("ind:")
     mop.dim <= 7 ? n = mop.dim : n = 7
-    [printstyled("\t\t$(mop.ind[i,:])\n") for i in 1:n]
+    [printstyled("\t\t$(mop.ind[i, :])\n") for i in 1:n]
     n < mop.dim ? print("\t\t...\n") : print("\n")
     print("\n")
-    showmeasure && show(mop.measure)
+    return showmeasure && show(mop.measure)
 end
 
 function show(t::Tensor)
@@ -59,7 +61,7 @@ function show(t::Tensor)
     printstyled("\t\t$(t.dim)\n")
     print("nonzeros:")
     printstyled("\t$(length(t.T.nzind))\n")
-    show(t.op; showmeasure = false)
+    return show(t.op; showmeasure = false)
 end
 
 """
@@ -182,25 +184,31 @@ function showpoly(coeffs::Vector{<:Real}; sym::String = "x", digits::Integer = 2
         ex > 0 && print(io, sym)
         ex > 1 && print(io, '^', ex)
     end
-    print(io, '\n')
+    return print(io, '\n')
 end
 
-function showpoly(d::Integer, α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
-        digits::Integer = 2)
-    @assert d>=0 "degree has to be non-negative."
+function showpoly(
+        d::Integer, α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
+        digits::Integer = 2
+    )
+    @assert d >= 0 "degree has to be non-negative."
     d == 0 && return print("1\n")
-    showpoly(rec2coeff(d, α, β)[end], sym = sym, digits = digits)
+    return showpoly(rec2coeff(d, α, β)[end], sym = sym, digits = digits)
 end
 
-function showpoly(d::Range, α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
-        digits::Integer = 2) where {Range <: OrdinalRange}
+function showpoly(
+        d::Range, α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
+        digits::Integer = 2
+    ) where {Range <: OrdinalRange}
     map(c -> showpoly(c, α, β; sym = sym, digits = digits), d)
-    print()
+    return print()
 end
 
-function showpoly(d::Union{Integer, Range}, op::AbstractOrthoPoly; sym::String = "x",
-        digits::Integer = 2) where {Range <: OrdinalRange}
-    showpoly(d, op.α, op.β; sym = sym, digits = digits)
+function showpoly(
+        d::Union{Integer, Range}, op::AbstractOrthoPoly; sym::String = "x",
+        digits::Integer = 2
+    ) where {Range <: OrdinalRange}
+    return showpoly(d, op.α, op.β; sym = sym, digits = digits)
 end
 
 """
@@ -246,10 +254,12 @@ x^3 - 0.6x
 x^4 - 0.86x^2 + 0.09
 ```
 """
-function showbasis(α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
-        digits::Integer = 2)
-    showpoly(0:length(α), α, β; sym = sym, digits = digits)
+function showbasis(
+        α::Vector{<:Real}, β::Vector{<:Real}; sym::String = "x",
+        digits::Integer = 2
+    )
+    return showpoly(0:length(α), α, β; sym = sym, digits = digits)
 end
 function showbasis(op::AbstractOrthoPoly; sym::String = "x", digits::Integer = 2)
-    showbasis(op.α[1:(op.deg)], op.β[1:(op.deg)]; sym = sym, digits = digits)
+    return showbasis(op.α[1:(op.deg)], op.β[1:(op.deg)]; sym = sym, digits = digits)
 end

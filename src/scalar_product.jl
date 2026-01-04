@@ -1,22 +1,30 @@
 export computeSP,
-       computeSP2
+    computeSP2
 
-function computeSP(a_::AbstractVector{<:Integer},
+function computeSP(
+        a_::AbstractVector{<:Integer},
         α::AbstractVector{<:AbstractVector{<:Real}},
         β::AbstractVector{<:AbstractVector{<:Real}},
         nodes::AbstractVector{<:AbstractVector{<:Real}},
         weights::AbstractVector{<:AbstractVector{<:Real}},
         ind::AbstractMatrix{<:Integer};
         issymmetric::BitArray = falses(length(α)),
-        zerotol::AbstractFloat = 0.0)
+        zerotol::AbstractFloat = 0.0
+    )
     minimum(a_) < 0 && throw(DomainError(minimum(a_), "no negative degrees allowed"))
     l, p = size(ind) # p-variate basis
     p == 1 && computeSP(a_, α[1], β[1], nodes[1], weights[1]; issymmetric = issymmetric[1])
     l -= 1
-    maximum(a_) > l && throw(DomainError(maximum(a_),
-        "not enough elements in multi-index (requested: $(maximum(a_)), max: $l)"))
-    !(length(α) == length(β) == length(nodes) == length(weights) == length(issymmetric) ==
-      p) &&
+    maximum(a_) > l && throw(
+        DomainError(
+            maximum(a_),
+            "not enough elements in multi-index (requested: $(maximum(a_)), max: $l)"
+        )
+    )
+    !(
+        length(α) == length(β) == length(nodes) == length(weights) == length(issymmetric) ==
+            p
+    ) &&
         throw(InconsistencyError("inconsistent number of recurrence coefficients and/or nodes/weights"))
 
     a = Vector{Int64}()
@@ -34,23 +42,27 @@ function computeSP(a_::AbstractVector{<:Integer},
         val = 1.0
         for i in 1:p
             # compute univariate scalar product
-            @inbounds v = computeSP(inds_uni[i, :], α[i], β[i], nodes[i], weights[i];
-                issymmetric = issymmetric[i])
+            @inbounds v = computeSP(
+                inds_uni[i, :], α[i], β[i], nodes[i], weights[i];
+                issymmetric = issymmetric[i]
+            )
             isapprox(v, 0, atol = zerotol) ? (return 0.0) : (val *= v)
         end
     end
     return val
 end
 
-function computeSP(a::AbstractVector{<:Integer}, op::AbstractVector,
-        ind::AbstractMatrix{<:Integer})
+function computeSP(
+        a::AbstractVector{<:Integer}, op::AbstractVector,
+        ind::AbstractMatrix{<:Integer}
+    )
     α, β = coeffs(op)
     nodes, weights = nw(op)
-    computeSP(a, α, β, nodes, weights, ind; issymmetric = issymmetric.(op))
+    return computeSP(a, α, β, nodes, weights, ind; issymmetric = issymmetric.(op))
 end
 
 function computeSP(a::AbstractVector{<:Integer}, mop::MultiOrthoPoly)
-    computeSP(a, mop.uni, mop.ind)
+    return computeSP(a, mop.uni, mop.ind)
 end
 
 """
@@ -101,9 +113,11 @@ The function is dispatched to facilitate its use with `AbstractOrthoPoly` and it
 
       - It is checked whether enough quadrature points are supplied to solve the integral exactly.
 """
-function computeSP(a_::AbstractVector{<:Integer}, α::AbstractVector{<:Real},
+function computeSP(
+        a_::AbstractVector{<:Integer}, α::AbstractVector{<:Real},
         β::AbstractVector{<:Real}, nodes::AbstractVector{<:Real},
-        weights::AbstractVector{<:Real}; issymmetric::Bool = false)
+        weights::AbstractVector{<:Real}; issymmetric::Bool = false
+    )
     minimum(a_) < 0 && throw(DomainError(minimum(a_), "no negative degrees allowed"))
     # this works because ``<Φ_i,Φ_j,Φ_0,...,Φ_0> = <Φ_i,Φ_j>``
     # hence, avoiding unnecessary operations that introduce numerical gibberish
@@ -118,9 +132,9 @@ function computeSP(a_::AbstractVector{<:Integer}, α::AbstractVector{<:Real},
     (issymmetric && isodd(sum(a))) && return 0.0
     # Gauss quadrature rules have exactness 2N-1
     !(Int(ceil(0.5 * (sum(a) + 1))) <= length(nodes)) &&
-        throw(InconsistencyError("not enough nodes to integrate exactly ($(length(nodes)) provided, where $(Int(ceil(0.5*(sum(a)+1)))) are needed)"))
+        throw(InconsistencyError("not enough nodes to integrate exactly ($(length(nodes)) provided, where $(Int(ceil(0.5 * (sum(a) + 1)))) are needed)"))
 
-    res = if iszero(length(a))
+    return res = if iszero(length(a))
         first(β)
     elseif isone(length(a))
         0.0
@@ -136,7 +150,7 @@ function computeSP(a_::AbstractVector{<:Integer}, α::AbstractVector{<:Real},
 end
 
 function computeSP(a::AbstractVector{<:Integer}, op::AbstractOrthoPoly)
-    computeSP(a, op.α, op.β, op.quad.nodes, op.quad.weights; issymmetric = issymmetric(op))
+    return computeSP(a, op.α, op.β, op.quad.nodes, op.quad.weights; issymmetric = issymmetric(op))
 end
 
 """
