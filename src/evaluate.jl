@@ -81,7 +81,8 @@ function evaluate(
     @assert n <= length(a) "Specified degree is $n, but you only provided $(length(a)) coefficients."
     # recurrence relation for orthogonal polynomials
     nx = length(x)
-    pminus, p = zeros(nx), ones(nx)
+    T = promote_type(eltype(x), eltype(a), eltype(b))
+    pminus, p = zeros(T, nx), ones(T, nx)
     if n == 0
         if nx == 1
             return first(p)
@@ -130,7 +131,8 @@ function evaluate(
         b::AbstractVector{<:AbstractVector{<:Real}}
     )
     @assert length(n) == size(x, 2) "number of univariate bases (= $(length(n))) inconsistent with columns points x (= $(size(x, 2)))"
-    val = ones(Float64, size(x, 1))
+    T = promote_type(eltype(x), eltype(eltype(a)), eltype(eltype(b)))
+    val = ones(T, size(x, 1))
     for i in 1:length(n)
         @inbounds val = val .* evaluate(n[i], x[:, i], a[i], b[i])
     end
