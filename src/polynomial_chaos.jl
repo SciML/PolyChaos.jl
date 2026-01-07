@@ -145,7 +145,7 @@ function assign2multi(x::AbstractVector{<:Real}, i::Int, ind::AbstractMatrix{<:I
         throw(DomainError(nx, "inconsistent number of coefficients ($nx vs $(deg + 1))"))
     i > p && throw(DomainError((i, p), "basis is $p-variate, you requested $i-variate"))
     myind = findUnivariateIndices(i, ind)[1:nx]
-    y = spzeros(Float64, l)
+    y = spzeros(eltype(x), l)
     y[myind] = x
     return y
 end
@@ -248,9 +248,12 @@ function sampleMeasure(
         n::Int, measure::ProductMeasure;
         method::Vector{String} = _createMethodVector(measure)
     )
-    samples = Matrix{Float64}(undef, n, 0)
-    for (k, unimeasure) in enumerate(measure.measures)
-        samples = hcat(samples, sampleMeasure(n, unimeasure; method = method[k]))
+    first_sample = sampleMeasure(n, first(measure.measures); method = first(method))
+    T = eltype(first_sample)
+    samples = Matrix{T}(undef, n, length(measure.measures))
+    samples[:, 1] = first_sample
+    for k in 2:length(measure.measures)
+        samples[:, k] = sampleMeasure(n, measure.measures[k]; method = method[k])
     end
     return samples
 end
@@ -287,7 +290,8 @@ function evaluatePCE(
     if Nrec > Nx
         α, β = α[1:Nx], β[1:Nx]
     end
-    ϕ = zeros(Float64, Nsmpl, Nx)
+    T = promote_type(eltype(x), eltype(ξ), eltype(α), eltype(β))
+    ϕ = zeros(T, Nsmpl, Nx)
     for n in 1:Nx
         ϕ[:, n] = evaluate(n - 1, ξ, α, β)
     end
@@ -318,7 +322,8 @@ function evaluatePCE(
     Nx = length(x)
     Nx > size(ind, 1) &&
         throw(InconsistencyError("too few pc coefficients (resp: too small basis)"))
-    ϕ = zeros(Float64, Nsmpl, Nx)
+    T = promote_type(eltype(x), eltype(ξ), eltype(eltype(α)), eltype(eltype(β)))
+    ϕ = zeros(T, Nsmpl, Nx)
     for n in 1:Nx
         ϕ[:, n] = evaluate(ind[n, :], ξ, α, β)
     end

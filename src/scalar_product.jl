@@ -134,14 +134,15 @@ function computeSP(
     !(Int(ceil(0.5 * (sum(a) + 1))) <= length(nodes)) &&
         throw(InconsistencyError("not enough nodes to integrate exactly ($(length(nodes)) provided, where $(Int(ceil(0.5 * (sum(a) + 1)))) are needed)"))
 
+    T = promote_type(eltype(α), eltype(β), eltype(nodes), eltype(weights))
     return res = if iszero(length(a))
         first(β)
     elseif isone(length(a))
-        0.0
+        zero(T)
     elseif length(a) == 2
-        @inbounds a[1] == a[2] ? computeSP2(first(a), β)[end] : 0.0
+        @inbounds a[1] == a[2] ? computeSP2(first(a), β)[end] : zero(T)
     else
-        f = ones(Float64, length(nodes))
+        f = ones(T, length(nodes))
         @simd for i in 1:length(a)
             @inbounds f = f .* evaluate(a[i], nodes, α, β)
         end
@@ -175,7 +176,8 @@ function computeSP2(n::Integer, β::AbstractVector{<:Real})
         throw(DomainError(n, "can only compute scalar products for non-negative degrees"))
     length(β) < n + 1 && throw(InconsistencyError("inconsistent length of β"))
     n == 0 && return β[1]
-    s = ones(Float64, n + 1)
+    T = eltype(β)
+    s = ones(T, n + 1)
     @inbounds s[1] = β[1]
     for i in 2:(n + 1)
         @inbounds s[i] = s[i - 1] * β[i]

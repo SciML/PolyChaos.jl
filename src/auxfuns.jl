@@ -136,7 +136,8 @@ function integrate(f::Function, mop::MultiOrthoPoly)
             "one or more univariate orthogonal polynomials have empty quadrature; use addQuadrature=true"
         )
     )
-    result = 0.0
+    T = promote_type(eltype.(nodes)..., eltype.(weights)...)
+    result = zero(T)
     for idx in Iterators.product([eachindex(n) for n in nodes]...)
         node_vals = [nodes[d][idx[d]] for d in 1:p]
         weight_prod = prod(weights[d][idx[d]] for d in 1:p)
