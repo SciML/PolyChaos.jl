@@ -205,9 +205,9 @@ function showpoly(
 end
 
 function showpoly(
-        d::Union{Integer, Range}, op::AbstractOrthoPoly; sym::String = "x",
+        d::Union{Integer, OrdinalRange}, op::AbstractOrthoPoly; sym::String = "x",
         digits::Integer = 2
-    ) where {Range <: OrdinalRange}
+    )
     return showpoly(d, op.α, op.β; sym = sym, digits = digits)
 end
 
