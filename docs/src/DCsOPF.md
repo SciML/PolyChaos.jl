@@ -1,42 +1,3 @@
-```@setup mysetup
-using PolyChaos, JuMP, MosekTools, LinearAlgebra
-A = [ -1 1 0 0; -1 0 1 0; -1 0 0 1 ; 0 1 -1 0; 0 0 -1 1] # incidence matrix
-Nl, N = size(A,1), size(A,2)
-Bbr = diagm(0 => -( 2 .+ 10*rand(Nl) )) # line parameters
-Ψ = [ zeros(Nl)  -Bbr*A[:,2:end]*inv(A[:,2:end]'*Bbr*A[:,2:end]) ] # PTDF matrix
-Cp, Cd = [1 0; 0 0; 0 0; 0 1], [0 0; 1 0; 0 1; 0 0 ] # book-keeping
-Ng, Nd = size(Cp,2), size(Cd,2)
-c = 4 .+ 10*rand(Ng) # cost function parameters
-λp, λl = 1.6*ones(Ng), 1.6*ones(Nl) # lambdas for chance constraint reformulations
-pmax, pmin = 10*ones(Ng), zeros(Ng) # engineering limits
-plmax, plmin = 10*ones(Nl), -10*ones(Nl) # engineering limits
-deg = 1
-opq = [Uniform01OrthoPoly(deg; Nrec=5*deg), Uniform01OrthoPoly(deg; Nrec=5*deg)]
-mop = MultiOrthoPoly(opq, deg)
-Npce = mop.dim
-d = zeros(Nd,Npce) # PCE coefficients of load
-d[1,[1,2]] = convert2affinePCE(1., 0.1, mop.uni[1], kind="μσ")
-d[2,[1,3]] = convert2affinePCE(2., 0.2, mop.uni[2], kind="μσ")
-function buildSOC(x::Vector,mop::MultiOrthoPoly)
-    t = [ sqrt(Tensor(2,mop).get([i,i])) for i in 0:mop.dim-1 ]
-    (t.*x)[2:end]
-end
-model = Model(with_optimizer(Mosek.Optimizer))
-@variable(model, p[i in 1:Ng,j in 1:Npce], base_name="p")
-@constraint(model, energy_balance[j in 1:Npce], sum(p[i,j] for i in 1:Ng) - sum(d[i,j] for i in 1:Nd) == 0)
-@constraint(model, con_pmax[i in 1:Ng], [1/λp[i]*(pmax[i] - mean(p[i,:],mop)); buildSOC(p[i,:],mop)] in SecondOrderCone())
-@constraint(model, con_pmin[i in 1:Ng], [1/λp[i]*(mean(p[i,:],mop) - pmin[i]); buildSOC(p[i,:],mop)] in SecondOrderCone())
-pl = Ψ*(Cp*p + Cd*d)
-@constraint(model, con_plmax[i in 1:Nl], [1/λl[i]*(plmax[i] - mean(pl[1,:],mop)); buildSOC(pl[i,:],mop)] in SecondOrderCone())
-@constraint(model, con_plmin[i in 1:Nl], [1/λl[i]*(mean(pl[1,:],mop) - plmin[i]); buildSOC(pl[i,:],mop)] in SecondOrderCone())
-@objective(model, Min, sum( mean(p[i,:],mop)*c[i] for i in 1:Ng) )
-optimize!(model) # here we go
-@assert termination_status(model) == MOI.OPTIMAL "Model not solved to optimality."
-psol, plsol, obj = value.(p), value.(pl), objective_value(model)
-p_moments = [ [mean(psol[i,:],mop) var(psol[i,:],mop) ] for i in 1:Ng ]
-pbr_moments = [ [mean(plsol[i,:],mop) var(plsol[i,:],mop) ] for i in 1:Nl ]
-```
-
 # Chance-Constrained DC Optimal Power Flow
 
 The purpose of this tutorial is to show how polynomial chaos can be leveraged to solve optimization problems under uncertainty.
@@ -93,14 +54,14 @@ which minimizes the total expected generation cost subject to the DC power flow 
 
 Let's solve the problem using `PolyChaos` and `JuMP`, using `Mosek` as a solver.
 
-```@example mysetup
+```julia
 using PolyChaos, JuMP, MosekTools, LinearAlgebra
 ```
 
 Let's define system-specific quantities such as the incidence matrix and the branch flow parameters.
 From these, we can compute the PTDF matrix $\Psi$ (assuming the slack is at bus 1).
 
-```@example mysetup
+```julia
 A = [-1 1 0 0; -1 0 1 0; -1 0 0 1; 0 1 -1 0; 0 0 -1 1] # incidence matrix
 Nl, N = size(A, 1), size(A, 2)
 Bbr = diagm(0 => -(2 .+ 10 * rand(Nl))) # line parameters
@@ -109,7 +70,7 @@ Bbr = diagm(0 => -(2 .+ 10 * rand(Nl))) # line parameters
 
 Now we can continue the remaining ingredients that specify our systems:
 
-```@example mysetup
+```julia
 Cp, Cd = [1 0; 0 0; 0 0; 0 1], [0 0; 1 0; 0 1; 0 0] # book-keeping
 Ng, Nd = size(Cp, 2), size(Cd, 2)
 c = 4 .+ 10 * rand(Ng) # cost function parameters
@@ -120,7 +81,7 @@ plmax, plmin = 10 * ones(Nl), -10 * ones(Nl) # engineering limits
 
 We specify the uncertainty using `PolyChaos`:
 
-```@example mysetup
+```julia
 deg = 1
 opq = [Uniform01OrthoPoly(deg; Nrec = 5 * deg), Uniform01OrthoPoly(deg; Nrec = 5 * deg)]
 mop = MultiOrthoPoly(opq, deg)
@@ -129,7 +90,7 @@ Npce = mop.dim
 
 It remains to specify the PCE coefficients, for which we will use `convert2affine`.
 
-```@example mysetup
+```julia
 d = zeros(Nd, Npce) # PCE coefficients of load
 d[1, [1, 2]] = convert2affinePCE(1.0, 0.1, mop.uni[1], kind = "μσ")
 d[2, [1, 3]] = convert2affinePCE(2.0, 0.2, mop.uni[2], kind = "μσ")
@@ -138,7 +99,7 @@ d[2, [1, 3]] = convert2affinePCE(2.0, 0.2, mop.uni[2], kind = "μσ")
 Now, let's put it all into an optimization problem, specifically a second-order cone program.
 To build the second-order cone constraints, we define a helper function `buildSOC`.
 
-```@example mysetup
+```julia
 function buildSOC(x::Vector, mop::MultiOrthoPoly)
     t = [sqrt(Tensor(2, mop).get([i, i])) for i in 0:(mop.dim - 1)]
     (t .* x)[2:end]
@@ -146,10 +107,10 @@ end
 ```
 
 Finally, let's use `JuMP` to formulate and then solve the problem.
-We use `Mosek` to solve the problem; for academic use there are [free license](https://www.mosek.com/products/academic-licenses/).
+We use `Mosek` to solve the problem; for academic use there are [free licenses](https://www.mosek.com/products/academic-licenses/).
 
-```@example mysetup
-model = Model(with_optimizer(Mosek.Optimizer))
+```julia
+model = Model(Mosek.Optimizer)
 @variable(model, p[i in 1:Ng, j in 1:Npce], base_name="p")
 @constraint(model, energy_balance[j in 1:Npce],
     sum(p[i, j] for i in 1:Ng) - sum(d[i, j] for i in 1:Nd)==0)
@@ -172,7 +133,7 @@ optimize!(model) # here we go
 
 Let's extract the numerical values of the optimal solution.
 
-```@example mysetup
+```julia
 @assert termination_status(model)==MOI.OPTIMAL "Model not solved to optimality."
 psol, plsol, obj = value.(p), value.(pl), objective_value(model)
 ```
@@ -181,12 +142,12 @@ Great, we've solved the problem.
 How do we now make sense of the solution?
 For instance, we can look at the moments of the generated power:
 
-```@example mysetup
+```julia
 p_moments = [[mean(psol[i, :], mop) var(psol[i, :], mop)] for i in 1:Ng]
 ```
 
 Similarly, we can study the moments for the branch flows:
 
-```@example mysetup
+```julia
 pbr_moments = [[mean(plsol[i, :], mop) var(plsol[i, :], mop)] for i in 1:Nl]
 ```
