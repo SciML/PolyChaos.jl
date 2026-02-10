@@ -14,7 +14,6 @@ pages = Any[
             "Chi Squared, Several DOFs" => "chi_squared_k_greater1.md",
             "Random ODE" => "random_ode.md",
         ],
-        "Optimal Power Flow" => "DCsOPF.md",
     ],
     "math.md",
     "functions.md",

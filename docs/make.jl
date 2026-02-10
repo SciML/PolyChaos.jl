@@ -11,7 +11,7 @@ makedocs(
     sitename = "PolyChaos.jl",
     clean = true, doctest = false, linkcheck = true,
     linkcheck_ignore = [
-        "https://www.sciencedirect.com/science/article/pii/S235246771830105X",
+        "https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html",
     ],
     warnonly = [:docs_block, :missing_docs],
     format = Documenter.HTML(
