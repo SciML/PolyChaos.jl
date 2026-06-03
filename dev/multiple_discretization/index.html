@@ -15,7 +15,7 @@ print(&quot;Fejer error:\t$(abs(int_exact - int_fejer))\twith $N nodes&quot;)</c
 end
 nodes, weights = quad_gaussleg(N + 1, γ)
 int_gaussleg = dot(weights, γ .+ (1 - γ) / sqrt.(1 .- nodes .^ 2))
-print(&quot;Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Gauss-Legendre error:	1.569226315865443	with 1000 nodes</code></pre><p>Even worse! Well, we can factor out <span>$\frac{1}{\sqrt{1-t^2}}$</span>, making the integral amenable to a Gauss-Chebyshev rule. So, let&#39;s give it another try.</p><pre><code class="language-julia hljs">function quad_gausscheb(N, γ)
+print(&quot;Gauss-Legendre error:\t$(abs(int_exact-int_gaussleg))\twith $N nodes&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Gauss-Legendre error:	1.5692263158654431	with 1000 nodes</code></pre><p>Even worse! Well, we can factor out <span>$\frac{1}{\sqrt{1-t^2}}$</span>, making the integral amenable to a Gauss-Chebyshev rule. So, let&#39;s give it another try.</p><pre><code class="language-julia hljs">function quad_gausscheb(N, γ)
     a, b = rm_chebyshev1(N)
     nodes, weights = golubwelsch(a, b)
 end
@@ -38,7 +38,7 @@ N = 8
 a, b = mcdiscretization(N, [n -&gt; quad_gaussleg_mod(n, γ); n -&gt; quad_gausscheb_mod(n, γ)])
 nodes, weights = golubwelsch(a, b)
 int_mc = sum(w)
-print(&quot;Discretization error:\t$(abs(int_exact-int_mc))\twith $(length(n)) nodes&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Discretization error:	4.440892098500626e-16	with 7 nodes</code></pre><p>Et voilà, no error with fewer nodes. (For this example, we&#39;d need just a single node.)</p><p>The function <code>mcdiscretization()</code> is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight <span>$w$</span>. Let&#39;s inspect the values of the recurrence coefficients a little more. For <span>$\gamma = 0$</span>, we are in the world of Chebyshev polynomials, for <span>$\gamma = 1$</span>, we enter the realm of Legendre polynomials. And in between? That&#39;s exactly where the weight <span>$w$</span> comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let&#39;s verify this by plotting the recurrence coefficients for several values of <span>$\gamma$</span>.</p><pre><code class="language-julia hljs">Γ = 0:0.1:1;
+print(&quot;Discretization error:\t$(abs(int_exact-int_mc))\twith $(length(n)) nodes&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Discretization error:	1.3322676295501878e-15	with 7 nodes</code></pre><p>Et voilà, no error with fewer nodes. (For this example, we&#39;d need just a single node.)</p><p>The function <code>mcdiscretization()</code> is able to construct the recurrence coefficients of the orthogonal polynomials relative to the weight <span>$w$</span>. Let&#39;s inspect the values of the recurrence coefficients a little more. For <span>$\gamma = 0$</span>, we are in the world of Chebyshev polynomials, for <span>$\gamma = 1$</span>, we enter the realm of Legendre polynomials. And in between? That&#39;s exactly where the weight <span>$w$</span> comes in: it can be thought of as an interpolatory weight, interpolating Legendre polynomials and Chebyshev polynomials. Let&#39;s verify this by plotting the recurrence coefficients for several values of <span>$\gamma$</span>.</p><pre><code class="language-julia hljs">Γ = 0:0.1:1;
 ab = [mcdiscretization(N,
           [n -&gt; quad_gaussleg_mod(n, gam); n -&gt; quad_gausscheb_mod(n, gam)])
       for gam in Γ];
@@ -50,17 +50,17 @@ bb[:, 1] - b_cheb</code></pre><pre class="documenter-example-output"><code class
  -2.7755575615628914e-16
   2.220446049250313e-16
  -3.608224830031759e-16
-  1.6653345369377348e-16
+  1.1102230246251565e-16
  -1.1102230246251565e-16
-  2.7755575615628914e-16
-  8.326672684688674e-16</code></pre><pre><code class="language-julia hljs">bb[:, end] - b_leg</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{Float64}:
+  3.3306690738754696e-16
+  7.771561172376096e-16</code></pre><pre><code class="language-julia hljs">bb[:, end] - b_leg</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{Float64}:
  -4.440892098500626e-16
- -5.551115123125783e-17
+  0.0
  -1.1102230246251565e-16
   1.1102230246251565e-16
   5.551115123125783e-17
-  2.220446049250313e-16
-  3.3306690738754696e-16
+  2.7755575615628914e-16
+  3.885780586188048e-16
  -1.6653345369377348e-16</code></pre><p>Let&#39;s plot these values to get a better feeling.</p><pre><code class="language-julia hljs">using Plots
 plot(Γ, bb&#39;, yaxis = :log10, w = 3, legend = false)
 zs, os = zeros(N), ones(N)
@@ -68,4 +68,4 @@ scatter!(zs, b_cheb, marker = :x)
 scatter!(os, b_leg, marker = :circle)
 
 xlabel!(&quot;Gamma&quot;)
-ylabel!(&quot;Beta&quot;)</code></pre><img src="39aaec8a.svg" alt="Example block output"/><p>The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials. The interpolating line in between stands for the β recursion coefficients of <span>$w(t; \gamma)$</span>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../gaussian_mixture_model/">« Gaussian Mixture Models</a><a class="docs-footer-nextpage" href="../scalar_products/">Computation of Scalar Products »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Sunday 10 May 2026 01:16">Sunday 10 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ylabel!(&quot;Beta&quot;)</code></pre><img src="0c54d250.svg" alt="Example block output"/><p>The crosses denote the values of the β recursion coefficients for Chebyshev polynomials; the circles the β recursion coefficients for Legendre polynomials. The interpolating line in between stands for the β recursion coefficients of <span>$w(t; \gamma)$</span>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../gaussian_mixture_model/">« Gaussian Mixture Models</a><a class="docs-footer-nextpage" href="../scalar_products/">Computation of Scalar Products »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Wednesday 3 June 2026 21:09">Wednesday 3 June 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
