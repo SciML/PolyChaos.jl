@@ -10,3 +10,13 @@ ispcs = "ispcs"
 eqs = "eqs"
 rhs = "rhs"
 MTK = "MTK"
+# PolyChaos local identifiers / math notation
+gam = "gam"
+sig = "sig"
+pn = "pn"
+# DCsOPF = DC stochastic Optimal Power Flow (appears in filenames)
+OPF = "OPF"
+
+[files]
+# generated notebook output cells contain base64 image/data blobs
+extend-exclude = ["examples/*.ipynb"]
