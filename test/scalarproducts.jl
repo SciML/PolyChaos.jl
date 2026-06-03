@@ -13,7 +13,7 @@ names = [
 deg = 10
 tol = 1.0e-7
 
-@testset "Norms of orthgonal polynomials ($names)" begin
+@testset "Norms of orthogonal polynomials ($names)" begin
     for op in names
         opq = op(deg)
         s = computeSP2(opq)
@@ -48,7 +48,7 @@ end
 a, b = 1.1:0.5:4, 1.1:0.5:4
 names = [Beta01OrthoPoly, JacobiOrthoPoly, genHermiteOrthoPoly]
 
-@testset "Norms of orthgonal polynomials ($names)" begin
+@testset "Norms of orthogonal polynomials ($names)" begin
     for α in a, β in b, name in names
         opq = if name in [Beta01OrthoPoly, JacobiOrthoPoly]
             name(deg, α, β)
