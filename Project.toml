@@ -33,8 +33,9 @@ julia = "1.10"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Aqua", "StaticArrays", "Test"]
+test = ["Aqua", "Pkg", "StaticArrays", "Test"]
