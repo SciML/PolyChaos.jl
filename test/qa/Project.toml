@@ -1,0 +1,12 @@
+[deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+PolyChaos = "8d666b04-775d-5f6e-b778-5ac7c70f65a3"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+Aqua = "0.8"
+Test = "1"
+julia = "1.10"
+
+[sources]
+PolyChaos = {path = "../.."}
