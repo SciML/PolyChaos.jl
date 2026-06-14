@@ -23,7 +23,8 @@ Distributions = "0.25"
 FFTW = "1.2"
 GaussQuadrature = "0.5"
 LinearAlgebra = "1"
-Pkg = "1"
+SafeTestsets = "0.0.1, 0.1"
+SciMLTesting = "1"
 SparseArrays = "1"
 Test = "1"
 QuadGK = "2.4"
@@ -34,9 +35,10 @@ julia = "1.10"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
-Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+SafeTestsets = "1201f925-eb70-4ca8-ba2c-9b673ab8e7da"
+SciMLTesting = "09d9d899-5365-40a9-917a-5f67fddea283"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Aqua", "Pkg", "StaticArrays", "Test"]
+test = ["Aqua", "SafeTestsets", "SciMLTesting", "StaticArrays", "Test"]
