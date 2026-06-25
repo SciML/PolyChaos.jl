@@ -2,8 +2,11 @@ __precompile__()
 
 module PolyChaos
 
-    using SpecialFunctions, SparseArrays, Distributions
-    import LinearAlgebra: I, dot, SymTridiagonal, eigen, issymmetric, pinv
+    using SpecialFunctions: beta, gamma
+    using SparseArrays: SparseVector, spzeros
+    using Distributions: Beta, Continuous, Distribution, Gamma, Logistic, Normal,
+        Uniform, Univariate
+    import LinearAlgebra: I, dot, issymmetric
     import FFTW: ifft
     import Combinatorics: with_replacement_combinations
     import Base: show
