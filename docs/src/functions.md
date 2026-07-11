@@ -120,3 +120,9 @@ coeffs
 integrate
 PolyChaos.issymmetric
 ```
+
+## API Reference
+
+```@autodocs
+Modules = [PolyChaos]
+```
