@@ -1,4 +1,4 @@
-using PolyChaos, Test, StaticArrays
+using PolyChaos, Test, StaticArrays, Random
 
 function betaMoments(α, β)
     # moments of beta distribution, analytic solution
@@ -7,6 +7,7 @@ end
 
 degs, Nsamples = 1:5, 10000
 
+Random.seed!(1234)
 α, β = rand():2:10, rand():0.3:7
 
 @testset "Mean and variance of beta distribution" begin
