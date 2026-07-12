@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Gaussian mixture models · PolyChaos.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/><link href="../assets/myfont.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="../index.html"><img class="logo" src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><h1>PolyChaos.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Overview</a></li><li><a class="toctext" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="toctext">Usage</span><ul><li><a class="toctext" href="../numerical_integration/">Numerical Integration</a></li><li><a class="toctext" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="toctext" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li class="current"><a class="toctext" href>Gaussian mixture models</a><ul class="internal"></ul></li><li><a class="toctext" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="toctext" href="../scalar_products/">Computation of Scalar Products</a></li><li><span class="toctext">Polynomial Chaos</span><ul><li><a class="toctext" href="../pce_tutorial/">Basic Usage</a></li><li><a class="toctext" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="toctext" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="toctext" href="../random_ode/">Random ODE</a></li></ul></li><li><a class="toctext" href="../DCsOPF/">Optimal Power Flow</a></li></ul></li><li><a class="toctext" href="../math/">Mathematical Background</a></li><li><a class="toctext" href="../functions/">Functions</a></li></ul></nav><article id="docs"><header><nav><ul><li>Usage</li><li><a href>Gaussian mixture models</a></li></ul><a class="edit-page" href="https://github.com/timueh/PolyChaos.jl/blob/master/docs/src/gaussian_mixture_model.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Gaussian mixture models</span><a class="fa fa-bars" href="#"></a></div></header><div></div><h1><a class="nav-anchor" id="Gaussian-mixture-models-1" href="#Gaussian-mixture-models-1">Gaussian mixture models</a></h1><p>Gaussian mixture models are popular for clustering data. Generally speaking, they are continuous random variables with a special probability density, namely</p><div>\[\rho(x) = \sum_{i = 1}^{n} \frac{w_i}{\sqrt{2 \pi \sigma_i^2}} \exp \left( \frac{(x - \mu_i)^2}{2 \sigma_i^2} \right) \quad \text{with} \quad \sum_{i = 1}^n w_i = 1,\]</div><p>where the pairs of means and standard deviations <span>$(\mu_i, \sigma_i)$</span>, and the weights <span>$w_i$</span> for all <span>$i \in \{ 1, \dots, n \}$</span> are given. Let&#39;s consider a simple example.</p><pre><code class="language-julia">using Plots
+f(x,μ,σ) = 1 / sqrt(2*π*σ^2) * exp(-(x - μ)^2 / (2σ^2))
+μs, σs, ws = [1., 1.7], [0.2, 0.3], [0.5, 0.5]
+ρ(x) = sum(w*f(x, μ, σ) for (μ, σ, w) in zip(μs, σs, ws))
+x = 0:0.01:3;
+plot(x, ρ.(x))
+xlabel!(&quot;x&quot;); ylabel!(&quot;rho(x)&quot;);</code></pre><?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="400" viewBox="0 0 2400 1600">
+<defs>
+  <clipPath id="clip4500">
+    <rect x="0" y="0" width="2400" height="1600"/>
+  </clipPath>
+</defs>
+<polygon clip-path="url(#clip4500)" points="
+0,1600 2400,1600 2400,0 0,0 
+  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
+<defs>
+  <clipPath id="clip4501">
+    <rect x="480" y="0" width="1681" height="1600"/>
+  </clipPath>
+</defs>
+<polygon clip-path="url(#clip4500)" points="
+102.74,1505.26 2352.76,1505.26 2352.76,47.2441 102.74,47.2441 
+  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
+<defs>
+  <clipPath id="clip4502">
+    <rect x="102" y="47" width="2251" height="1459"/>
+  </clipPath>
+</defs>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  166.42,1505.26 166.42,47.2441 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  873.972,1505.26 873.972,47.2441 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  1581.52,1505.26 1581.52,47.2441 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  2289.08,1505.26 2289.08,47.2441 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,1464 2352.76,1464 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,1134.41 2352.76,1134.41 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,804.815 2352.76,804.815 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,475.222 2352.76,475.222 
+  "/>
+<polyline clip-path="url(#clip4502)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  102.74,145.629 2352.76,145.629 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,1505.26 2352.76,1505.26 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,1505.26 102.74,47.2441 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  166.42,1505.26 166.42,1483.39 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  873.972,1505.26 873.972,1483.39 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1581.52,1505.26 1581.52,1483.39 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2289.08,1505.26 2289.08,1483.39 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,1464 136.49,1464 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,1134.41 136.49,1134.41 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,804.815 136.49,804.815 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,475.222 136.49,475.222 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  102.74,145.629 136.49,145.629 
+  "/>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 166.42, 1559.26)" x="166.42" y="1559.26">0</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 873.972, 1559.26)" x="873.972" y="1559.26">1</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1581.52, 1559.26)" x="1581.52" y="1559.26">2</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2289.08, 1559.26)" x="2289.08" y="1559.26">3</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 1481.5)" x="78.7402" y="1481.5">0.00</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 1151.91)" x="78.7402" y="1151.91">0.25</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 822.315)" x="78.7402" y="822.315">0.50</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 492.722)" x="78.7402" y="492.722">0.75</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 78.7402, 163.129)" x="78.7402" y="163.129">1.00</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1227.75, 1639.12)" x="1227.75" y="1639.12">x</text>
+</g>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, -50.4901, 776.252)" x="-50.4901" y="776.252">rho(x)</text>
+</g>
+<polyline clip-path="url(#clip4502)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
+  166.42,1464 173.495,1463.99 180.571,1463.99 187.646,1463.99 194.722,1463.99 201.797,1463.98 208.873,1463.98 215.948,1463.97 223.024,1463.97 230.1,1463.96 
+  237.175,1463.95 244.251,1463.93 251.326,1463.92 258.402,1463.9 265.477,1463.87 272.553,1463.84 279.628,1463.8 286.704,1463.76 293.779,1463.7 300.855,1463.64 
+  307.93,1463.56 315.006,1463.46 322.081,1463.34 329.157,1463.2 336.232,1463.03 343.308,1462.83 350.383,1462.59 357.459,1462.31 364.534,1461.97 371.61,1461.57 
+  378.685,1461.11 385.761,1460.56 392.837,1459.92 399.912,1459.17 406.988,1458.29 414.063,1457.28 421.139,1456.1 428.214,1454.74 435.29,1453.18 442.365,1451.38 
+  449.441,1449.32 456.516,1446.97 463.592,1444.28 470.667,1441.24 477.743,1437.78 484.818,1433.88 491.894,1429.48 498.969,1424.54 506.045,1419.01 513.12,1412.82 
+  520.196,1405.93 527.271,1398.28 534.347,1389.81 541.422,1380.45 548.498,1370.14 555.574,1358.82 562.649,1346.44 569.725,1332.92 576.8,1318.21 583.876,1302.25 
+  590.951,1284.99 598.027,1266.39 605.102,1246.39 612.178,1224.96 619.253,1202.08 626.329,1177.72 633.404,1151.87 640.48,1124.53 647.555,1095.71 654.631,1065.43 
+  661.706,1033.73 668.782,1000.66 675.857,966.287 682.933,930.683 690.008,893.943 697.084,856.177 704.159,817.507 711.235,778.071 718.311,738.02 725.386,697.519 
+  732.462,656.744 739.537,615.884 746.613,575.135 753.688,534.703 760.764,494.799 767.839,455.639 774.915,417.442 781.99,380.424 789.066,344.801 796.141,310.785 
+  803.217,278.578 810.292,248.377 817.368,220.363 824.443,194.706 831.519,171.558 838.594,151.056 845.67,133.314 852.745,118.426 859.821,106.466 866.896,97.4822 
+  873.972,91.4986 881.047,88.5156 888.123,88.5087 895.199,91.4292 902.274,97.2042 909.35,105.738 916.425,116.913 923.501,130.591 930.576,146.614 937.652,164.809 
+  944.727,184.985 951.803,206.941 958.878,230.463 965.954,255.33 973.029,281.316 980.105,308.19 987.18,335.722 994.256,363.681 1001.33,391.843 1008.41,419.987 
+  1015.48,447.903 1022.56,475.387 1029.63,502.251 1036.71,528.316 1043.78,553.42 1050.86,577.415 1057.94,600.17 1065.01,621.569 1072.09,641.516 1079.16,659.928 
+  1086.24,676.743 1093.31,691.914 1100.39,705.41 1107.46,717.219 1114.54,727.339 1121.62,735.788 1128.69,742.593 1135.77,747.796 1142.84,751.45 1149.92,753.618 
+  1156.99,754.371 1164.07,753.791 1171.14,751.963 1178.22,748.981 1185.29,744.942 1192.37,739.948 1199.45,734.102 1206.52,727.508 1213.6,720.275 1220.67,712.507 
+  1227.75,704.31 1234.82,695.788 1241.9,687.042 1248.97,678.173 1256.05,669.275 1263.13,660.441 1270.2,651.759 1277.28,643.315 1284.35,635.187 1291.43,627.45 
+  1298.5,620.175 1305.58,613.426 1312.65,607.263 1319.73,601.742 1326.81,596.91 1333.88,592.814 1340.96,589.49 1348.03,586.975 1355.11,585.295 1362.18,584.475 
+  1369.26,584.534 1376.33,585.486 1383.41,587.339 1390.49,590.1 1397.56,593.768 1404.64,598.339 1411.71,603.806 1418.79,610.157 1425.86,617.376 1432.94,625.445 
+  1440.01,634.341 1447.09,644.039 1454.16,654.512 1461.24,665.728 1468.32,677.654 1475.39,690.255 1482.47,703.494 1489.54,717.332 1496.62,731.729 1503.69,746.642 
+  1510.77,762.029 1517.84,777.847 1524.92,794.052 1532,810.599 1539.07,827.444 1546.15,844.543 1553.22,861.851 1560.3,879.325 1567.37,896.922 1574.45,914.599 
+  1581.52,932.317 1588.6,950.034 1595.68,967.712 1602.75,985.315 1609.83,1002.81 1616.9,1020.15 1623.98,1037.32 1631.05,1054.28 1638.13,1071 1645.2,1087.45 
+  1652.28,1103.62 1659.35,1119.48 1666.43,1135.01 1673.51,1150.18 1680.58,1164.99 1687.66,1179.41 1694.73,1193.44 1701.81,1207.07 1708.88,1220.28 1715.96,1233.06 
+  1723.03,1245.42 1730.11,1257.35 1737.19,1268.84 1744.26,1279.9 1751.34,1290.52 1758.41,1300.72 1765.49,1310.48 1772.56,1319.82 1779.64,1328.75 1786.71,1337.26 
+  1793.79,1345.37 1800.87,1353.08 1807.94,1360.41 1815.02,1367.36 1822.09,1373.94 1829.17,1380.17 1836.24,1386.05 1843.32,1391.6 1850.39,1396.84 1857.47,1401.76 
+  1864.54,1406.38 1871.62,1410.72 1878.7,1414.79 1885.77,1418.6 1892.85,1422.16 1899.92,1425.49 1907,1428.58 1914.07,1431.47 1921.15,1434.15 1928.22,1436.65 
+  1935.3,1438.96 1942.38,1441.1 1949.45,1443.08 1956.53,1444.92 1963.6,1446.61 1970.68,1448.17 1977.75,1449.6 1984.83,1450.92 1991.9,1452.13 1998.98,1453.24 
+  2006.06,1454.26 2013.13,1455.19 2020.21,1456.05 2027.28,1456.82 2034.36,1457.53 2041.43,1458.18 2048.51,1458.76 2055.58,1459.29 2062.66,1459.78 2069.74,1460.22 
+  2076.81,1460.61 2083.89,1460.97 2090.96,1461.29 2098.04,1461.58 2105.11,1461.85 2112.19,1462.08 2119.26,1462.29 2126.34,1462.49 2133.41,1462.66 2140.49,1462.81 
+  2147.57,1462.94 2154.64,1463.07 2161.72,1463.18 2168.79,1463.27 2175.87,1463.36 2182.94,1463.44 2190.02,1463.5 2197.09,1463.56 2204.17,1463.62 2211.25,1463.66 
+  2218.32,1463.71 2225.4,1463.74 2232.47,1463.78 2239.55,1463.8 2246.62,1463.83 2253.7,1463.85 2260.77,1463.87 2267.85,1463.89 2274.93,1463.9 2282,1463.92 
+  2289.08,1463.93 
+  "/>
+<polygon clip-path="url(#clip4500)" points="
+1989.93,251.724 2280.76,251.724 2280.76,130.764 1989.93,130.764 
+  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
+<polyline clip-path="url(#clip4500)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1989.93,251.724 2280.76,251.724 2280.76,130.764 1989.93,130.764 1989.93,251.724 
+  "/>
+<polyline clip-path="url(#clip4500)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2013.93,191.244 2157.93,191.244 
+  "/>
+<g clip-path="url(#clip4500)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2181.93, 208.744)" x="2181.93" y="208.744">y1</text>
+</g>
+</svg>
+<p>This looks nice!</p><p>What are now the polynomials that are orthogonal relative to this specific density?</p><pre><code class="language-julia">using PolyChaos
+deg = 4
+meas = Measure(&quot;my_GaussMixture&quot;, ρ, (-Inf,Inf), false, Dict(:μ=&gt;μ, :σ=&gt;σ)) # build measure
+op = OrthoPoly(&quot;my_op&quot;, deg, meas; Nquad = 100, Nrec = 2*deg) # construct orthogonal polynomial
+showbasis(op, digits=2) # in case you wondered</code></pre><pre><code class="language-none">1
+x - 1.35
+x^2 - 2.84x + 1.82
+x^3 - 4.36x^2 + 5.94x - 2.5
+x^4 - 5.91x^3 + 12.35x^2 - 10.74x + 3.26</code></pre><p>Let&#39;s add the quadrature rule and compute the square norms of the basis polynomials.</p><pre><code class="language-julia">T2 = Tensor(2,op) # compute scalar products
+[ T2.get([i,j]) for i in 0:deg, j in 0:deg ]</code></pre><pre><code class="language-none">5×5 Array{Float64,2}:
+ 1.0  0.0     0.0     0.0        0.0       
+ 0.0  0.1875  0.0     0.0        0.0       
+ 0.0  0.0     0.0385  0.0        0.0       
+ 0.0  0.0     0.0     0.0128086  0.0       
+ 0.0  0.0     0.0     0.0        0.00485189</code></pre><p>Great!</p><footer><hr/><a class="previous" href="../orthogonal_polynomials_canonical/"><span class="direction">Previous</span><span class="title">Univariate Monic Orthogonal Polynomials</span></a><a class="next" href="../multiple_discretization/"><span class="direction">Next</span><span class="title">Multiple Discretization</span></a></footer></article></body></html>
