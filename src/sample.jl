@@ -38,6 +38,14 @@ function sampleInverseCDF(n::Int, pdf::Function, dom::Tuple{<:Real, <:Real})
     n < 1 && throw(DomainError(n, "Number of samples must be positive"))
     !(dom[1] < dom[2]) && throw(DomainError(dom, "Invalid domain bounds"))
 
+    return _sample_inverse_cdf(n, pdf, dom)
+end
+
+function _sample_inverse_cdf(
+        draws::Union{Int, AbstractVector{<:Real}}, pdf::Function,
+        dom::Tuple{<:Real, <:Real}
+    )
+
     # Handle infinite domains by truncating
     a, b = _handle_domain(dom)
 
@@ -60,15 +68,19 @@ function sampleInverseCDF(n::Int, pdf::Function, dom::Tuple{<:Real, <:Real})
     v = _simple_chebpolyval(cdf_coeffs)
     tol = 100 * eps()
 
-    idx1 = something(findfirst(v_ -> v_ > tol, v), 1)
-    idx2 = something(findlast(v_ -> v_ < 1 - tol, v), length(v))
+    first_above_lower = something(findfirst(v_ -> v_ > tol, v), 1)
+    last_below_upper = something(findlast(v_ -> v_ < 1 - tol, v), length(v))
+
+    # Keep the nodes bracketing the cutoffs so resolved tail mass is not discarded.
+    lower_idx = max(first_above_lower - 1, 1)
+    upper_idx = min(last_below_upper + 1, length(v))
 
     k = length(v) - 1
     chebnodes = sin.(π * (-k:2:k) / (2k))
 
     # Refined domain
-    dnew_a = (b - a) * (chebnodes[idx1] + 1) / 2 + a
-    dnew_b = (b - a) * (chebnodes[idx2] + 1) / 2 + a
+    dnew_a = (b - a) * (chebnodes[lower_idx] + 1) / 2 + a
+    dnew_b = (b - a) * (chebnodes[upper_idx] + 1) / 2 + a
 
     # Reconstruct on refined domain
     map_fn_new(t) = (dnew_b - dnew_a) * (t + 1) / 2 + dnew_a
@@ -82,7 +94,8 @@ function sampleInverseCDF(n::Int, pdf::Function, dom::Tuple{<:Real, <:Real})
     Y_new = Y_new ./ integral_new
 
     # Generate samples and map back
-    samples_canonical = _generate_random_samples(Y_new, n)
+    probabilities = draws isa Int ? rand(draws) : draws
+    samples_canonical = _invert_cdf(Y_new, probabilities)
     samples = map_fn_new.(samples_canonical)
 
     return samples
@@ -108,24 +121,22 @@ function _handle_domain(dom::Tuple{<:Real, <:Real})
 end
 
 """
-Generate random samples using inverse CDF via bisection.
+Invert the CDF at the supplied probabilities via bisection.
 """
-function _generate_random_samples(Y::Vector{Float64}, n::Int)
+function _invert_cdf(Y::Vector{Float64}, probabilities::AbstractVector{<:Real})
     # Compute CDF coefficients
     cdf = _simple_cumsum(Y)
 
-    # Generate uniform random samples
-    r = rand(n)
-
     # Bisection method
+    n = length(probabilities)
     a = -ones(n)
     b = ones(n)
 
     while norm(b - a, Inf) > eps()
         mid = (a + b) / 2
         vals = _clenshaw_evaluate(cdf, mid)
-        I1 = (vals .- r) .<= -eps()
-        I2 = (vals .- r) .>= eps()
+        I1 = (vals .- probabilities) .<= -eps()
+        I2 = (vals .- probabilities) .>= eps()
         I3 = .~I1 .& .~I2
         a = I1 .* mid .+ I2 .* a .+ I3 .* mid
         b = I1 .* b .+ I2 .* mid .+ I3 .* mid
