@@ -1,6 +1,6 @@
 using SciMLTesting, PolyChaos, Test
 
 run_qa(
-    PolyChaos; explicit_imports = true,
+    PolyChaos;
     aqua_kwargs = (; ambiguities = (; recursive = false))
 )
