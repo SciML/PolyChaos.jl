@@ -7,9 +7,32 @@ export coeffs,
     issymmetric,
     integrate
 
+"""
+    dim(basis)
+
+Return the number of polynomials represented by an orthogonal basis.
+
+# Arguments
+
+- `basis`: a univariate [`AbstractOrthoPoly`](@ref) or a
+  [`MultiOrthoPoly`](@ref).
+
+For univariate bases this is `deg(basis) + 1`; for multivariate bases it is the
+number of rows in the total-degree multi-index matrix.
+"""
 dim(op::AbstractOrthoPoly) = op.deg + 1
 dim(mop::MultiOrthoPoly) = mop.dim
 
+"""
+    deg(basis)
+
+Return the maximum represented polynomial degree.
+
+# Arguments
+
+- `basis`: a univariate [`AbstractOrthoPoly`](@ref) or a
+  [`MultiOrthoPoly`](@ref).
+"""
 deg(op::AbstractOrthoPoly) = op.deg
 deg(mop::MultiOrthoPoly) = mop.deg
 
@@ -156,6 +179,21 @@ Is the measure symmetric (around any point in the domain)?
 issymmetric(m::AbstractMeasure) = m.symmetric
 issymmetric(op::AbstractOrthoPoly) = issymmetric(op.measure)
 
+"""
+    multi2uni(a, ind)
+
+Convert scalar-product basis indices to coordinate-wise univariate indices.
+
+# Arguments
+
+- `a`: nonnegative row indices into `ind`, using PolyChaos's zero-based basis
+  convention.
+- `ind`: total-degree multi-index matrix.
+
+# Returns
+
+A matrix whose column `j` is the univariate multi-index represented by `a[j]`.
+"""
 function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
     minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
     l, p = size(ind) # p-variate basis
@@ -174,6 +212,20 @@ function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
     return A
 end
 
+"""
+    getentry(a, T, ind, dim)
+
+Return a sparse scalar-product tensor entry.
+
+# Arguments
+
+- `a`: zero-based polynomial indices; its length must equal `dim`.
+- `T`: sparse tensor storage returned by [`computeTensorizedSP`](@ref).
+- `ind`: total-degree multi-index matrix used to construct `T`.
+- `dim`: scalar-product order.
+
+`a` is sorted in place in descending order before lookup.
+"""
 function getentry(
         a::AbstractVector{<:Int}, T::SparseVector{<:Real, <:Int},
         ind::AbstractMatrix{<:Int}, dim::Int

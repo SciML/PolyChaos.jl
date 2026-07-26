@@ -1,5 +1,29 @@
 export computeTensorizedSP
 
+"""
+    computeTensorizedSP(m, basis)
+    computeTensorizedSP(m, alpha, beta, nodes, weights, ind; issymmetric)
+
+Compute sparse tensorized scalar products of order `m`.
+
+# Arguments
+
+- `m`: positive scalar-product order.
+- `basis`: a univariate basis, coordinate-basis vector, or
+  [`MultiOrthoPoly`](@ref).
+- `alpha`, `beta`: recurrence coefficient vectors for each coordinate.
+- `nodes`, `weights`: quadrature data for each coordinate.
+- `ind`: multivariate basis multi-index matrix.
+
+# Keywords
+
+- `issymmetric`: coordinate symmetry flags used to eliminate zero products.
+
+# Returns
+
+A sparse vector indexed by the polynomial-index tuples in the total-degree
+basis.
+"""
 function computeTensorizedSP(
         m::Integer,
         α::AbstractVector{<:AbstractVector{<:Real}},

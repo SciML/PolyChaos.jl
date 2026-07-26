@@ -9,11 +9,10 @@ include("pages.jl")
 
 makedocs(
     sitename = "PolyChaos.jl",
-    clean = true, doctest = false, linkcheck = true,
-    linkcheck_ignore = [
-        "https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html",
-    ],
-    warnonly = [:docs_block, :missing_docs],
+    clean = true,
+    doctest = true,
+    checkdocs = :exports,
+    linkcheck = true,
     format = Documenter.HTML(
         assets = ["assets/favicon.ico"],
         canonical = "https://docs.sciml.ai/PolyChaos/stable/"

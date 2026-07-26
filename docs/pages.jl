@@ -17,4 +17,5 @@ pages = Any[
     ],
     "math.md",
     "functions.md",
+    "Developer API" => "developer_api.md",
 ]

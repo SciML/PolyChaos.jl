@@ -16,6 +16,16 @@ export OrthoPoly,
     InconsistencyError,
     Quad
 
+"""
+    InconsistencyError(message)
+
+Exception thrown when recurrence coefficients, quadrature data, or basis indices
+violate a PolyChaos consistency requirement.
+
+# Fields
+
+- `var`: descriptive failure message.
+"""
 struct InconsistencyError <: Exception
     var::String
 end
@@ -32,6 +42,45 @@ function _checkConsistency(deg::Int, Nrec::Int)
     )
 end
 
+"""
+    OrthoPoly(name, deg, alpha, beta, measure; addQuadrature = true)
+    OrthoPoly(name, deg, measure; Nrec = deg + 1, Nquad = 10Nrec,
+              quadrature = clenshaw_curtis, discretization = stieltjes,
+              addQuadrature = true)
+
+Construct a univariate orthogonal-polynomial basis from recurrence coefficients
+or by discretizing a measure.
+
+# Arguments
+
+- `name`: descriptive basis name.
+- `deg`: maximum represented polynomial degree.
+- `alpha`, `beta`: equal-length monic recurrence coefficient vectors.
+- `measure`: source [`AbstractMeasure`](@ref).
+
+# Keywords
+
+- `Nrec`: number of recurrence coefficients; at least `deg + 1`.
+- `Nquad`: number of nodes used during numerical discretization.
+- `quadrature`: numerical quadrature generator.
+- `discretization`: recurrence-recovery procedure.
+- `addQuadrature`: attach a Golub-Welsch quadrature rule when `true`.
+
+# Fields
+
+- `name`, `deg`: basis identity and maximum degree.
+- `alpha`, `beta`: recurrence coefficients.
+- `measure`, `quad`: source measure and attached quadrature or [`EmptyQuad`](@ref).
+
+# Examples
+
+```jldoctest
+julia> using PolyChaos
+
+julia> op = OrthoPoly("legendre", 2, LegendreMeasure()); deg(op)
+2
+```
+"""
 struct OrthoPoly{V <: AbstractVector{<:Real}, M, Q} <: AbstractOrthoPoly{M, Q}
     name::String
     deg::Int          # maximum degree
@@ -104,6 +153,25 @@ end
 
 ##############################################
 
+"""
+    LegendreOrthoPoly(deg; Nrec = deg + 1, addQuadrature = true)
+
+Construct the canonical Legendre basis through degree `deg`.
+
+# Arguments
+
+- `deg`: nonnegative maximum polynomial degree.
+
+# Keywords
+
+- `Nrec`: number of recurrence coefficients; must be at least `deg + 1`.
+- `addQuadrature`: attach the associated Gaussian quadrature rule.
+
+# Fields
+
+`deg`, `alpha`, `beta`, `measure`, and `quad` satisfy the
+[`AbstractOrthoPoly`](@ref) contract.
+"""
 struct LegendreOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int # maximum degree
     α::V # recurrence coefficients
@@ -134,6 +202,26 @@ function OrthoPoly(
     return LegendreOrthoPoly(deg; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    JacobiOrthoPoly(deg, shape_a, shape_b; Nrec = deg + 1, addQuadrature = true)
+
+Construct the canonical Jacobi basis.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+- `shape_a`, `shape_b`: Jacobi parameters, each greater than `-1`.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+The basis follows the [`AbstractOrthoPoly`](@ref) contract and stores a
+[`JacobiMeasure`](@ref).
+"""
 struct JacobiOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int            # maximum degree
     α::V # recurrence coefficients
@@ -171,6 +259,20 @@ function OrthoPoly(
     )
 end
 
+"""
+    LaguerreOrthoPoly(deg; Nrec = deg + 1, addQuadrature = true)
+
+Construct the canonical Laguerre basis.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct LaguerreOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V # recurrence coefficients
@@ -201,6 +303,21 @@ function OrthoPoly(
     return LaguerreOrthoPoly(deg; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    genLaguerreOrthoPoly(deg, shape; Nrec = deg + 1, addQuadrature = true)
+
+Construct a generalized Laguerre basis.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+- `shape`: generalized-Laguerre parameter greater than `-1`.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct genLaguerreOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V  # recurrence coefficients
@@ -235,6 +352,20 @@ function OrthoPoly(
     return genLaguerreOrthoPoly(deg, μ.shapeParameter; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    HermiteOrthoPoly(deg; Nrec = deg + 1, addQuadrature = true)
+
+Construct the canonical Hermite basis.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct HermiteOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V  # recurrence coefficients
@@ -264,6 +395,21 @@ function OrthoPoly(
     return HermiteOrthoPoly(deg; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    genHermiteOrthoPoly(deg, mu; Nrec = deg + 1, addQuadrature = true)
+
+Construct a generalized Hermite basis.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+- `mu`: generalized-Hermite parameter greater than `-0.5`.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct genHermiteOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V  # recurrence coefficients
@@ -297,6 +443,23 @@ function OrthoPoly(
     return genHermiteOrthoPoly(deg, μ.muParameter; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    MeixnerPollaczekOrthoPoly(deg, lambda, phi; Nrec = deg + 1,
+                              addQuadrature = true)
+
+Construct a Meixner-Pollaczek basis.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+- `lambda`: positive family parameter.
+- `phi`: angle parameter in `(0, pi)`.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct MeixnerPollaczekOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V              # recurrence coefficients
@@ -334,6 +497,20 @@ function OrthoPoly(
     )
 end
 
+"""
+    GaussOrthoPoly(deg; Nrec = deg + 1, addQuadrature = true)
+
+Construct the basis orthogonal to the standard Gaussian probability measure.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct GaussOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V  # recurrence coefficients
@@ -362,6 +539,20 @@ function OrthoPoly(
     return GaussOrthoPoly(deg; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    Uniform01OrthoPoly(deg; Nrec = deg + 1, addQuadrature = true)
+
+Construct the basis orthogonal to the uniform probability measure on `(0, 1)`.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct Uniform01OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V  # recurrence coefficients
@@ -392,6 +583,20 @@ function OrthoPoly(
     return Uniform01OrthoPoly(deg; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    Uniform_11OrthoPoly(deg; Nrec = deg + 1, addQuadrature = true)
+
+Construct the basis orthogonal to the uniform probability measure on `(-1, 1)`.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct Uniform_11OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V  # recurrence coefficients
@@ -422,6 +627,22 @@ function OrthoPoly(
     return Uniform_11OrthoPoly(deg; Nrec = Nrec, addQuadrature = addQuadrature)
 end
 
+"""
+    Beta01OrthoPoly(deg, shape_a, shape_b; Nrec = deg + 1,
+                    addQuadrature = true)
+
+Construct the basis orthogonal to a beta probability measure on `(0, 1)`.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+- `shape_a`, `shape_b`: positive beta shape parameters.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct Beta01OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V # recurrence coefficients
@@ -463,6 +684,22 @@ function OrthoPoly(
     )
 end
 
+"""
+    GammaOrthoPoly(deg, shape, rate; Nrec = deg + 1, addQuadrature = true)
+
+Construct the basis orthogonal to a unit-rate gamma probability measure.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+- `shape`: positive gamma shape.
+- `rate`: currently required to equal `1`.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct GammaOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V # recurrence coefficients
@@ -500,6 +737,20 @@ function OrthoPoly(
     )
 end
 
+"""
+    LogisticOrthoPoly(deg; Nrec = deg + 1, addQuadrature = true)
+
+Construct the basis orthogonal to the standard logistic measure.
+
+# Arguments
+
+- `deg`: nonnegative maximum degree.
+
+# Keywords
+
+- `Nrec`: recurrence coefficient count.
+- `addQuadrature`: whether to attach Gaussian quadrature.
+"""
 struct LogisticOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
     α::V # recurrence coefficients
@@ -534,6 +785,34 @@ end
 # #####################################################
 # #####################################################
 
+"""
+    MultiOrthoPoly(uniOrthoPolys, deg)
+
+Construct a total-degree multivariate orthogonal-polynomial basis from
+univariate bases.
+
+# Arguments
+
+- `uniOrthoPolys`: one basis per coordinate; each must represent at least `deg`.
+- `deg`: requested nonnegative total degree.
+
+# Fields
+
+- `name`: coordinate basis names.
+- `deg`, `dim`: total degree and number of multivariate polynomials.
+- `ind`: total-degree multi-index matrix.
+- `measure`: product measure.
+- `uni`: coordinate bases.
+
+# Examples
+
+```jldoctest
+julia> using PolyChaos
+
+julia> MultiOrthoPoly([LegendreOrthoPoly(2), HermiteOrthoPoly(2)], 2).dim
+6
+```
+"""
 struct MultiOrthoPoly{M, Q, V <: AbstractVector} <: AbstractOrthoPoly{M, Q}
     name::Vector{String}
     deg::Int

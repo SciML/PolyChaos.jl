@@ -138,6 +138,22 @@ function convert2affinePCE(p1::Real, p2::Real, op::LogisticOrthoPoly)
     return convert2affinePCE(p1, p2, first(op.α))
 end
 
+"""
+    assign2multi(x, i, ind)
+
+Embed a univariate coefficient vector into a multivariate total-degree basis.
+
+# Arguments
+
+- `x`: univariate coefficients ordered by polynomial degree.
+- `i`: one-based coordinate index in `ind`.
+- `ind`: total-degree multi-index matrix.
+
+# Returns
+
+A coefficient vector aligned with the rows of `ind`, with terms that depend on
+coordinates other than `i` set to zero.
+"""
 function assign2multi(x::AbstractVector{<:Real}, i::Int, ind::AbstractMatrix{<:Int})
     l, p = size(ind)
     nx, deg = length(x), ind[end, end]
@@ -166,7 +182,7 @@ Draw `n` samples from the measure `m` described by its
   - domain `dom`,
   - symmetry property `symm`,
   - and, if applicable, parameters stored in the dictionary `d`.
-    By default, an adaptive rejection sampling method is used (from [AdaptiveRejectionSampling.jl](https://github.com/mauriciogtec/AdaptiveRejectionSampling.jl)),
+    By default, an adaptive rejection sampling method is used (from [AdaptiveRejectionSampling.jl](https://github.com/JuliaStats/AdaptiveRejectionSampling.jl)),
     unless it is a common random variable for which [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is used.
 
 The function is dispatched to accept `AbstractOrthoPoly`.
@@ -386,7 +402,10 @@ mean(x::AbstractVector,mop::MultiOrthoPoly)
 ```
 
 compute mean of random variable with PCE `x`
+
+For one-argument calls, `mean(x)` delegates to [`Statistics.mean`](https://docs.julialang.org/en/v1/stdlib/Statistics/).
 """
+mean(x; kwargs...) = Statistics.mean(x; kwargs...)
 mean(x::AbstractVector, op::AbstractOrthoPoly) = x[1] * computeSP2(0, op.β)
 
 function mean(x::AbstractVector, mop::MultiOrthoPoly)
@@ -410,7 +429,10 @@ var(x::AbstractVector,t2::Tensor)
 ```
 
 compute variance of random variable with PCE `x`
+
+For one-argument calls, `var(x)` delegates to [`Statistics.var`](https://docs.julialang.org/en/v1/stdlib/Statistics/).
 """
+var(x; kwargs...) = Statistics.var(x; kwargs...)
 function var(x::AbstractVector, op::AbstractOrthoPoly)
     t = computeSP2(op)
     # length(t2) > length(x) && throw(InconsistencyError("cannot compute variance; too many PCE coefficients"))
@@ -441,6 +463,9 @@ std(x::AbstractVector,mop::MultiOrthoPoly)
 ```
 
 compute standard deviation of random variable with PCE `x`
+
+For one-argument calls, `std(x)` delegates to [`Statistics.std`](https://docs.julialang.org/en/v1/stdlib/Statistics/).
 """
+std(x; kwargs...) = Statistics.std(x; kwargs...)
 std(x::AbstractVector, op::AbstractOrthoPoly) = sqrt(var(x, op))
 std(x::AbstractVector, mop::MultiOrthoPoly) = sqrt(var(x, mop))

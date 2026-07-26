@@ -1,6 +1,40 @@
 export EmptyQuad,
     Quad
 
+"""
+    Quad(name, N, nodes, weights)
+    Quad(N, alpha, beta)
+    Quad(N, measure; quadrature = clenshaw_curtis)
+
+Construct a quadrature rule.
+
+# Arguments
+
+- `name`: descriptive rule name for the direct constructor.
+- `N`: positive number of quadrature nodes.
+- `nodes`, `weights`: equal-length vectors of nodes and weights.
+- `alpha`, `beta`: recurrence coefficients for the Golub-Welsch constructor.
+- `measure`: measure used by numerical quadrature.
+
+# Keywords
+
+- `quadrature`: rule generator used for numerical measure discretization.
+
+# Fields
+
+- `name`: lowercase rule name.
+- `Nquad`: number of nodes.
+- `nodes`, `weights`: paired quadrature vectors.
+
+# Examples
+
+```jldoctest
+julia> using PolyChaos
+
+julia> Quad("rule", 2, [-1.0, 1.0], [1.0, 1.0]).Nquad
+2
+```
+"""
 struct Quad{T, V <: AbstractVector{<:T}} <: AbstractQuad{T}
     name::String
     Nquad::Int # number of qudrature points
@@ -21,6 +55,15 @@ struct Quad{T, V <: AbstractVector{<:T}} <: AbstractQuad{T}
     end
 end
 
+"""
+    EmptyQuad()
+
+Represent the absence of an attached quadrature rule.
+
+`EmptyQuad` is returned when an orthogonal basis is constructed with
+`addQuadrature = false`. [`nw`](@ref) returns an empty `0 x 2` matrix for it;
+quadrature-dependent operations should reject it.
+"""
 struct EmptyQuad{T} <: AbstractQuad{T}
     EmptyQuad() = new{Float64}()
 end

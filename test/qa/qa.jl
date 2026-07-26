@@ -1,6 +1,3 @@
-using SciMLTesting, PolyChaos, Test
+using SciMLTesting, PolyChaos
 
-run_qa(
-    PolyChaos;
-    aqua_kwargs = (; ambiguities = (; recursive = false))
-)
+run_qa(PolyChaos)
