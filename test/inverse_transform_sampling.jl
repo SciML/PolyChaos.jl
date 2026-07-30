@@ -1,3 +1,4 @@
+using Distributions: Gamma, cdf
 using PolyChaos, Test
 
 @testset "Inverse Transform Sampling" begin
@@ -53,8 +54,15 @@ using PolyChaos, Test
 
         # GammaMeasure (semi-infinite domain)
         m = GammaMeasure(2.0, 1.0)
-        samples = sampleMeasure(Nsamples, m; method = "inversecdf")
-        @test isapprox(mean(samples), 2.0; atol = atol_mean)
+        probabilities = collect(range(0.001, 0.999; length = 999))
+        samples = PolyChaos._sample_inverse_cdf(probabilities, m.w, m.dom)
+        reference = Gamma(2.0, 1.0)
+        lower, upper = PolyChaos._handle_domain(m.dom)
+        reference_lower = cdf(reference, lower)
+        reference_mass = cdf(reference, upper) - reference_lower
+        sample_probabilities =
+            (cdf.(Ref(reference), samples) .- reference_lower) ./ reference_mass
+        @test sample_probabilities ≈ probabilities
     end
 
     @testset "OrthoPoly interface with inversecdf" begin
