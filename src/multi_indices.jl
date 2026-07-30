@@ -1,6 +1,31 @@
 export calculateMultiIndices,
     findUnivariateIndices
 
+"""
+    calculateMultiIndices(d, n)
+
+Construct the total-degree multi-index matrix for `d` variables through degree
+`n`.
+
+# Arguments
+
+- `d`: positive number of variables.
+- `n`: nonnegative maximum total degree.
+
+# Returns
+
+A matrix whose rows are multi-indices in the ordering used by
+[`MultiOrthoPoly`](@ref).
+
+# Examples
+
+```jldoctest
+julia> using PolyChaos
+
+julia> size(calculateMultiIndices(2, 2))
+(6, 2)
+```
+"""
 function calculateMultiIndices(d::Int, n::Int)
     # d denotes dimension of random variables/number of sources of uncertainty,
     # n the maximum degree of multivariate basis

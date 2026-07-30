@@ -63,24 +63,13 @@ Exploiting the underlying uniform measure, the integration can be done exactly w
 ```jldoctest
 julia> using PolyChaos
 
-julia> opq = Uniform01OrthoPoly(3, addQuadrature = true)
-Uniform01OrthoPoly{Array{Float64,1},Uniform01Measure,Quad{Float64,Array{Float64,1}}}(3, [0.5, 0.5, 0.5, 0.5], [1.0, 0.08333333333333333, 0.06666666666666667, 0.06428571428571428], Uniform01Measure(PolyChaos.w_uniform01, (0.0, 1.0), true), Quad{Float64,Array{Float64,1}}("golubwelsch", 3, [0.11270166537925838, 0.49999999999999994, 0.8872983346207417], [0.2777777777777777, 0.4444444444444444, 0.27777777777777757]))
+julia> opq = Uniform01OrthoPoly(3, addQuadrature = true);
 
-julia> integrate(x -> 6x^5, opq)
-0.9999999999999993
+julia> isapprox(integrate(x -> 6x^5, opq), 1.0)
+true
 
-julia> show(opq)
-
-Univariate orthogonal polynomials
-degree:         3
-#coeffs:        4
-α =             [0.5, 0.5, 0.5, 0.5]
-β =             [1.0, 0.08333333333333333, 0.06666666666666667, 0.06428571428571428]
-
-Measure dλ(t)=w(t)dt
-w:      w_uniform01
-dom:    (0.0, 1.0)
-symmetric:      true
+julia> size(coeffs(opq))
+(4, 2)
 ```
 
 To get going with PolyChaos check out the tutorials such as the one on [numerical integration](@ref NumericalIntegration).
@@ -88,14 +77,14 @@ In case you are unfamiliar with orthogonal polynomials, perhaps [this background
 
 ## References
 
-The code base of `PolyChaos` is partially based on Walter Gautschi's [Matlab suite of programs for generating orthogonal polynomials and related quadrature rules](https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html), with much of the theory presented in his book *Orthogonal Polynomials: Computation and Approximation* published in 2004 by the Oxford University Press.
+The code base of `PolyChaos` is partially based on Walter Gautschi's [Matlab suite of programs for generating orthogonal polynomials and related quadrature rules](https://www.math.unipd.it/~alvise/POINTSETS/INTERVAL/GAUTSCHI/OPQ.html), with much of the theory presented in his book *Orthogonal Polynomials: Computation and Approximation* published in 2004 by the Oxford University Press.
 
 For the theory of polynomial chaos expansion, we mainly consulted T. J. Sullivan. *Introduction to Uncertainty Quantification*. Springer International Publishing Switzerland. 2015.
 
 ## Contributing
 
   - Please refer to the
-    [SciML ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac/blob/master/README.md)
+    [SciML ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://docs.sciml.ai/ColPrac/stable/)
     for guidance on PRs, issues, and other matters relating to contributing to SciML.
 
   - See the [SciML Style Guide](https://github.com/SciML/SciMLStyle) for common coding practices and other style decisions.

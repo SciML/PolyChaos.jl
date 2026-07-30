@@ -252,6 +252,20 @@ function rm_meixner_pollaczek(N::Int, lambda::Real, phi::Real)
 end
 rm_meixner_pollaczek(N::Int, lambda::Real) = rm_meixner_pollaczek(N, lambda, pi / 2)
 
+"""
+    rm_chebyshev1(N)
+
+Return the first `N` monic recurrence coefficients for first-kind Chebyshev
+polynomials.
+
+# Arguments
+
+- `N`: nonnegative recurrence coefficient count.
+
+# Returns
+
+The pair `(alpha, beta)` of recurrence coefficient vectors.
+"""
 function rm_chebyshev1(N::Int)
     @assert N >= 0 "N has to be non-negative"
     α = zeros(Float64, N)

@@ -24,10 +24,10 @@ convert2affinePCE(a,b,beta01)
 pce_beta = convert2affinePCE(μ,σ,beta01; kind="μσ")
 a1, a2 = μ, sqrt(3)*σ/pi
 pce_logistic = convert2affinePCE(a1,a2,logistic)
-mean(pce_gaussian,myops["gaussian"]), std(pce_gaussian,myops["gaussian"])
-mean(pce_uniform,myops["uniform01"]), std(pce_uniform,myops["uniform01"])
-mean(pce_beta,myops["beta01"]), std(pce_beta,myops["beta01"])
-mean(pce_logistic,myops["logistic"]), std(pce_logistic,myops["logistic"])
+PolyChaos.mean(pce_gaussian, myops["gaussian"]), PolyChaos.std(pce_gaussian, myops["gaussian"])
+PolyChaos.mean(pce_uniform, myops["uniform01"]), PolyChaos.std(pce_uniform, myops["uniform01"])
+PolyChaos.mean(pce_beta, myops["beta01"]), PolyChaos.std(pce_beta, myops["beta01"])
+PolyChaos.mean(pce_logistic, myops["logistic"]), PolyChaos.std(pce_logistic, myops["logistic"])
 using Statistics
 N = 1000
 ξ_gaussian = sampleMeasure(N,myops["gaussian"])
@@ -167,25 +167,25 @@ It is a key feature of PCE to compute moments from the PCE coefficients alone; n
 ### Gaussian
 
 ```@example mysetup
-mean(pce_gaussian, myops["gaussian"]), std(pce_gaussian, myops["gaussian"])
+PolyChaos.mean(pce_gaussian, myops["gaussian"]), PolyChaos.std(pce_gaussian, myops["gaussian"])
 ```
 
 ### Uniform
 
 ```@example mysetup
-mean(pce_uniform, myops["uniform01"]), std(pce_uniform, myops["uniform01"])
+PolyChaos.mean(pce_uniform, myops["uniform01"]), PolyChaos.std(pce_uniform, myops["uniform01"])
 ```
 
 ### Beta
 
 ```@example mysetup
-mean(pce_beta, myops["beta01"]), std(pce_beta, myops["beta01"])
+PolyChaos.mean(pce_beta, myops["beta01"]), PolyChaos.std(pce_beta, myops["beta01"])
 ```
 
 ### Logistic
 
 ```@example mysetup
-mean(pce_logistic, myops["logistic"]), std(pce_logistic, myops["logistic"])
+PolyChaos.mean(pce_logistic, myops["logistic"]), PolyChaos.std(pce_logistic, myops["logistic"])
 ```
 
 ## Sampling

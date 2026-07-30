@@ -125,4 +125,12 @@ PolyChaos.issymmetric
 
 ```@autodocs
 Modules = [PolyChaos]
+Filter = t -> !(t in [
+    AbstractMeasure,
+    AbstractCanonicalMeasure,
+    AbstractQuad,
+    AbstractOrthoPoly,
+    AbstractCanonicalOrthoPoly,
+    AbstractTensor,
+])
 ```

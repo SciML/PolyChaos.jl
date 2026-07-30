@@ -23,8 +23,8 @@ probgalerkin = ODEProblem(ODEgalerkin,xinit,(0,tend),a)
 solgalerkin = solve(probgalerkin;saveat=0:Δt:tend)
 t, x = solgalerkin.t, solgalerkin.u;
 # an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
-mean_pce = [ mean(x_, opq) for x_ in x]  
-std_pce = [ std(x_, opq) for x_ in x]
+mean_pce = [PolyChaos.mean(x_, opq) for x_ in x]
+std_pce = [PolyChaos.std(x_, opq) for x_ in x]
 using Statistics
 Nsmpl = 5000
 ξ = sampleMeasure(Nsmpl,opq)     # sample from Gaussian measure; effectively randn() here    
@@ -32,9 +32,9 @@ asmpl = evaluatePCE(a,ξ,opq)     # sample random variable with PCE coefficients
 # or: asmpl = samplePCE(Nsmpl,a,opq)
 xmc = [ solve(ODEProblem((u,p,t)->aa*u,x0,(0,tend));saveat=0:Δt:tend).u for aa in asmpl]
 xmc = hcat(xmc...);
-[ mean(xmc,dims=2)-mean_pce std(xmc,dims=2)-std_pce]
+[Statistics.mean(xmc, dims = 2) - mean_pce Statistics.std(xmc, dims = 2) - std_pce]
 logx_pce = [ log.(evaluatePCE(x[i],ξ,opq)) for i=1:length(t)]
-[mean.(logx_pce)-(log(x0) .+ μ*t) std.(logx_pce)-σ*t ]
+[Statistics.mean.(logx_pce) - (log(x0) .+ μ * t) Statistics.std.(logx_pce) - σ * t]
 ```
 
 # Galerkin-based Solution of Random Differential Equation
@@ -150,8 +150,8 @@ For later purposes, we compute the expected value and the standard deviation at 
 
 ```@example mysetup
 # an advantage of PCE is that moments can be computed from the PCE coefficients alone; no sampling required
-mean_pce = [mean(x_, opq) for x_ in x]
-std_pce = [std(x_, opq) for x_ in x]
+mean_pce = [PolyChaos.mean(x_, opq) for x_ in x]
+std_pce = [PolyChaos.std(x_, opq) for x_ in x]
 ```
 
 We compare the solution from PCE to a Monte-Carlo-based solution.
@@ -173,7 +173,7 @@ xmc = hcat(xmc...);
 Now we can compare the Monte Carlo mean and standard deviation to the expression from PCE for every time instant.
 
 ```@example mysetup
-[mean(xmc, dims = 2) - mean_pce std(xmc, dims = 2) - std_pce]
+[Statistics.mean(xmc, dims = 2) - mean_pce Statistics.std(xmc, dims = 2) - std_pce]
 ```
 
 Clearly, the accuracy of PCE deteriorates over time.
@@ -183,5 +183,5 @@ Finally, we compare whether the samples follow a log-normal distribution, and co
 
 ```@example mysetup
 logx_pce = [log.(evaluatePCE(x_, ξ, opq)) for x_ in x]
-[mean.(logx_pce) - (log(x0) .+ μ * t) std.(logx_pce) - σ * t]
+[Statistics.mean.(logx_pce) - (log(x0) .+ μ * t) Statistics.std.(logx_pce) - σ * t]
 ```

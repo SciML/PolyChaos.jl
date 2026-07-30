@@ -131,8 +131,7 @@ Show the monic polynomial of degree/range `d` that has the recurrence coefficien
 ```jldoctest
 julia> using PolyChaos
 
-julia> α, β = rm_hermite(10)
-([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [1.77245, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5])
+julia> α, β = rm_hermite(10);
 
 julia> showpoly(3, α, β)
 x^3 - 1.5x

@@ -94,6 +94,21 @@ end
 ####################################################
 # Quadrature rules based on recurrence coefficients
 
+"""
+    golubwelsch(alpha, beta, maxiter = 30)
+
+Compute Gaussian quadrature nodes and weights from monic recurrence
+coefficients using the Golub-Welsch eigenproblem.
+
+# Arguments
+
+- `alpha`, `beta`: equal-length recurrence coefficient vectors.
+- `maxiter`: maximum eigensolver iteration count.
+
+# Returns
+
+Node and weight vectors for the associated Gaussian quadrature rule.
+"""
 function golubwelsch(
         α::AbstractVector{<:Real}, β::AbstractVector{<:Real},
         maxiter::Int = 30
