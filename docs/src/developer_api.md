@@ -13,6 +13,10 @@ AbstractCanonicalOrthoPoly
 AbstractTensor
 ```
 
+```@docs
+InconsistencyError
+```
+
 ## Generic Interface Guarantees
 
 The generic methods are tested against independent subtypes rather than only

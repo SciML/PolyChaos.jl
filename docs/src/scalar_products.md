@@ -36,6 +36,10 @@ ind_my_opq = findUnivariateIndices(2,mop.ind)
 
 # [Computation of Scalar Products](@id ComputationOfScalarProducts)
 
+```@docs
+computeTensorizedSP
+```
+
 By now, we are able to construct orthogonal polynomials, and to construct quadrature rules for a given nonnegative weight function, respectively.
 Now we combine both ideas to solve integrals involving the orthogonal polynomials
 
