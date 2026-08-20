@@ -49,9 +49,38 @@ rm_legendre01
 rm_jacobi
 rm_jacobi01
 rm_meixner_pollaczek
+rm_chebyshev1
 stieltjes
 lanczos
 mcdiscretization
+```
+
+## Weight Functions
+
+```@docs
+w_legendre
+build_w_jacobi
+w_jacobi
+w_laguerre
+w_hermite
+build_w_genhermite
+build_w_genlaguerre
+w_meixner_pollaczek
+build_w_meixner_pollaczek
+w_gaussian
+w_uniform01
+w_uniform_11
+w_logistic
+w_genhermite
+build_w_beta
+build_w_gamma
+```
+
+## Multi-index Utilities
+
+```@docs
+calculateMultiIndices
+findUnivariateIndices
 ```
 
 ## Show Orthogonal Polynomials
@@ -94,6 +123,7 @@ fejer
 fejer2
 clenshaw_curtis
 quadgp
+golubwelsch
 gauss
 radau
 lobatto
@@ -108,6 +138,8 @@ std
 sampleMeasure
 evaluatePCE
 samplePCE
+assign2multi
+sampleInverseCDF
 calculateAffinePCE
 convert2affinePCE
 ```
@@ -117,6 +149,58 @@ convert2affinePCE
 ```@docs
 nw
 coeffs
+dim
+deg
+multi2uni
+getentry
 integrate
 PolyChaos.issymmetric
+```
+
+## API Reference
+
+```@autodocs
+Modules = [PolyChaos]
+Filter = t -> !(t in [
+    AbstractMeasure,
+    AbstractCanonicalMeasure,
+    AbstractQuad,
+    AbstractOrthoPoly,
+    AbstractCanonicalOrthoPoly,
+    AbstractTensor,
+    InconsistencyError,
+    Measure,
+    ProductMeasure,
+    Beta01Measure,
+    GammaMeasure,
+    GaussMeasure,
+    HermiteMeasure,
+    JacobiMeasure,
+    LaguerreMeasure,
+    LegendreMeasure,
+    LogisticMeasure,
+    MeixnerPollaczekMeasure,
+    Uniform01Measure,
+    Uniform_11Measure,
+    genHermiteMeasure,
+    genLaguerreMeasure,
+    OrthoPoly,
+    MultiOrthoPoly,
+    Beta01OrthoPoly,
+    GammaOrthoPoly,
+    GaussOrthoPoly,
+    HermiteOrthoPoly,
+    JacobiOrthoPoly,
+    LaguerreOrthoPoly,
+    LegendreOrthoPoly,
+    LogisticOrthoPoly,
+    MeixnerPollaczekOrthoPoly,
+    Uniform01OrthoPoly,
+    Uniform_11OrthoPoly,
+    genHermiteOrthoPoly,
+    genLaguerreOrthoPoly,
+    Quad,
+    EmptyQuad,
+    Tensor,
+])
 ```
