@@ -22,6 +22,10 @@ export OrthoPoly,
 Exception thrown when recurrence coefficients, quadrature data, or basis indices
 violate a PolyChaos consistency requirement.
 
+# Arguments
+
+- `message`: description of the inconsistent data.
+
 # Fields
 
 - `var`: descriptive failure message.
@@ -272,6 +276,13 @@ Construct the canonical Laguerre basis.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: canonical Laguerre measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct LaguerreOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -317,6 +328,13 @@ Construct a generalized Laguerre basis.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: generalized-Laguerre measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct genLaguerreOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -365,6 +383,13 @@ Construct the canonical Hermite basis.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: canonical Hermite measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct HermiteOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -409,6 +434,13 @@ Construct a generalized Hermite basis.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: generalized-Hermite measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct genHermiteOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -459,6 +491,13 @@ Construct a Meixner-Pollaczek basis.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: Meixner-Pollaczek measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct MeixnerPollaczekOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -510,6 +549,13 @@ Construct the basis orthogonal to the standard Gaussian probability measure.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: standard Gaussian measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct GaussOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -552,6 +598,13 @@ Construct the basis orthogonal to the uniform probability measure on `(0, 1)`.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: uniform measure on `(0, 1)`.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct Uniform01OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -596,6 +649,13 @@ Construct the basis orthogonal to the uniform probability measure on `(-1, 1)`.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: uniform measure on `(-1, 1)`.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct Uniform_11OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -642,6 +702,13 @@ Construct the basis orthogonal to a beta probability measure on `(0, 1)`.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: beta measure on `(0, 1)`.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct Beta01OrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -699,6 +766,13 @@ Construct the basis orthogonal to a unit-rate gamma probability measure.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: unit-rate gamma measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct GammaOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
@@ -750,6 +824,13 @@ Construct the basis orthogonal to the standard logistic measure.
 
 - `Nrec`: recurrence coefficient count.
 - `addQuadrature`: whether to attach Gaussian quadrature.
+
+# Fields
+
+- `deg`: maximum represented degree.
+- `α`, `β`: monic recurrence coefficients.
+- `measure`: standard logistic measure.
+- `quad`: attached quadrature rule or [`EmptyQuad`](@ref).
 """
 struct LogisticOrthoPoly{V, M, Q} <: AbstractCanonicalOrthoPoly{V, M, Q}
     deg::Int          # maximum degree
