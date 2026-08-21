@@ -39,5 +39,6 @@ module PolyChaos
     include("show.jl")
     include("sample.jl")
     include("polynomial_chaos.jl")
+    include("precompile.jl")
 
 end
