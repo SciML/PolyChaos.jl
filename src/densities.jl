@@ -160,6 +160,14 @@ end
     w_gaussian(t)
 
 Evaluate the standard normal probability density at `t`.
+
+# Arguments
+
+- `t`: real evaluation point.
+
+# Returns
+
+The standard normal density evaluated at `t`.
 """
 function w_gaussian(t)
     return 1 / (sqrt(2 * pi)) * exp(-0.5 * t^2)
@@ -203,6 +211,14 @@ end
     w_uniform01(t)
 
 Evaluate the unit uniform density on `(0, 1)`.
+
+# Arguments
+
+- `t`: evaluation point in `(0, 1)`.
+
+# Returns
+
+The unit uniform density, or a `DomainError` outside the support.
 """
 function w_uniform01(t)
     return 0.0 <= t <= 1.0 ? 1.0 : _throwError(t)
@@ -212,6 +228,14 @@ end
     w_uniform_11(t)
 
 Evaluate the uniform density `1 / 2` on `(-1, 1)`.
+
+# Arguments
+
+- `t`: evaluation point in `(-1, 1)`.
+
+# Returns
+
+The uniform density, or a `DomainError` outside the support.
 """
 function w_uniform_11(t)
     return -1.0 <= t <= 1.0 ? 0.5 : _throwError(t)
@@ -221,6 +245,14 @@ end
     w_logistic(t)
 
 Evaluate the standard logistic probability density at `t`.
+
+# Arguments
+
+- `t`: real evaluation point.
+
+# Returns
+
+The standard logistic density evaluated at `t`.
 """
 function w_logistic(t)
     return 0.25 * sech(0.5t)^2

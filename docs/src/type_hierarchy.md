@@ -40,24 +40,6 @@ AbstractMeasure
 There are several canonical measures that `PolyChaos` provides, all gathered in as subtypes of `AbstractCanonicalMeasure`.
 The `Measure` type is a generic measure, and `ProductMeasure` has an obvious meaning.
 
-```@docs
-Measure
-ProductMeasure
-Beta01Measure
-GammaMeasure
-GaussMeasure
-HermiteMeasure
-JacobiMeasure
-LaguerreMeasure
-LegendreMeasure
-LogisticMeasure
-MeixnerPollaczekMeasure
-Uniform01Measure
-Uniform_11Measure
-genHermiteMeasure
-genLaguerreMeasure
-```
-
 What are the relevant fields?
 
 ### Measure
@@ -264,24 +246,6 @@ AbstractOrthoPoly
 
 It mirrors the type tree from `AbstractMeasure`: there is a generic (univariate) type `OrthoPoly`, a multivariate extension `MultiOrthoPoly` for product measures, and several univariate canonical orthogonal polynomials.
 
-```@docs
-OrthoPoly
-MultiOrthoPoly
-Beta01OrthoPoly
-GammaOrthoPoly
-GaussOrthoPoly
-HermiteOrthoPoly
-JacobiOrthoPoly
-LaguerreOrthoPoly
-LegendreOrthoPoly
-LogisticOrthoPoly
-MeixnerPollaczekOrthoPoly
-Uniform01OrthoPoly
-Uniform_11OrthoPoly
-genHermiteOrthoPoly
-genLaguerreOrthoPoly
-```
-
 ## OrthoPoly
 
 Given an absolutely continuous measure, we are wondering what are the monic polynomials $\phi_i: \Omega \rightarrow \mathbb{R}$ that are orthogonal relative to this very measure?
@@ -389,11 +353,6 @@ with obvious meanings.
 
 `PolyChaos` provides the type `EmptyQuad` that is added in case no quadrature rule is desired.
 
-```@docs
-Quad
-EmptyQuad
-```
-
 [This tutorial shows the above in action.](@ref NumericalIntegration)
 
 ## Tensor
@@ -411,9 +370,5 @@ Its fields are
 
 The *dimension* $m$ of the tensor is the number of terms that appear in the scalar product.
 Let's assume we set $m = 3$, hence have $\langle \phi_{i} \phi_{j}, \phi_{k} \rangle$, then the concrete entry is obtained as `Tensor.get([i,j,k])`.
-
-```@docs
-Tensor
-```
 
 [This tutorial shows the above in action.](@ref ComputationOfScalarProducts)

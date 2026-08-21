@@ -10,7 +10,6 @@ GaussMeasure
 GaussOrthoPoly
 HermiteMeasure
 HermiteOrthoPoly
-InconsistencyError
 JacobiMeasure
 JacobiOrthoPoly
 LaguerreMeasure

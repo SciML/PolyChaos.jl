@@ -42,6 +42,22 @@ end
 """
     calculateAffinePCE(α::AbstractVector{<:Real})
 
+# Arguments
+
+- α: recurrence coefficients of the basis; α[1] is the constant shift.
+- op: basis from which to read α.
+- i, mop: coordinate and multivariate basis for a component PCE.
+
+# Returns
+
+The two coefficients [x₀, x₁] of the affine expansion.
+
+# Examples
+
+    julia> using PolyChaos
+    julia> calculateAffinePCE(LegendreOrthoPoly(1))
+    [0.0, 1.0]
+
 Computes the affine PCE coefficients ``x_0`` and ``x_1`` from recurrence coefficients ``\alpha``.
 """
 function calculateAffinePCE(α::AbstractVector{<:Real})
@@ -73,6 +89,21 @@ where ``\\phi_1(t) = t-\\alpha_0`` is the first-order monic basis polynomial.
 
 Works for subtypes of AbstractCanonicalOrthoPoly. The keyword `kind in ["lbub", "μσ"]`
 specifies whether `p1` and `p2` have the meaning of lower/upper bounds or mean/standard deviation.
+
+# Arguments
+
+- `par1`, `par2`: lower and upper bounds, or mean and standard deviation,
+  depending on `kind`.
+- `α0`: constant recurrence coefficient for the first-order basis.
+- `op`: canonical orthogonal-polynomial basis.
+
+# Keywords
+
+- `kind`: `"lbub"` for bounds or `"μσ"` for mean and standard deviation.
+
+# Returns
+
+The affine PCE coefficient vector `[x₀, x₁]`.
 """
 function convert2affinePCE(a1::Real, a2::Real, α0::Real)
     return [a1 + α0 * a2; a2]
@@ -196,6 +227,22 @@ sampleMeasure(n::Int,mop::MultiOrthoPoly;method::Vector{String}=["adaptivereject
 
 Multivariate extension, which provides an array of samples with `n` rows and
 as many columns as the multimeasure has univariate measures.
+
+# Arguments
+
+- `n`: number of samples to draw.
+- `w`, `dom`: weight function and its support.
+- `meas`, `op`, `mop`: measure, basis, or multivariate basis to sample.
+
+# Keywords
+
+- `method`: sampling method, such as `"adaptiverejection"` or `"inversecdf"`;
+  multivariate calls accept one method per component.
+
+# Returns
+
+A vector of `n` univariate samples, or an `n`-by-`d` matrix for a product
+measure with `d` components.
 """
 function sampleMeasure(
         n::Int, w::Function, dom::Tuple{<:Real, <:Real};
@@ -289,6 +336,16 @@ Evaluation of polynomial chaos expansion
 
 where `L+1 = length(x)` and ``x_j`` is the ``j``th sample where ``j=1,\\dots,m``
 with `m = length(ξ)`.
+
+# Arguments
+
+- `x`: PCE coefficients, ordered by polynomial degree.
+- `ξ`: sample points at which to evaluate the random variable.
+- `α`, `β`: recurrence coefficients of the basis.
+
+# Returns
+
+The PCE value at each sample point in `ξ`.
 """
 function evaluatePCE(
         x::AbstractVector{<:Real}, ξ::AbstractVector{<:Real},
@@ -363,6 +420,20 @@ __Multivariate__
 ```
 samplePCE(n::Int,x::AbstractVector{<:Real},mop::MultiOrthoPoly;method::Vector{String}=["adaptiverejection" for i=1:length(mop.meas.name)])
 ```
+
+# Arguments
+
+- `n`: number of samples.
+- `x`: PCE coefficient vector.
+- `op`, `mop`: univariate or multivariate basis used for sampling.
+
+# Keywords
+
+- `method`: sampling method passed to [`sampleMeasure`](@ref).
+
+# Returns
+
+The sampled PCE values as a vector.
 """
 function samplePCE(
         n::Int, x::AbstractVector{<:Real}, op::AbstractOrthoPoly;
@@ -404,6 +475,15 @@ mean(x::AbstractVector,mop::MultiOrthoPoly)
 compute mean of random variable with PCE `x`
 
 For one-argument calls, `mean(x)` delegates to [`Statistics.mean`](https://docs.julialang.org/en/v1/stdlib/Statistics/).
+
+# Arguments
+
+- `x`: PCE coefficients.
+- `op`, `mop`: basis associated with the PCE.
+
+# Returns
+
+The mean coefficient of the PCE, accounting for the basis normalization.
 """
 mean(x; kwargs...) = Statistics.mean(x; kwargs...)
 mean(x::AbstractVector, op::AbstractOrthoPoly) = x[1] * computeSP2(0, op.β)
@@ -431,6 +511,15 @@ var(x::AbstractVector,t2::Tensor)
 compute variance of random variable with PCE `x`
 
 For one-argument calls, `var(x)` delegates to [`Statistics.var`](https://docs.julialang.org/en/v1/stdlib/Statistics/).
+
+# Arguments
+
+- `x`: PCE coefficients.
+- `op`, `mop`, `t2`: basis or scalar-product tensor associated with the PCE.
+
+# Returns
+
+The variance of the PCE.
 """
 var(x; kwargs...) = Statistics.var(x; kwargs...)
 function var(x::AbstractVector, op::AbstractOrthoPoly)
@@ -465,6 +554,15 @@ std(x::AbstractVector,mop::MultiOrthoPoly)
 compute standard deviation of random variable with PCE `x`
 
 For one-argument calls, `std(x)` delegates to [`Statistics.std`](https://docs.julialang.org/en/v1/stdlib/Statistics/).
+
+# Arguments
+
+- `x`: PCE coefficients.
+- `op`, `mop`: basis associated with the PCE.
+
+# Returns
+
+The standard deviation of the PCE.
 """
 std(x; kwargs...) = Statistics.std(x; kwargs...)
 std(x::AbstractVector, op::AbstractOrthoPoly) = sqrt(var(x, op))

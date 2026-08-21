@@ -18,6 +18,15 @@ export r_scale,
 
 Given the recursion coefficients `(α,β)` for a system of orthogonal polynomials that are orthogonal with respect to some positive weight ``m(t)``,
 this function returns the recursion coefficients `(α_,β_)` for the scaled measure ``c m(t)`` for some positive ``c``.
+
+# Arguments
+
+- `c`: positive scaling factor.
+- `a`, `b`: recurrence coefficient vectors for the original measure.
+
+# Returns
+
+The unchanged `a` vector and the scaled `b` vector.
 """
 function r_scale(c::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
     c <= 0 && throw(
@@ -36,6 +45,24 @@ Given a positive `weight` function with domain `(lb,ub)`, i.e. a function ``w: [
 this function creates `Npoly` recursion coefficients `(α,β)`.
 
 The keyword `quadrature` specifies what quadrature rule is being used.
+
+# Arguments
+
+- `weight`: nonnegative weight function on `(lb, ub)`, or an
+  [`AbstractMeasure`](@ref).
+- `lb`, `ub`: support bounds when `weight` is a function.
+- `Npoly`: number of recurrence coefficients to compute.
+- `Nquad`: number of quadrature nodes used for discretization.
+
+# Keywords
+
+- `quadrature`: quadrature rule used to discretize the weight.
+- `discretization`: recurrence algorithm, typically [`stieltjes`](@ref) or
+  [`lanczos`](@ref).
+
+# Returns
+
+A pair `(α, β)` of monic recurrence coefficient vectors.
 """
 function rm_compute(
         weight::Function, lb::Real, ub::Real, Npoly::Int = 4, Nquad::Int = 10;
@@ -96,6 +123,14 @@ end
 
 Creates `N` recurrence coefficients for monic polynomials that are orthogonal
 on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\mathrm{e}^{-t})^2}``
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 function rm_logistic(N::Int)
     @assert N >= 0 "parameter(s) out of range."
@@ -111,6 +146,15 @@ Creates `N` recurrence coefficients for monic generalized Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = |t|^{2 \\mu} \\mathrm{e}^{-t^2}``
 
 The call `rm_hermite(N)` is the same as `rm_hermite(N,0)`.
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+- `mu`: generalized-Hermite parameter; must exceed `-0.5`.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 function rm_hermite(N::Int, mu::Real)
     @assert N >= 0&&mu > -0.5 "parameter(s) out of range."
@@ -126,6 +170,14 @@ rm_hermite(N::Int) = rm_hermite(N, 0.0)
 
 Creates `N` recurrence coefficients for monic probabilists' Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{-0.5t^2}``
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 function rm_hermite_prob(N::Int)
     @assert N >= 0 "parameter(s) out of range."
@@ -142,6 +194,15 @@ Creates `N` recurrence coefficients for monic generalized Laguerre polynomials
 that are orthogonal on ``(0,\\infty)`` relative to ``w(t) = t^a \\mathrm{e}^{-t}``.
 
 The call `rm_laguerre(N)` is the same as `rm_laguerre(N,0)`.
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+- `a`: generalized-Laguerre exponent; must exceed `-1`.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 function rm_laguerre(N::Int, a::Real)
     @assert N >= 0&&a > -1.0 "parameter(s) out of range"
@@ -165,6 +226,15 @@ that are orthogonal on ``(-1,1)`` relative to ``w(t) = (1-t)^a (1+t)^b``.
 
 The call `rm_jacobi(N,a)` is the same as `rm_jacobi(N,a,a)` and `rm_jacobi(N)` the same as
 `rm_jacobi(N,0,0)`.
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+- `a`, `b`: Jacobi exponents; each must exceed `-1`.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 function rm_jacobi(N::Int, a::Real, b::Real)
     @assert N >= 0&&a > -1.0 && b > -1.0 "parameter(s) out of range"
@@ -198,6 +268,15 @@ that are orthogonal on ``(0,1)`` relative to ``w(t) = (1-t)^a t^b``.
 
 The call `rm_jacobi01(N,a)` is the same as `rm_jacobi01(N,a,a)` and `rm_jacobi01(N)` the same as
 `rm_jacobi01(N,0,0)`.
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+- `a`, `b`: exponents in the weight on `(0, 1)`; each must exceed `-1`.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 function rm_jacobi01(N::Int, a::Real, b::Real)
     @assert N >= 0&&a > -1.0 && b > -1.0 "parameter(s) out of range"
@@ -213,6 +292,14 @@ rm_jacobi01(N::Int) = rm_jacobi01(N, 0.0, 0.0)
 
 Creates `N` recurrence coefficients for monic Legendre polynomials
 that are orthogonal on ``(-1,1)`` relative to ``w(t) = 1``.
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 rm_legendre(N::Int) = rm_jacobi(N)
 
@@ -221,6 +308,14 @@ rm_legendre(N::Int) = rm_jacobi(N)
 
 Creates `N` recurrence coefficients for monic Legendre polynomials
 that are orthogonal on ``(0,1)`` relative to ``w(t) = 1``.
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 rm_legendre01(N::Int) = rm_jacobi01(N)
 
@@ -233,6 +328,16 @@ Meixner-Pollaczek polynomials with parameters λ and ϕ. These are orthogonal on
 ``[-\\infty,\\infty]`` relative to the weight function ``w(t)=(2 \\pi)^{-1} \\exp{(2 \\phi-\\pi)t} |\\Gamma(\\lambda+ i t)|^2``.
 
 The call `rm_meixner_pollaczek(n,lambda)` is the same as `rm_meixner_pollaczek(n,lambda,pi/2)`.
+
+# Arguments
+
+- `N`: number of coefficients; must be nonnegative.
+- `lambda`: positive shape parameter.
+- `phi`: angle parameter in `(0, pi)`.
+
+# Returns
+
+A pair `(α, β)` of recurrence coefficient vectors.
 """
 function rm_meixner_pollaczek(N::Int, lambda::Real, phi::Real)
     @assert N >= 0&&lambda > 0.0 && phi > 0.0 "parameter(s) out of range"
