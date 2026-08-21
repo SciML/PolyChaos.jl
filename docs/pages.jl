@@ -17,5 +17,10 @@ pages = Any[
     ],
     "math.md",
     "functions.md",
+    "API" => [
+        "Constructors and Utilities" => "api/constructors.md",
+        "Measures and Orthogonal Polynomials" => "api/types.md",
+        "Weights and Recurrence Helpers" => "api/weights.md",
+    ],
     "Developer API" => "developer_api.md",
 ]

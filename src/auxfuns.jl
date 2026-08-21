@@ -37,15 +37,32 @@ deg(op::AbstractOrthoPoly) = op.deg
 deg(mop::MultiOrthoPoly) = mop.deg
 
 """
-```
-nw(q::EmptyQuad)
-nw(q::AbstractQuad)
-nw(opq::AbstractOrthoPoly)
-nw(opq::AbstractVector)
-nw(mop::MultiOrthoPoly)
-```
+    nw(q::AbstractQuad)
+    nw(op::AbstractOrthoPoly)
+    nw(ops::AbstractVector)
+    nw(mop::MultiOrthoPoly)
 
-returns nodes and weights in matrix form
+Return quadrature nodes and weights in matrix form. `nw(EmptyQuad())` returns
+an empty `0 x 2` matrix.
+
+# Arguments
+
+- `q`, `op`, `ops`, `mop`: a quadrature rule, basis, collection of bases, or
+  multivariate basis.
+
+# Returns
+
+A node/weight matrix for a univariate input, or one node and weight array per
+component for a collection or multivariate basis.
+
+# Examples
+
+```jldoctest
+julia> using PolyChaos
+
+julia> size(nw(LegendreOrthoPoly(2)), 2)
+2
+```
 """
 nw(::EmptyQuad) = Array{Float64}(undef, 0, 2)
 
@@ -69,13 +86,21 @@ end
 nw(mop::MultiOrthoPoly) = nw(mop.uni)
 
 """
-```
-coeffs(op::AbstractOrthoPoly)
-coeffs(op::AbstractVector)
-coeffs(mop::MultiOrthoPoly)
-```
+    coeffs(op::AbstractOrthoPoly)
+    coeffs(ops::AbstractVector)
+    coeffs(mop::MultiOrthoPoly)
 
-returns recurrence coefficients of in matrix form
+Return the monic recurrence coefficients associated with an orthogonal basis.
+
+# Arguments
+
+- `op`, `ops`, `mop`: a basis, collection of univariate bases, or multivariate
+  basis.
+
+# Returns
+
+A two-column `α`/`β` matrix for a univariate basis, or the corresponding
+coefficient arrays for collections and multivariate bases.
 """
 function coeffs(op::AbstractOrthoPoly)
     return [op.α op.β]
@@ -90,13 +115,22 @@ end
 coeffs(mop::MultiOrthoPoly) = coeffs(mop.uni)
 
 """
-```
-integrate(f::Function,nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real})
-integrate(f::Function,q::AbstractQuad)
-integrate(f::Function,opq::AbstractOrthoPoly)
-```
+    integrate(f::Function, nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real})
+    integrate(f::Function, q::AbstractQuad)
+    integrate(f::Function, op::AbstractOrthoPoly)
 
-integrate function `f` using quadrature rule specified via `nodes`, `weights`.
+Integrate `f` using the supplied quadrature rule.
+
+# Arguments
+
+- `f`: scalar-valued integrand.
+- `nodes`, `weights`: paired quadrature data.
+- `q`, `op`: a quadrature rule or basis with an attached rule.
+
+# Returns
+
+The weighted sum of `f` evaluated at the quadrature nodes.
+
 For example ``\\int_0^1 6x^5 = 1`` can be solved as follows:
 
 ```@repl
@@ -140,7 +174,16 @@ For product measures, this computes the integral by evaluating `f` at all
 combinations of quadrature nodes and weighting by the product of the
 corresponding univariate weights.
 
-# Example
+# Arguments
+
+- `f`: function accepting one scalar argument per coordinate.
+- `mop`: multivariate basis with attached quadrature rules.
+
+# Returns
+
+The tensor-product quadrature estimate of the integral.
+
+# Examples
 ```julia
 op1 = GaussOrthoPoly(3)
 op2 = Uniform01OrthoPoly(5)
@@ -169,12 +212,19 @@ function integrate(f::Function, mop::MultiOrthoPoly)
 end
 
 """
-```
-issymmetric(m::AbstractMeasure)
-issymmetric(op::AbstractOrthoPoly)
-```
+    issymmetric(m::AbstractMeasure)
+    issymmetric(op::AbstractOrthoPoly)
 
-Is the measure symmetric (around any point in the domain)?
+Return whether the measure underlying `m` or `op` is symmetric about zero.
+
+# Arguments
+
+- `m`: measure implementing the [`AbstractMeasure`](@ref) contract.
+- `op`: basis with an underlying measure.
+
+# Returns
+
+`true` when the measure is symmetric and `false` otherwise.
 """
 issymmetric(m::AbstractMeasure) = m.symmetric
 issymmetric(op::AbstractOrthoPoly) = issymmetric(op.measure)

@@ -66,24 +66,9 @@ function computeSP(a::AbstractVector{<:Integer}, mop::MultiOrthoPoly)
 end
 
 """
-__Univariate__
-
-```
-computeSP(a::AbstractVector{<:Integer},α::AbstractVector{<:Real},β::AbstractVector{<:Real},nodes::AbstractVector{<:Real},weights::AbstractVector{<:Real};issymmetric::Bool=false)
-computeSP(a::AbstractVector{<:Integer},op::AbstractOrthoPoly;issymmetric=issymmetric(op))
-```
-
-__Multivariate__
-
-```
-computeSP( a::AbstractVector{<:Integer},
-           α::AbstractVector{<:AbstractVector{<:Real}},β::AbstractVector{<:AbstractVector{<:Real}},
-           nodes::AbstractVector{<:AbstractVector{<:Real}},weights::AbstractVector{<:AbstractVector{<:Real}},
-           ind::AbstractMatrix{<:Integer};
-           issymmetric::BitArray=falses(length(α)))
-computeSP(a::AbstractVector{<:Integer},op::AbstractVector,ind::AbstractMatrix{<:Integer})
-computeSP(a::AbstractVector{<:Integer},mOP::MultiOrthoPoly)
-```
+    computeSP(a, α, β, nodes, weights; issymmetric = false)
+    computeSP(a, op::AbstractOrthoPoly)
+    computeSP(a, mop::MultiOrthoPoly)
 
 Computes the scalar product
 
@@ -100,6 +85,23 @@ of the univariate scalar products.
 Mathematically, this follows from Fubini's theorem.
 
 The function is dispatched to facilitate its use with `AbstractOrthoPoly` and its quadrature rule `Quad`.
+
+# Arguments
+
+- `a`: zero-based polynomial degrees in the scalar product.
+- `α`, `β`: monic recurrence coefficients.
+- `nodes`, `weights`: quadrature data for the recurrence coefficients.
+- `op`, `mop`: univariate or multivariate orthogonal-polynomial basis.
+- `ind`: multivariate total-degree index matrix.
+
+# Keywords
+
+- `issymmetric`: symmetry flags used to eliminate odd products.
+- `zerotol`: absolute tolerance for zero multivariate factors.
+
+# Returns
+
+The scalar product represented by the requested basis indices.
 
 !!! note
 
@@ -169,6 +171,16 @@ The computation is based on equation (1.3.7) from Gautschi, W. "Orthogonal Polyn
 Whenever there exists an analytical expression for `β`, this function should be used.
 
 The function is multiple-dispatched to facilitate its use with `AbstractOrthoPoly`.
+
+# Arguments
+
+- `n`: highest polynomial degree to include.
+- `β`: monic recurrence norm coefficients, or `op` supplying them.
+
+# Returns
+
+A vector containing the squared norms from degree `0` through `n`, or the
+single scalar norm when `n == 0`.
 """
 function computeSP2(n::Integer, β::AbstractVector{<:Real})
     n < 0 &&

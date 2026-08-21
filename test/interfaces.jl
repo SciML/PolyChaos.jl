@@ -35,12 +35,14 @@ end
     @test PolyChaos.issymmetric !== LinearAlgebra.issymmetric
     @test nw(quad) == [-1.0 0.5; 1.0 0.5]
     @test integrate(x -> x^2, quad) == 1.0
+    @test Quad(2, measure) isa Quad
 
     @test deg(basis) == 2
     @test dim(basis) == 3
     @test coeffs(basis) == [0.0 1.0; 0.0 1 / 3; 0.0 4 / 15]
     @test nw(basis) == nw(quad)
     @test evaluate(1, 0.25, basis) == 0.25
+    @test computeSP([1, 1], basis) == 1 / 3
     @test computeSP2(basis) == [basis.β[1], basis.β[1] * basis.β[2], prod(basis.β)]
     @test Quad(2, basis) isa Quad
 

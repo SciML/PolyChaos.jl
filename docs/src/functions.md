@@ -120,17 +120,3 @@ coeffs
 integrate
 PolyChaos.issymmetric
 ```
-
-## API Reference
-
-```@autodocs
-Modules = [PolyChaos]
-Filter = t -> !(t in [
-    AbstractMeasure,
-    AbstractCanonicalMeasure,
-    AbstractQuad,
-    AbstractOrthoPoly,
-    AbstractCanonicalOrthoPoly,
-    AbstractTensor,
-])
-```
