@@ -30,6 +30,8 @@ using PolyChaos, Test
         # Custom Measure
         w = x -> exp(-x^2)
         m = Measure("custom_gaussian", w, (-5.0, 5.0), true)
+        samples = sampleMeasure(Nsamples, m)
+        @test isapprox(mean(samples), 0.0; atol = atol_mean)
         samples = sampleMeasure(Nsamples, m; method = "inversecdf")
         @test isapprox(mean(samples), 0.0; atol = atol_mean)
 
@@ -78,5 +80,12 @@ using PolyChaos, Test
         @test_throws DomainError sampleInverseCDF(0, pdf, (0.0, 1.0))
         @test_throws DomainError sampleInverseCDF(-1, pdf, (0.0, 1.0))
         @test_throws DomainError sampleInverseCDF(10, pdf, (1.0, 0.0))
+    end
+
+    @testset "deprecated adaptiverejection method" begin
+        w = x -> exp(-x^2)
+        m = Measure("custom_gaussian", w, (-5.0, 5.0), true)
+        samples = @test_deprecated sampleMeasure(10, m; method = "adaptiverejection")
+        @test length(samples) == 10
     end
 end

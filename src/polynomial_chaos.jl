@@ -170,9 +170,9 @@ end
 __Univariate__
 
 ```
-sampleMeasure(n::Int,name::String,w::Function,dom::Tuple{<:Real,<:Real},symm::Bool,d::Dict;method::String="adaptiverejection")
-sampleMeasure(n::Int,m::Measure;method::String="adaptiverejection")
-sampleMeasure(n::Int,op::AbstractOrthoPoly;method::String="adaptiverejection")
+sampleMeasure(n::Int,name::String,w::Function,dom::Tuple{<:Real,<:Real},symm::Bool,d::Dict;method::String="inversecdf")
+sampleMeasure(n::Int,m::Measure;method::String="inversecdf")
+sampleMeasure(n::Int,op::AbstractOrthoPoly;method::String="inversecdf")
 ```
 
 Draw `n` samples from the measure `m` described by its
@@ -182,8 +182,10 @@ Draw `n` samples from the measure `m` described by its
   - domain `dom`,
   - symmetry property `symm`,
   - and, if applicable, parameters stored in the dictionary `d`.
-    By default, an adaptive rejection sampling method is used (from [AdaptiveRejectionSampling.jl](https://github.com/JuliaStats/AdaptiveRejectionSampling.jl)),
-    unless it is a common random variable for which [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is used.
+    Generic measures are sampled by inverse transform sampling
+    (`method = "inversecdf"`; see [`sampleInverseCDF`](@ref)). Canonical
+    measures are sampled from [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
+    unless `method = "inversecdf"` is requested.
 
 The function is dispatched to accept `AbstractOrthoPoly`.
 
@@ -199,31 +201,31 @@ as many columns as the multimeasure has univariate measures.
 """
 function sampleMeasure(
         n::Int, w::Function, dom::Tuple{<:Real, <:Real};
-        method::String = "adaptiverejection"
+        method::String = "inversecdf"
     )
     _checkNumberOfSamples(n)
     method = lowercase(method)
 
     if method == "adaptiverejection"
-        # works only if w is log-concave
-        sampler = RejectionSampler(w, dom)
-        return run_sampler!(sampler, n)
+        Base.depwarn(
+            "method=\"adaptiverejection\" is deprecated; use method=\"inversecdf\"",
+            :sampleMeasure
+        )
+        return sampleInverseCDF(n, w, dom)
     elseif method == "rejection"
-        # all purpose method but needs a solid envelope PDF
         throw(error("method $method not yet implemented"))
     elseif method == "inversecdf"
-        # Inverse transform sampling using Chebyshev technology
         return sampleInverseCDF(n, w, dom)
     else
         throw(error("method $method not implemented"))
     end
 end
 
-function sampleMeasure(n::Int, meas::AbstractMeasure; method::String = "adaptiverejection")
+function sampleMeasure(n::Int, meas::AbstractMeasure; method::String = "inversecdf")
     return sampleMeasure(n, meas.w, meas.dom; method = method)
 end
 
-function sampleMeasure(n::Int, op::AbstractOrthoPoly; method::String = "adaptiverejection")
+function sampleMeasure(n::Int, op::AbstractOrthoPoly; method::String = "inversecdf")
     return sampleMeasure(n, op.measure; method = method)
 end
 function sampleMeasure(n::Int, op::AbstractCanonicalOrthoPoly)
@@ -352,7 +354,7 @@ end
 __Univariate__
 
 ```
-samplePCE(n::Int,x::AbstractVector{<:Real},op::AbstractOrthoPoly;method::String="adaptiverejection")
+samplePCE(n::Int,x::AbstractVector{<:Real},op::AbstractOrthoPoly;method::String="inversecdf")
 ```
 
 Combines [`sampleMeasure`](@ref) and [`evaluatePCE`](@ref), i.e. it first draws `n` samples
@@ -366,7 +368,7 @@ samplePCE(n::Int,x::AbstractVector{<:Real},mop::MultiOrthoPoly;method::Vector{St
 """
 function samplePCE(
         n::Int, x::AbstractVector{<:Real}, op::AbstractOrthoPoly;
-        method::String = "adaptiverejection"
+        method::String = "inversecdf"
     )
     ξ = sampleMeasure(n, op; method = method)
     return evaluatePCE(x, ξ, op)
