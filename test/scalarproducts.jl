@@ -19,9 +19,9 @@ tol = 1.0e-7
         s = computeSP2(opq)
         t = [
             quadgk(
-                    x -> evaluate(d, x, opq)^2 * opq.measure.w(x), opq.measure.dom...;
-                    order = max(10, 10d)
-                )[1]
+                x -> evaluate(d, x, opq)^2 * opq.measure.w(x), opq.measure.dom...;
+                order = max(10, 10d)
+            )[1]
                 for d in 0:deg
         ]
         u = computeSP2(deg, opq)
@@ -59,9 +59,9 @@ names = [Beta01OrthoPoly, JacobiOrthoPoly, genHermiteOrthoPoly]
         s = computeSP2(opq)
         t = [
             quadgk(
-                    x -> evaluate(d, x, opq)^2 * opq.measure.w(x), opq.measure.dom...;
-                    order = max(10, 10d)
-                )[1]
+                x -> evaluate(d, x, opq)^2 * opq.measure.w(x), opq.measure.dom...;
+                order = max(10, 10d)
+            )[1]
                 for d in 0:deg
         ]
         u = computeSP2(deg, opq)
