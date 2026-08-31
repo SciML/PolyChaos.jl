@@ -78,6 +78,16 @@ end
 
 Given the multi-index `ind` this function returns all entries of the multivariate basis
 that correspond to the `i`th univariate basis.
+
+# Arguments
+
+- `i`: one-based coordinate index.
+- `ind`: total-degree multi-index matrix.
+
+# Returns
+
+Indices of rows in `ind` corresponding to the univariate basis in coordinate
+`i`.
 """
 function findUnivariateIndices(i::Int, ind::AbstractMatrix{Int})
     l, p = size(ind)

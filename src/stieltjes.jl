@@ -17,6 +17,20 @@ generates the first`N` recurrence coefficients of the
 corresponding discrete orthogonal polynomials.
 
 Set the Boolean `removezeroweights` to `true` if zero weights should be removed.
+
+# Arguments
+
+- `N`: number of recurrence coefficients to compute.
+- `nodes`, `weights`: paired nodes and positive discrete weights.
+
+# Keywords
+
+- `removezeroweights`: whether to discard entries whose weights are numerically
+  zero.
+
+# Returns
+
+A pair `(α, β)` of monic recurrence coefficient vectors.
 """
 function stieltjes(
         N::Int, nodes_::AbstractVector{<:Real}, weights_::AbstractVector{<:Real};
@@ -71,6 +85,20 @@ The script is adapted from the routine RKPW in
 W.B. Gragg and W.J. Harrod, *The numerically stable
 reconstruction of Jacobi matrices from spectral data*,
 Numer. Math. 44 (1984), 317-335.
+
+# Arguments
+
+- `N`: number of recurrence coefficients to compute.
+- `nodes`, `weights`: paired nodes and positive discrete weights.
+
+# Keywords
+
+- `removezeroweights`: whether to discard entries whose weights are numerically
+  zero.
+
+# Returns
+
+A pair `(α, β)` of monic recurrence coefficient vectors.
 """
 function lanczos(
         N::Int, nodes::AbstractVector{<:Real}, weights::AbstractVector{<:Real};
@@ -141,6 +169,24 @@ are available *for all* ``m`` weights ``w_i(t)`` with ``i = 1, \\dots, m``.
 
 For further information, please see W. Gautschi "Orthogonal Polynomials: Approximation
 and Computation", Section 2.2.4.
+
+# Arguments
+
+- `N`: number of recurrence coefficients to compute.
+- `quads`: quadrature data for the continuous components.
+- `discretemeasure`: optional two-column matrix of discrete nodes and weights.
+
+# Keywords
+
+- `discretization`: [`stieltjes`](@ref) or [`lanczos`](@ref).
+- `Nmax`: maximum discretization size.
+- `ε`: convergence tolerance.
+- `gaussquad`: whether the supplied quadratures are Gaussian rules.
+- `removezeroweights`: whether zero quadrature weights are removed.
+
+# Returns
+
+A pair `(α, β)` of monic recurrence coefficient vectors.
 """
 function mcdiscretization(
         N::Int, quads::AbstractVector,

@@ -80,6 +80,15 @@ p_k (t) = t^d + \\sum_{i=0}^{k-1} c_i t^i,
 where ``k`` runs from `1` to `deg`.
 
 The call `rec2coeff(a,b)` outputs all possible recurrence coefficients given `(a,b)`.
+
+# Arguments
+
+- `deg`: highest polynomial degree to return.
+- `a`, `b`: recurrence coefficient vectors.
+
+# Returns
+
+A matrix of polynomial coefficients, one row for each degree.
 """
 function rec2coeff(deg::Int, a::Vector{<:Real}, b::Vector{<:Real})
     deg <= 0 &&
@@ -109,6 +118,17 @@ showpoly(coeffs::Vector{<:Real};sym::String,digits::Integer)
 ```
 
 Show the monic polynomial with coefficients `coeffs` in a human-readable way.
+
+# Arguments
+
+- `coeffs`, `α`, `β`: polynomial coefficients or recurrence coefficients.
+- `d`: degree or range of degrees to print.
+- `op`: orthogonal-polynomial basis supplying recurrence coefficients.
+
+# Keywords
+
+- `sym`: variable name used in the printed polynomial.
+- `digits`: number of displayed decimal digits.
 The keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
 
 ```jldoctest
@@ -216,6 +236,16 @@ showbasis(α::Vector{<:Real},β::Vector{<:Real};sym::String,digits::Integer)
 ```
 
 Show all basis polynomials given the recurrence coefficients `α`, `β`.
+
+# Arguments
+
+- `α`, `β`: recurrence coefficient vectors.
+- `op`: orthogonal-polynomial basis.
+
+# Keywords
+
+- `sym`: variable name used in the printed polynomial.
+- `digits`: number of displayed decimal digits.
 The keyword `sym` sets the name of the variable, and `digits` controls the number of shown digits.
 
 ```jldoctest
