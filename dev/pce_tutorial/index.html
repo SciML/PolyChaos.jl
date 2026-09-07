@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Basic Usage · PolyChaos.jl</title><meta name="title" content="Basic Usage · PolyChaos.jl"/><meta property="og:title" content="Basic Usage · PolyChaos.jl"/><meta property="twitter:title" content="Basic Usage · PolyChaos.jl"/><meta name="description" content="Documentation for PolyChaos.jl."/><meta property="og:description" content="Documentation for PolyChaos.jl."/><meta property="twitter:description" content="Documentation for PolyChaos.jl."/><meta property="og:url" content="https://docs.sciml.ai/PolyChaos/stable/pce_tutorial/"/><meta property="twitter:url" content="https://docs.sciml.ai/PolyChaos/stable/pce_tutorial/"/><link rel="canonical" href="https://docs.sciml.ai/PolyChaos/stable/pce_tutorial/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">PolyChaos.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Overview</a></li><li><a class="tocitem" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="tocitem">Usage</span><ul><li><a class="tocitem" href="../numerical_integration/">Numerical Integration</a></li><li><a class="tocitem" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="tocitem" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li><a class="tocitem" href="../gaussian_mixture_model/">Gaussian Mixture Models</a></li><li><a class="tocitem" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="tocitem" href="../scalar_products/">Computation of Scalar Products</a></li><li><input class="collapse-toggle" id="menuitem-3-7" type="checkbox" checked/><label class="tocitem" for="menuitem-3-7"><span class="docs-label">Polynomial Chaos</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href>Basic Usage</a><ul class="internal"><li><a class="tocitem" href="#Construction-of-Basis"><span>Construction of Basis</span></a></li><li><a class="tocitem" href="#Finding-PCE-Coefficients"><span>Finding PCE Coefficients</span></a></li><li><a class="tocitem" href="#Moments"><span>Moments</span></a></li><li><a class="tocitem" href="#Sampling"><span>Sampling</span></a></li></ul></li><li><a class="tocitem" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="tocitem" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="tocitem" href="../random_ode/">Random ODE</a></li></ul></li></ul></li><li><a class="tocitem" href="../math/">Mathematical Background</a></li><li><a class="tocitem" href="../functions/">Functions</a></li><li><span class="tocitem">API</span><ul><li><a class="tocitem" href="../api/constructors/">Constructors and Utilities</a></li><li><a class="tocitem" href="../api/types/">Measures and Orthogonal Polynomials</a></li><li><a class="tocitem" href="../api/weights/">Weights and Recurrence Helpers</a></li></ul></li><li><a class="tocitem" href="../developer_api/">Developer API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Usage</a></li><li><a class="is-disabled">Polynomial Chaos</a></li><li class="is-active"><a href>Basic Usage</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Basic Usage</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/SciML/PolyChaos.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/SciML/PolyChaos.jl/blob/master/docs/src/pce_tutorial.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="CommonRandomVariables"><a class="docs-heading-anchor" href="#CommonRandomVariables">Common Random Variables</a><a id="CommonRandomVariables-1"></a><a class="docs-heading-anchor-permalink" href="#CommonRandomVariables" title="Permalink"></a></h1><p>Polynomial chaos expansion (PCE) is a Hilbert space technique for random variables with finite variance. Mathematically equivalent to Fourier series expansions for periodic signals, PCE allows characterizing a random variable in terms of its PCE coefficients (aka Fourier coefficients). That is, the PCE of a random variable <span>$\mathsf{x}$</span> is given by</p><p class="math-container">\[\mathsf{x} = \sum_{i=0}^L x_i \phi_i,\]</p><p>where <span>$x_i$</span> are the so-called PCE coefficients, and <span>$\phi_i$</span> are the orthogonal polynomials that are orthogonal relative to the probability density function of <span>$\mathsf{x}$</span>.</p><p>This tutorial walks you through the PCE of common random variables, namely Gaussian (<code>gaussian</code>), Beta (<code>beta01</code>), Uniform(<code>uniform01</code>), Logistic (<code>logistic</code>), and shows how they are implemented in <code>PolyChaos</code>.</p><h2 id="Construction-of-Basis"><a class="docs-heading-anchor" href="#Construction-of-Basis">Construction of Basis</a><a id="Construction-of-Basis-1"></a><a class="docs-heading-anchor-permalink" href="#Construction-of-Basis" title="Permalink"></a></h2><pre><code class="language-julia hljs">using PolyChaos</code></pre><p>The orthogonal polynomials are constructed using the <code>OrthoPoly</code>-type (here of degree at most <code>d</code>). For canonical measures, special constructors are implemented:</p><pre><code class="language-julia hljs">d = 6
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Basic Usage · PolyChaos.jl</title><meta name="title" content="Basic Usage · PolyChaos.jl"/><meta property="og:title" content="Basic Usage · PolyChaos.jl"/><meta property="twitter:title" content="Basic Usage · PolyChaos.jl"/><meta name="description" content="Documentation for PolyChaos.jl."/><meta property="og:description" content="Documentation for PolyChaos.jl."/><meta property="twitter:description" content="Documentation for PolyChaos.jl."/><meta property="og:url" content="https://docs.sciml.ai/PolyChaos/stable/pce_tutorial/"/><meta property="twitter:url" content="https://docs.sciml.ai/PolyChaos/stable/pce_tutorial/"/><link rel="canonical" href="https://docs.sciml.ai/PolyChaos/stable/pce_tutorial/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.63.2/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="PolyChaos.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">PolyChaos.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Overview</a></li><li><a class="tocitem" href="../type_hierarchy/">Type Hierarchy</a></li><li><span class="tocitem">Usage</span><ul><li><a class="tocitem" href="../numerical_integration/">Numerical Integration</a></li><li><a class="tocitem" href="../quadrature_rules/">Quadrature Rules</a></li><li><a class="tocitem" href="../orthogonal_polynomials_canonical/">Univariate Monic Orthogonal Polynomials</a></li><li><a class="tocitem" href="../gaussian_mixture_model/">Gaussian Mixture Models</a></li><li><a class="tocitem" href="../multiple_discretization/">Multiple Discretization</a></li><li><a class="tocitem" href="../scalar_products/">Computation of Scalar Products</a></li><li><input class="collapse-toggle" id="menuitem-3-7" type="checkbox" checked/><label class="tocitem" for="menuitem-3-7"><span class="docs-label">Polynomial Chaos</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href>Basic Usage</a><ul class="internal"><li><a class="tocitem" href="#Construction-of-Basis"><span>Construction of Basis</span></a></li><li><a class="tocitem" href="#Finding-PCE-Coefficients"><span>Finding PCE Coefficients</span></a></li><li><a class="tocitem" href="#Moments"><span>Moments</span></a></li><li><a class="tocitem" href="#Sampling"><span>Sampling</span></a></li></ul></li><li><a class="tocitem" href="../chi_squared_k1/">Chi Squared, One DOF</a></li><li><a class="tocitem" href="../chi_squared_k_greater1/">Chi Squared, Several DOFs</a></li><li><a class="tocitem" href="../random_ode/">Random ODE</a></li></ul></li></ul></li><li><a class="tocitem" href="../math/">Mathematical Background</a></li><li><a class="tocitem" href="../functions/">Functions</a></li><li><span class="tocitem">API</span><ul><li><a class="tocitem" href="../api/constructors/">Constructors and Utilities</a></li><li><a class="tocitem" href="../api/types/">Measures and Orthogonal Polynomials</a></li><li><a class="tocitem" href="../api/weights/">Weights and Recurrence Helpers</a></li></ul></li><li><a class="tocitem" href="../developer_api/">Developer API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Usage</a></li><li><a class="is-disabled">Polynomial Chaos</a></li><li class="is-active"><a href>Basic Usage</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Basic Usage</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/SciML/PolyChaos.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/SciML/PolyChaos.jl/blob/master/docs/src/pce_tutorial.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="CommonRandomVariables"><a class="docs-heading-anchor" href="#CommonRandomVariables">Common Random Variables</a><a id="CommonRandomVariables-1"></a><a class="docs-heading-anchor-permalink" href="#CommonRandomVariables" title="Permalink"></a></h1><p>Polynomial chaos expansion (PCE) is a Hilbert space technique for random variables with finite variance. Mathematically equivalent to Fourier series expansions for periodic signals, PCE allows characterizing a random variable in terms of its PCE coefficients (aka Fourier coefficients). That is, the PCE of a random variable <span>$\mathsf{x}$</span> is given by</p><p class="math-container">\[\mathsf{x} = \sum_{i=0}^L x_i \phi_i,\]</p><p>where <span>$x_i$</span> are the so-called PCE coefficients, and <span>$\phi_i$</span> are the orthogonal polynomials that are orthogonal relative to the probability density function of <span>$\mathsf{x}$</span>.</p><p>This tutorial walks you through the PCE of common random variables, namely Gaussian (<code>gaussian</code>), Beta (<code>beta01</code>), Uniform(<code>uniform01</code>), Logistic (<code>logistic</code>), and shows how they are implemented in <code>PolyChaos</code>.</p><h2 id="Construction-of-Basis"><a class="docs-heading-anchor" href="#Construction-of-Basis">Construction of Basis</a><a id="Construction-of-Basis-1"></a><a class="docs-heading-anchor-permalink" href="#Construction-of-Basis" title="Permalink"></a></h2><pre><code class="language-julia hljs">using PolyChaos</code></pre><p>The orthogonal polynomials are constructed using the <code>OrthoPoly</code>-type (here of degree at most <code>d</code>). For canonical measures, special constructors are implemented:</p><pre><code class="language-julia hljs">d = 6
 
 myops = Dict()
 polynames = [&quot;gaussian&quot;, &quot;beta01&quot;, &quot;uniform01&quot;, &quot;logistic&quot;]
@@ -29,9 +29,9 @@ myops</code></pre><pre class="documenter-example-output"><code class="nohighligh
 
 [evaluate(degree, points, gaussian) for degree in degrees]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4-element Vector{Vector{Float64}}:
  [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
- [-0.9984200795642125, -0.9434232829058739, -0.14012487528529705, -0.9048281544004299, 3.8425583028213977, 0.3567988014011545, 5.774505968807529, -0.9949746361964853, -0.8967027075888783, -0.9977649703851221]
- [2.9905229735338588, 2.6637406223523916, -1.4198655181850919, 2.438026606597407, -2.60497890070393, -3.299889820923317, 8.246895308563662, 2.9698730714602695, 2.390886576152738, 2.986594817668112]
- [-14.9289410186746, -12.501880506698077, 13.23938112756188, -10.852270114800776, -35.28065173179978, 20.940136217711377, -87.64748791076796, -14.774237316150252, -10.51057458452943, -14.899498586526416]</code></pre><h2 id="Finding-PCE-Coefficients"><a class="docs-heading-anchor" href="#Finding-PCE-Coefficients">Finding PCE Coefficients</a><a id="Finding-PCE-Coefficients-1"></a><a class="docs-heading-anchor-permalink" href="#Finding-PCE-Coefficients" title="Permalink"></a></h2><p>Having constructed the orthogonal bases, the question remains how to find the PCE coefficients for the common random variables. Every random variable can be characterized exactly by two PCE coefficients. For a Gaussian random variable, this is familiar: the mean and the variance suffice to describe a Gaussian random variable entirely. The same is true for any random variable of finite variance given the right basis. The function <code>convert2affinePCE</code> provides the first two PCE coefficients (hence the name affine) for the common random variables.</p><h3 id="Gaussian"><a class="docs-heading-anchor" href="#Gaussian">Gaussian</a><a id="Gaussian-1"></a><a class="docs-heading-anchor-permalink" href="#Gaussian" title="Permalink"></a></h3><p>Given the Gaussian random variable <span>$\mathsf{x} \sim \mathcal{N}(\mu, \sigma^2)$</span> with <span>$\sigma &gt; 0$</span>, the affine PCE coefficients are</p><pre><code class="language-julia hljs"># Gaussian
+ [-0.5606388093167538, -0.7746051998199677, 1.953898629505407, -0.7215666937821672, -0.831603899196546, -0.9947711908335957, -0.916531340748426, 0.3297957055454457, -0.8917899536191891, -0.8236408204295664]
+ [0.5568711117791227, 1.6984340148680024, -5.9978746636385205, 1.4069252687043972, 2.0179806419450825, 2.9686544854468724, 2.5061550615678114, -3.2104176147855643, 2.362449135852872, 1.9729474827961553]
+ [1.9604932605173202, -5.607825540572266, 12.816974669814769, -3.6117922387867885, -7.84275891554679, -14.765113551233313, -11.34783406226358, 20.667010509375434, -10.30492204868263, -7.524890100609118]</code></pre><h2 id="Finding-PCE-Coefficients"><a class="docs-heading-anchor" href="#Finding-PCE-Coefficients">Finding PCE Coefficients</a><a id="Finding-PCE-Coefficients-1"></a><a class="docs-heading-anchor-permalink" href="#Finding-PCE-Coefficients" title="Permalink"></a></h2><p>Having constructed the orthogonal bases, the question remains how to find the PCE coefficients for the common random variables. Every random variable can be characterized exactly by two PCE coefficients. For a Gaussian random variable, this is familiar: the mean and the variance suffice to describe a Gaussian random variable entirely. The same is true for any random variable of finite variance given the right basis. The function <code>convert2affinePCE</code> provides the first two PCE coefficients (hence the name affine) for the common random variables.</p><h3 id="Gaussian"><a class="docs-heading-anchor" href="#Gaussian">Gaussian</a><a id="Gaussian-1"></a><a class="docs-heading-anchor-permalink" href="#Gaussian" title="Permalink"></a></h3><p>Given the Gaussian random variable <span>$\mathsf{x} \sim \mathcal{N}(\mu, \sigma^2)$</span> with <span>$\sigma &gt; 0$</span>, the affine PCE coefficients are</p><pre><code class="language-julia hljs"># Gaussian
 μ, σ = 2.0, 0.2
 pce_gaussian = convert2affinePCE(μ, σ, gaussian)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{Float64}:
  2.0
@@ -53,89 +53,89 @@ N = 1000
 ξ_gaussian = sampleMeasure(N, myops[&quot;gaussian&quot;])
 samples_gaussian = evaluatePCE(pce_gaussian, ξ_gaussian, myops[&quot;gaussian&quot;])
 # samplePCE(N,pce_gaussian,myops[&quot;gaussian&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 2.1684805743224778
- 2.065015589614785
- 2.2525232554064933
- 1.9593207955656755
- 1.9159600249991173
- 1.4707258662240377
- 1.7451775589635647
- 1.9003097216394913
- 2.1140292353010257
- 2.2417569115207043
+ 2.159711152970719
+ 1.7946086808233248
+ 1.9493890581853195
+ 2.1877059465075774
+ 1.9285915615768854
+ 1.922611489994619
+ 2.3679515967514777
+ 1.8101236065463466
+ 1.8076715406937036
+ 1.888578363379152
  ⋮
- 2.0820498998876875
- 2.1486326645009597
- 1.8395950226895912
- 1.8968750593420662
- 2.1723018413511634
- 1.9793620879655263
- 1.8564962327075056
- 1.8746605077774448
- 1.701963994328633</code></pre><h3 id="Uniform-3"><a class="docs-heading-anchor" href="#Uniform-3">Uniform</a><a class="docs-heading-anchor-permalink" href="#Uniform-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_uniform = sampleMeasure(N, myops[&quot;uniform01&quot;])
+ 2.018714931042752
+ 1.9296777740753785
+ 1.9270332535004713
+ 1.7735246421761444
+ 2.4040834261493966
+ 2.213712795082889
+ 2.2375620878175657
+ 2.133359042899462
+ 2.281714058165429</code></pre><h3 id="Uniform-3"><a class="docs-heading-anchor" href="#Uniform-3">Uniform</a><a class="docs-heading-anchor-permalink" href="#Uniform-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_uniform = sampleMeasure(N, myops[&quot;uniform01&quot;])
 samples_uniform = evaluatePCE(pce_uniform, ξ_uniform, myops[&quot;uniform01&quot;])
 # samples_uniform = samplePCE(N,pce_uniform,myops[&quot;uniform01&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 1.9515065251531938
- 2.040925129210312
- 1.9556521087157877
- 1.7056298614150434
- 1.7750134413634855
- 1.970888328725191
- 2.3313657679013895
- 2.31184833948535
- 1.84284392569048
- 2.3343143998751845
+ 2.2898534389104284
+ 2.1377337396604688
+ 2.059365532320302
+ 1.710233944126201
+ 1.8653113266696855
+ 1.9981064583855912
+ 1.87864383098875
+ 2.0815889879630745
+ 2.0423310798965453
+ 2.016036515561388
  ⋮
- 1.7334246112888119
- 1.9439682321698084
- 2.060027998576894
- 2.0812100621346286
- 1.9938034415418036
- 2.2132359067560583
- 2.0955720212300286
- 1.6598746979403511
- 1.909732032029011</code></pre><h3 id="Beta-3"><a class="docs-heading-anchor" href="#Beta-3">Beta</a><a class="docs-heading-anchor-permalink" href="#Beta-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_beta = sampleMeasure(N, myops[&quot;beta01&quot;])
+ 1.7359185678189681
+ 1.7061480523812178
+ 2.1883248174024903
+ 2.163436697038164
+ 1.9434644710156803
+ 1.8242433330105077
+ 1.739501059361712
+ 1.7528176693703763
+ 2.3253215876500484</code></pre><h3 id="Beta-3"><a class="docs-heading-anchor" href="#Beta-3">Beta</a><a class="docs-heading-anchor-permalink" href="#Beta-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_beta = sampleMeasure(N, myops[&quot;beta01&quot;])
 samples_beta = evaluatePCE(pce_beta, ξ_beta, myops[&quot;beta01&quot;])
 # samples_beta = samplePCE(N,pce_beta,myops[&quot;beta01&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 1.7768107462529097
- 2.3399116856115043
- 1.8064863837218972
- 2.014358675403912
- 2.2657452580410844
- 1.9655375369703094
- 2.3102319533905464
- 2.2139523061072555
- 2.308308889032016
- 2.4046078313680095
+ 1.8918170827066842
+ 1.9342570482523354
+ 1.9883949790775381
+ 2.181520013626052
+ 1.8288747288147866
+ 1.8698113567483015
+ 2.3450514680199563
+ 2.3764319438114554
+ 1.8019924135052747
+ 1.8159820572640804
  ⋮
- 1.7717719751682321
- 2.344097394125647
- 2.1705729253619923
- 1.6809888977197314
- 1.8726940570257473
- 2.0906462458926347
- 1.8804749799894982
- 1.9415843820812693
- 1.7249313542150888</code></pre><h3 id="Logistic-3"><a class="docs-heading-anchor" href="#Logistic-3">Logistic</a><a class="docs-heading-anchor-permalink" href="#Logistic-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_logistic = sampleMeasure(N, myops[&quot;logistic&quot;])
+ 1.6824237065225756
+ 1.9480710039418276
+ 2.4899024442817295
+ 2.326036578274658
+ 1.8910605144672132
+ 1.9789289875838734
+ 1.7926164861408116
+ 2.289367246953085
+ 1.8887852246044559</code></pre><h3 id="Logistic-3"><a class="docs-heading-anchor" href="#Logistic-3">Logistic</a><a class="docs-heading-anchor-permalink" href="#Logistic-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">ξ_logistic = sampleMeasure(N, myops[&quot;logistic&quot;])
 samples_logistic = evaluatePCE(pce_logistic, ξ_logistic, myops[&quot;logistic&quot;])
 # samples_logistic = samplePCE(N,pce_logistic,myops[&quot;logistic&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1000-element Vector{Float64}:
- 2.136477460360276
- 2.1584186931112663
- 2.127013405626029
- 1.7431099233835452
- 2.2228300413418296
- 2.166656437444411
- 1.6025403599209262
- 1.9486361858952905
- 1.8639619871509414
- 1.973266863268838
+ 1.8937717863274484
+ 2.0320281533674125
+ 2.1691110682641845
+ 2.072002247663338
+ 2.4417399452089854
+ 1.969811974500415
+ 2.031552825073331
+ 1.8330727524364447
+ 1.9159168813332197
+ 1.9739516997666064
  ⋮
- 2.106265175470448
- 2.1177324947552565
- 2.2817177422821024
- 2.123190167151863
- 2.0112212323262946
- 2.030954335578664
- 2.133931267777839
- 2.035327519274334
- 2.0132606324794535</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../scalar_products/">« Computation of Scalar Products</a><a class="docs-footer-nextpage" href="../chi_squared_k1/">Chi Squared, One DOF »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Sunday 30 August 2026 02:26">Sunday 30 August 2026</span>. Using Julia version 1.12.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 1.8421871694568226
+ 1.853003778547714
+ 2.0201797661757763
+ 2.12660639647002
+ 2.3243847000238205
+ 2.007890149575705
+ 1.9518652273433363
+ 1.8997536565865807
+ 2.3071249860433367</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../scalar_products/">« Computation of Scalar Products</a><a class="docs-footer-nextpage" href="../chi_squared_k1/">Chi Squared, One DOF »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.19.0 on <span class="colophon-date" title="Monday 7 September 2026 10:44">Monday 7 September 2026</span>. Using Julia version 1.12.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
