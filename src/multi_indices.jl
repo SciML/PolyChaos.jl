@@ -68,7 +68,7 @@ end
     `(d+n)!/(d!+n!)`
 """
 
-function numberPolynomials(d::Int64, n::Int64)
+function numberPolynomials(d::Integer, n::Integer)
     x, y = max(d, n), min(d, n)
     return UInt128(prod(UInt128(x + 1):UInt128(d + n)) ÷ factorial(UInt128(y)))
 end
