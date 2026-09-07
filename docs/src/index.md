@@ -77,7 +77,7 @@ In case you are unfamiliar with orthogonal polynomials, perhaps [this background
 
 ## References
 
-The code base of `PolyChaos` is partially based on Walter Gautschi's [Matlab suite of programs for generating orthogonal polynomials and related quadrature rules](https://www.math.unipd.it/~alvise/POINTSETS/INTERVAL/GAUTSCHI/), with much of the theory presented in his book *Orthogonal Polynomials: Computation and Approximation* published in 2004 by the Oxford University Press.
+The code base of `PolyChaos` is partially based on Walter Gautschi's [OPQ Matlab suite of programs for generating orthogonal polynomials and related quadrature rules](https://www.cs.purdue.edu/homes/wxg/selected_works/section_11/174.pdf), with much of the theory presented in his book *Orthogonal Polynomials: Computation and Approximation* published in 2004 by the Oxford University Press.
 
 For the theory of polynomial chaos expansion, we mainly consulted T. J. Sullivan. *Introduction to Uncertainty Quantification*. Springer International Publishing Switzerland. 2015.
 

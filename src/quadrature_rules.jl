@@ -9,7 +9,15 @@ export fejer,
 """
     fejer(N::Int)
 
-Fejer's first quadrature rule.
+Fejer's first quadrature rule on `(-1, 1)`.
+
+# Arguments
+
+- `N`: number of quadrature nodes; must be positive.
+
+# Returns
+
+A pair `(nodes, weights)` containing `N` nodes and weights.
 """
 function fejer(N::Int)
     @assert N >= 1 "N has to be positive"
@@ -24,6 +32,14 @@ end
     fejer2(n::Int)
 
 Fejer's second quadrature rule according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
+
+# Arguments
+
+- `n`: number of quadrature subintervals; must be at least two.
+
+# Returns
+
+A pair `(nodes, weights)` containing `n + 1` nodes and weights.
 """
 function fejer2(n::Int)
     @assert n >= 2
@@ -39,6 +55,14 @@ end
     clenshaw_curtis(n::Int)
 
 Clenshaw-Curtis quadrature according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
+
+# Arguments
+
+- `n`: polynomial order; must be at least two.
+
+# Returns
+
+A pair `(nodes, weights)` containing `n + 1` nodes and weights on `(-1, 1)`.
 """
 function clenshaw_curtis(n::Int)
     @assert n >= 2
@@ -63,6 +87,22 @@ general purpose quadrature based on Gautschi, "Orthogonal Polynomials: Computati
 Compute the `N`-point quadrature rule for `weight` with support (`lb`, `ub`).
 The quadrature rule can be specified by the keyword `quadrature`.
 The keyword `bnd` sets the numerical value for infinity.
+
+# Arguments
+
+- `weight`: nonnegative weight function to integrate.
+- `lb`, `ub`: lower and upper support bounds.
+- `N`: number of quadrature nodes.
+
+# Keywords
+
+- `quadrature`: finite-interval rule used after mapping the support; defaults to
+  [`clenshaw_curtis`](@ref).
+- `bnd`: finite cutoff used to represent infinite bounds.
+
+# Returns
+
+A pair `(nodes, weights)` for the requested support.
 """
 function quadgp(
         weight::Function, lb::Real, ub::Real, N::Int = 10;
@@ -143,6 +183,16 @@ with respect to the weight function.
 !!! note
 
     If no `N` is provided, then `N = length(α) - 1`.
+
+# Arguments
+
+- `N`: requested number of nodes.
+- `α`, `β`: monic recurrence coefficients.
+- `op`: orthogonal-polynomial basis supplying `α` and `β`.
+
+# Returns
+
+A pair `(nodes, weights)` for the Gaussian quadrature rule.
 """
 function gauss(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
     N += 1
@@ -181,6 +231,16 @@ interval of w, or outside thereof).
 !!! note
 
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
+
+# Arguments
+
+- `N`: number of free nodes; the returned rule has `N + 1` nodes.
+- `α`, `β`, `op`: recurrence coefficients or a basis supplying them.
+- `end0`: prescribed node, usually an endpoint of the support.
+
+# Returns
+
+A pair `(nodes, weights)` for the Gauss-Radau rule.
 """
 function radau(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, end0::Real)
     α_ = copy(α)
@@ -230,6 +290,16 @@ resp. to the right thereof).
 !!! note
 
     Reference: OPQ: A MATLAB SUITE OF PROGRAMS FOR GENERATING ORTHOGONAL POLYNOMIALS AND RELATED QUADRATURE RULES by Walter Gautschi
+
+# Arguments
+
+- `N`: number of free nodes; the returned rule has `N + 2` nodes.
+- `α`, `β`, `op`: recurrence coefficients or a basis supplying them.
+- `endl`, `endr`: prescribed left and right nodes.
+
+# Returns
+
+A pair `(nodes, weights)` for the Gauss-Lobatto rule.
 """
 function lobatto(
         N::Int, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real}, endl::Real,
