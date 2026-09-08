@@ -244,7 +244,7 @@ Convert scalar-product basis indices to coordinate-wise univariate indices.
 
 A matrix whose column `j` is the univariate multi-index represented by `a[j]`.
 """
-function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
+function multi2uni(a::AbstractVector{<:Integer}, ind::AbstractMatrix{<:Integer})
     minimum(a) < 0 && throw(DomainError(a, "no negative degrees allowed"))
     l, p = size(ind) # p-variate basis
     m = length(a) # dimension of scalar product
@@ -255,7 +255,7 @@ function multi2uni(a::AbstractVector{<:Int}, ind::AbstractMatrix{<:Int})
             "not enough elements in multi-index (requested: $(maximum(a)), max: $l)"
         )
     )
-    A = zeros(Int64, p, m)
+    A = zeros(Int, p, m)
     for (i, a_element) in enumerate(a)
         A[:, i] = ind[a_element + 1, :]
     end
@@ -277,8 +277,8 @@ Return a sparse scalar-product tensor entry.
 `a` is sorted in place in descending order before lookup.
 """
 function getentry(
-        a::AbstractVector{<:Int}, T::SparseVector{<:Real, <:Int},
-        ind::AbstractMatrix{<:Int}, dim::Int
+        a::AbstractVector{<:Integer}, T::SparseVector{<:Real, <:Int},
+        ind::AbstractMatrix{<:Integer}, dim::Int
     )
     m = length(a)
     l = size(ind, 1) - 1
