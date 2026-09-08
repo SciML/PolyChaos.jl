@@ -7,7 +7,7 @@ export fejer,
     radau,
     lobatto
 """
-    fejer(N::Int)
+    fejer(N::Integer)
 
 Fejer's first quadrature rule on `(-1, 1)`.
 
@@ -19,7 +19,7 @@ Fejer's first quadrature rule on `(-1, 1)`.
 
 A pair `(nodes, weights)` containing `N` nodes and weights.
 """
-function fejer(N::Int)
+function fejer(N::Integer)
     @assert N >= 1 "N has to be positive"
     N == 1 && return zeros(1), [2.0]
     θ = map(x -> (2x - 1) * pi / (2N), 1:N)
@@ -29,7 +29,7 @@ function fejer(N::Int)
 end
 
 """
-    fejer2(n::Int)
+    fejer2(n::Integer)
 
 Fejer's second quadrature rule according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 
@@ -41,7 +41,7 @@ Fejer's second quadrature rule according to [Waldvogel, J. Bit Numer Math (2006)
 
 A pair `(nodes, weights)` containing `n + 1` nodes and weights.
 """
-function fejer2(n::Int)
+function fejer2(n::Integer)
     @assert n >= 2
     N = 1:2:(n - 1)
     m = n - length(N)
@@ -52,7 +52,7 @@ function fejer2(n::Int)
 end
 
 """
-    clenshaw_curtis(n::Int)
+    clenshaw_curtis(n::Integer)
 
 Clenshaw-Curtis quadrature according to [Waldvogel, J. Bit Numer Math (2006) 46: 195](https://doi.org/10.1007/s10543-006-0045-4).
 
@@ -64,7 +64,7 @@ Clenshaw-Curtis quadrature according to [Waldvogel, J. Bit Numer Math (2006) 46:
 
 A pair `(nodes, weights)` containing `n + 1` nodes and weights on `(-1, 1)`.
 """
-function clenshaw_curtis(n::Int)
+function clenshaw_curtis(n::Integer)
     @assert n >= 2
     N = 1:2:(n - 1)
     l = length(N)
@@ -80,7 +80,7 @@ function clenshaw_curtis(n::Int)
 end
 
 """
-    quadgp(weight::Function,lb::Real,ub::Real,N::Int=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
+    quadgp(weight::Function,lb::Real,ub::Real,N::Integer=10;quadrature::Function=clenshaw_curtis,bnd::Float64=Inf)
 
 general purpose quadrature based on Gautschi, "Orthogonal Polynomials: Computation and Approximation", Section 2.2.2, pp. 93-95
 
@@ -105,7 +105,7 @@ The keyword `bnd` sets the numerical value for infinity.
 A pair `(nodes, weights)` for the requested support.
 """
 function quadgp(
-        weight::Function, lb::Real, ub::Real, N::Int = 10;
+        weight::Function, lb::Real, ub::Real, N::Integer = 10;
         quadrature::Function = clenshaw_curtis, bnd::Float64 = Inf
     )
     @assert lb < ub "inconsistent interval bounds"
@@ -151,7 +151,7 @@ Node and weight vectors for the associated Gaussian quadrature rule.
 """
 function golubwelsch(
         α::AbstractVector{<:Real}, β::AbstractVector{<:Real},
-        maxiter::Int = 30
+        maxiter::Integer = 30
     )
     N = length(α) - 1
     a, β0 = copy(α[1:N]), β[1]
@@ -164,9 +164,9 @@ end
 golubwelsch(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}) = golubwelsch(op.α, op.β)
 
 """
-    gauss(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real})
+    gauss(N::Integer,α::AbstractVector{<:Real},β::AbstractVector{<:Real})
     gauss(α::AbstractVector{<:Real},β::AbstractVector{<:Real})
-    gauss(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
+    gauss(N::Integer,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
     gauss(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly})
 
 Gauss quadrature rule, also known as Golub-Welsch algorithm
@@ -194,7 +194,7 @@ with respect to the weight function.
 
 A pair `(nodes, weights)` for the Gaussian quadrature rule.
 """
-function gauss(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
+function gauss(N::Integer, α::AbstractVector{<:Real}, β::AbstractVector{<:Real})
     N += 1
     @assert N > 0 "only positive N allowed"
     @assert length(α) == length(β) "inconsistent number of recurrence coefficients"
@@ -205,14 +205,14 @@ end
 
 gauss(α::AbstractVector{<:Real}, β::AbstractVector{<:Real}) = gauss(length(α) - 1, α, β)
 
-gauss(N::Int, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}) = gauss(N::Int, op.α, op.β)
+gauss(N::Integer, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}) = gauss(N::Integer, op.α, op.β)
 
 gauss(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}) = gauss(op.α, op.β)
 
 """
-    radau(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real)
+    radau(N::Integer,α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real)
     radau(α::AbstractVector{<:Real},β::AbstractVector{<:Real},end0::Real)
-    radau(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
+    radau(N::Integer,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
     radau(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},end0::Real)
 
 Gauss-Radau quadrature rule.
@@ -242,7 +242,7 @@ interval of w, or outside thereof).
 
 A pair `(nodes, weights)` for the Gauss-Radau rule.
 """
-function radau(N::Int, α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, end0::Real)
+function radau(N::Integer, α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, end0::Real)
     α_ = copy(α)
     @assert N > 0 "only positive N allowed"
     @assert length(α_) == length(β) > 0 "inconsistent number of recurrence coefficients"
@@ -260,7 +260,7 @@ end
 function radau(α::AbstractVector{<:Real}, β::AbstractVector{<:Real}, end0::Real)
     return radau(length(α) - 2, α, β, end0)
 end
-function radau(N::Int, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, end0::Real)
+function radau(N::Integer, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, end0::Real)
     return radau(N, op.α, op.β, end0)
 end
 function radau(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, end0::Real)
@@ -268,9 +268,9 @@ function radau(op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, end0::Real)
 end
 
 """
-    lobatto(N::Int,α::AbstractVector{<:Real},β::AbstractVector{<:Real},endl::Real,endr::Real)
+    lobatto(N::Integer,α::AbstractVector{<:Real},β::AbstractVector{<:Real},endl::Real,endr::Real)
     lobatto(α::AbstractVector{<:Real},β::AbstractVector{<:Real},endl::Real,endr::Real)
-    lobatto(N::Int,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
+    lobatto(N::Integer,op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
     lobatto(op::Union{OrthoPoly,AbstractCanonicalOrthoPoly},endl::Real,endr::Real)
 
 Gauss-Lobatto quadrature rule.
@@ -302,7 +302,7 @@ resp. to the right thereof).
 A pair `(nodes, weights)` for the Gauss-Lobatto rule.
 """
 function lobatto(
-        N::Int, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real}, endl::Real,
+        N::Integer, α_::AbstractVector{<:Real}, β_::AbstractVector{<:Real}, endl::Real,
         endr::Real
     )
     α, β = copy(α_), copy(β_)
@@ -334,7 +334,7 @@ function lobatto(
     return lobatto(length(α) - 3, α, β, endl, endr)
 end
 function lobatto(
-        N::Int, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, endl::Real,
+        N::Integer, op::Union{OrthoPoly, AbstractCanonicalOrthoPoly}, endl::Real,
         endr::Real
     )
     return lobatto(N, op.α, op.β, endl, endr)
