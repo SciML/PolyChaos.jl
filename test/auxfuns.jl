@@ -24,10 +24,8 @@ mopq = MultiOrthoPoly([opq for i in 1:nunc], d)
 @testset "dimensions" begin
     @test isequal(PolyChaos.dim(op), d + 1)
     @test isequal(PolyChaos.dim(opq), d + 1)
-    @test isequal(
-        PolyChaos.dim(mop),
-        factorial(d + nunc) / (factorial(d) * factorial(nunc))
-    )
+    # binomial avoids OverflowError from factorial(::Int32) for n≥13 on 32-bit
+    @test isequal(PolyChaos.dim(mop), binomial(d + nunc, d))
 end
 
 @testset "degrees" begin
