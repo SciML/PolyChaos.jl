@@ -39,7 +39,7 @@ julia> evaluate(1, 0.5, LegendreOrthoPoly(2))
 ```
 """
 function evaluate(
-        n::Int, x::AbstractArray{<:Real}, a::AbstractVector{<:Real},
+        n::Integer, x::AbstractArray{<:Real}, a::AbstractVector{<:Real},
         b::AbstractVector{<:Real}
     )
     @assert n >= 0 "Degree n has to be non-negative (currently n=$n)."
@@ -64,13 +64,13 @@ function evaluate(
     end
     return nx == 1 ? first(pplus) : pplus
 end
-function evaluate(n::Int, x::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
+function evaluate(n::Integer, x::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
     return evaluate(n, [x], a, b)
 end
-function evaluate(n::Int, x::AbstractVector{<:Real}, op::AbstractOrthoPoly)
+function evaluate(n::Integer, x::AbstractVector{<:Real}, op::AbstractOrthoPoly)
     return evaluate(n, x, op.α, op.β)
 end
-evaluate(n::Int, x::Real, op::AbstractOrthoPoly) = evaluate(n, [x], op)
+evaluate(n::Integer, x::Real, op::AbstractOrthoPoly) = evaluate(n, [x], op)
 
 # univariate + several bases
 function evaluate(
@@ -92,7 +92,7 @@ evaluate(x::Real, op::AbstractOrthoPoly) = evaluate([x], op)
 
 # multivariate
 function evaluate(
-        n::AbstractVector{<:Int}, x::AbstractMatrix{<:Real},
+        n::AbstractVector{<:Integer}, x::AbstractMatrix{<:Real},
         a::AbstractVector{<:AbstractVector{<:Real}},
         b::AbstractVector{<:AbstractVector{<:Real}}
     )
@@ -104,22 +104,22 @@ function evaluate(
     return val
 end
 function evaluate(
-        n::AbstractVector{<:Int}, x::AbstractVector{<:Real},
+        n::AbstractVector{<:Integer}, x::AbstractVector{<:Real},
         a::AbstractVector{<:AbstractVector{<:Real}},
         b::AbstractVector{<:AbstractVector{<:Real}}
     )
     return evaluate(n, reshape(x, 1, length(x)), a, b)
 end
-function evaluate(n::AbstractVector{<:Int}, x::AbstractMatrix{<:Real}, op::MultiOrthoPoly)
+function evaluate(n::AbstractVector{<:Integer}, x::AbstractMatrix{<:Real}, op::MultiOrthoPoly)
     return evaluate(n, x, coeffs(op)...)
 end
-function evaluate(n::AbstractVector{<:Int}, x::AbstractVector{<:Real}, op::MultiOrthoPoly)
+function evaluate(n::AbstractVector{<:Integer}, x::AbstractVector{<:Real}, op::MultiOrthoPoly)
     return evaluate(n, reshape(x, 1, length(x)), op)
 end
 
 # using multi-index + multivariate
 function evaluate(
-        ind::AbstractMatrix{<:Int}, x::AbstractMatrix{<:Real},
+        ind::AbstractMatrix{<:Integer}, x::AbstractMatrix{<:Real},
         a::AbstractVector{<:AbstractVector{<:Real}},
         b::AbstractVector{<:AbstractVector{<:Real}}
     )
@@ -127,19 +127,19 @@ function evaluate(
     return hcat(vals...) |> transpose |> Matrix
 end
 
-function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractMatrix{<:Real}, op::MultiOrthoPoly)
+function evaluate(ind::AbstractMatrix{<:Integer}, x::AbstractMatrix{<:Real}, op::MultiOrthoPoly)
     return evaluate(ind, x, coeffs(op)...)
 end
 evaluate(x::AbstractMatrix{<:Real}, mop::MultiOrthoPoly) = evaluate(mop.ind, x, mop)
 
 function evaluate(
-        ind::AbstractMatrix{<:Int}, x::AbstractVector{<:Real},
+        ind::AbstractMatrix{<:Integer}, x::AbstractVector{<:Real},
         a::AbstractVector{<:AbstractVector{<:Real}},
         b::AbstractVector{<:AbstractVector{<:Real}}
     )
     return evaluate(ind, reshape(x, 1, length(x)), a, b)
 end
-function evaluate(ind::AbstractMatrix{<:Int}, x::AbstractVector{<:Real}, op::MultiOrthoPoly)
+function evaluate(ind::AbstractMatrix{<:Integer}, x::AbstractVector{<:Real}, op::MultiOrthoPoly)
     return evaluate(ind, reshape(x, 1, length(x)), coeffs(op)...)
 end
 function evaluate(x::AbstractVector{<:Real}, mop::MultiOrthoPoly)
