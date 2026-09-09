@@ -6,7 +6,7 @@ function integration_test(
         tol::Float64 = 1.0e-6,
         dom::Tuple{<:Real, <:Real} = op.measure.dom
     )
-    N, w, ind = op.deg, op.measure.w, zeros(Int64, dim)
+    N, w, ind = op.deg, op.measure.w, zeros(Int, dim)
     return @testset "$name" begin
         for ind_ in Iterators.product([collect(1:N) for i in 1:dim]...)
             ind[:] .= ind_[:]

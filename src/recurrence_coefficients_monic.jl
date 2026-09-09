@@ -39,7 +39,7 @@ function r_scale(c::Real, a::AbstractVector{<:Real}, b::AbstractVector{<:Real})
 end
 
 """
-    rm_compute(weight::Function,lb::Real,ub::Real,Npoly::Int=4,Nquad::Int=10;quadrature::Function=clenshaw_curtis)
+    rm_compute(weight::Function,lb::Real,ub::Real,Npoly::Integer=4,Nquad::Integer=10;quadrature::Function=clenshaw_curtis)
 
 Given a positive `weight` function with domain `(lb,ub)`, i.e. a function ``w: [lb, ub ] \\rightarrow \\mathbb{R}_{\\geq 0}``,
 this function creates `Npoly` recursion coefficients `(α,β)`.
@@ -65,7 +65,7 @@ The keyword `quadrature` specifies what quadrature rule is being used.
 A pair `(α, β)` of monic recurrence coefficient vectors.
 """
 function rm_compute(
-        weight::Function, lb::Real, ub::Real, Npoly::Int = 4, Nquad::Int = 10;
+        weight::Function, lb::Real, ub::Real, Npoly::Integer = 4, Nquad::Integer = 10;
         quadrature::Function = clenshaw_curtis,
         discretization::Function = stieltjes
     )
@@ -84,7 +84,7 @@ function rm_compute(
 end
 
 function rm_compute(
-        m::AbstractMeasure, Npoly::Int = 4, Nquad::Int = 10;
+        m::AbstractMeasure, Npoly::Integer = 4, Nquad::Integer = 10;
         quadrature::Function = clenshaw_curtis,
         discretization::Function = stieltjes
     )
@@ -95,7 +95,7 @@ function rm_compute(
 end
 
 ##
-# function rm_logisticsum(n::Int,p1::AbstractVector{<:Real},p2::AbstractVector{<:Real};Mmax::Int=100,eps0::Real=1e-9)
+# function rm_logisticsum(n::Integer,p1::AbstractVector{<:Real},p2::AbstractVector{<:Real};Mmax::Int=100,eps0::Real=1e-9)
 #     M0 = n
 #     Mcap = 0
 #     Mi = M0
@@ -119,7 +119,7 @@ end
 # end
 
 """
-    rm_logistic(N::Int)
+    rm_logistic(N::Integer)
 
 Creates `N` recurrence coefficients for monic polynomials that are orthogonal
 on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\mathrm{e}^{-t})^2}``
@@ -132,15 +132,15 @@ on ``(-\\infty,\\infty)`` relative to ``w(t) = \\frac{\\mathrm{e}^{-t}}{(1 - \\m
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-function rm_logistic(N::Int)
+function rm_logistic(N::Integer)
     @assert N >= 0 "parameter(s) out of range."
     N == 0 && return Vector{Float64}(undef, 0), Vector{Float64}(undef, 0)
     return zeros(N), pushfirst!(map(k -> k^4 * pi^2 / (4 * k^2 - 1), Base.OneTo(N - 1)), 1.0)
 end
 
 """
-    rm_hermite(N::Int,mu::Real)
-    rm_hermite(N::Int)
+    rm_hermite(N::Integer,mu::Real)
+    rm_hermite(N::Integer)
 
 Creates `N` recurrence coefficients for monic generalized Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = |t|^{2 \\mu} \\mathrm{e}^{-t^2}``
@@ -156,17 +156,17 @@ The call `rm_hermite(N)` is the same as `rm_hermite(N,0)`.
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-function rm_hermite(N::Int, mu::Real)
+function rm_hermite(N::Integer, mu::Real)
     @assert N >= 0&&mu > -0.5 "parameter(s) out of range."
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     m0 = mu != 0.0 ? gamma(mu + 0.5) : sqrt(π)
     N == 1 && return [0.0], [m0]
     return zeros(N), pushfirst!(map(x -> isodd(x) ? 0.5 * x + mu : 0.5 * x, 1:(N - 1)), m0)
 end
-rm_hermite(N::Int) = rm_hermite(N, 0.0)
+rm_hermite(N::Integer) = rm_hermite(N, 0.0)
 
 """
-    rm_hermite_prob(N::Int)
+    rm_hermite_prob(N::Integer)
 
 Creates `N` recurrence coefficients for monic probabilists' Hermite polynomials
 that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{-0.5t^2}``
@@ -179,7 +179,7 @@ that are orthogonal on ``(-\\infty,\\infty)`` relative to ``w(t) = \\mathrm{e}^{
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-function rm_hermite_prob(N::Int)
+function rm_hermite_prob(N::Integer)
     @assert N >= 0 "parameter(s) out of range."
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     # return zeros(N), [sqrt(2*pi); collect(1.:N-1) ]
@@ -187,8 +187,8 @@ function rm_hermite_prob(N::Int)
 end
 
 """
-    rm_laguerre(N::Int,a::Real)
-    rm_laguerre(N::Int)
+    rm_laguerre(N::Integer,a::Real)
+    rm_laguerre(N::Integer)
 
 Creates `N` recurrence coefficients for monic generalized Laguerre polynomials
 that are orthogonal on ``(0,\\infty)`` relative to ``w(t) = t^a \\mathrm{e}^{-t}``.
@@ -204,7 +204,7 @@ The call `rm_laguerre(N)` is the same as `rm_laguerre(N,0)`.
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-function rm_laguerre(N::Int, a::Real)
+function rm_laguerre(N::Integer, a::Real)
     @assert N >= 0&&a > -1.0 "parameter(s) out of range"
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     N == 1 && return [a + 1.0], [gamma(a + 1)]
@@ -212,14 +212,14 @@ function rm_laguerre(N::Int, a::Real)
     return pushfirst!(map(x -> 2x + a + 1.0, n), a + 1.0),
         pushfirst!(map(x -> x^2 + a * x, n), gamma(a + 1))
 end
-function rm_laguerre(N::Int)
+function rm_laguerre(N::Integer)
     return rm_laguerre(N, 0.0)
 end
 
 """
-    rm_jacobi(N::Int,a::Real,b::Real)
-    rm_jacobi(N::Int,a::Real)
-    rm_jacobi(N::Int)
+    rm_jacobi(N::Integer,a::Real,b::Real)
+    rm_jacobi(N::Integer,a::Real)
+    rm_jacobi(N::Integer)
 
 Creates `N` recurrence coefficients for monic Jacobi polynomials
 that are orthogonal on ``(-1,1)`` relative to ``w(t) = (1-t)^a (1+t)^b``.
@@ -236,7 +236,7 @@ The call `rm_jacobi(N,a)` is the same as `rm_jacobi(N,a,a)` and `rm_jacobi(N)` t
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-function rm_jacobi(N::Int, a::Real, b::Real)
+function rm_jacobi(N::Integer, a::Real, b::Real)
     @assert N >= 0&&a > -1.0 && b > -1.0 "parameter(s) out of range"
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     nu = (b - a) / (a + b + 2.0)
@@ -256,12 +256,12 @@ function rm_jacobi(N::Int, a::Real, b::Real)
     return A, pushfirst!(pushfirst!(B1 ./ B2, B3), mu)
 end
 
-rm_jacobi(N::Int, a::Real) = rm_jacobi(N, a, a)
-rm_jacobi(N::Int) = rm_jacobi(N, 0.0, 0.0)
+rm_jacobi(N::Integer, a::Real) = rm_jacobi(N, a, a)
+rm_jacobi(N::Integer) = rm_jacobi(N, 0.0, 0.0)
 """
-    rm_jacobi01(N::Int,a::Real,b::Real)
-    rm_jacobi01(N::Int,a::Real)
-    rm_jacobi01(N::Int)
+    rm_jacobi01(N::Integer,a::Real,b::Real)
+    rm_jacobi01(N::Integer,a::Real)
+    rm_jacobi01(N::Integer)
 
 Creates `N` recurrence coefficients for monic Jacobi polynomials
 that are orthogonal on ``(0,1)`` relative to ``w(t) = (1-t)^a t^b``.
@@ -278,17 +278,17 @@ The call `rm_jacobi01(N,a)` is the same as `rm_jacobi01(N,a,a)` and `rm_jacobi01
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-function rm_jacobi01(N::Int, a::Real, b::Real)
+function rm_jacobi01(N::Integer, a::Real, b::Real)
     @assert N >= 0&&a > -1.0 && b > -1.0 "parameter(s) out of range"
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     c, d = rm_jacobi(N, a, b)
     return map(x -> (1 + x) / 2, c), pushfirst!(0.25 * d[2:N], d[1] / 2^(a + b + 1.0))
 end
-rm_jacobi01(N::Int, a::Real) = rm_jacobi01(N, a, a)
-rm_jacobi01(N::Int) = rm_jacobi01(N, 0.0, 0.0)
+rm_jacobi01(N::Integer, a::Real) = rm_jacobi01(N, a, a)
+rm_jacobi01(N::Integer) = rm_jacobi01(N, 0.0, 0.0)
 
 """
-    rm_legendre(N::Int)
+    rm_legendre(N::Integer)
 
 Creates `N` recurrence coefficients for monic Legendre polynomials
 that are orthogonal on ``(-1,1)`` relative to ``w(t) = 1``.
@@ -301,10 +301,10 @@ that are orthogonal on ``(-1,1)`` relative to ``w(t) = 1``.
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-rm_legendre(N::Int) = rm_jacobi(N)
+rm_legendre(N::Integer) = rm_jacobi(N)
 
 """
-    rm_legendre01(N::Int)
+    rm_legendre01(N::Integer)
 
 Creates `N` recurrence coefficients for monic Legendre polynomials
 that are orthogonal on ``(0,1)`` relative to ``w(t) = 1``.
@@ -317,11 +317,11 @@ that are orthogonal on ``(0,1)`` relative to ``w(t) = 1``.
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-rm_legendre01(N::Int) = rm_jacobi01(N)
+rm_legendre01(N::Integer) = rm_jacobi01(N)
 
 """
-    rm_meixner_pollaczek(N::Int,lambda::Real,phi::Real)
-    rm_meixner_pollaczek(N::Int,lambda::Real)
+    rm_meixner_pollaczek(N::Integer,lambda::Real,phi::Real)
+    rm_meixner_pollaczek(N::Integer,lambda::Real)
 
 Creates `N` recurrence coefficients for monic
 Meixner-Pollaczek polynomials with parameters λ and ϕ. These are orthogonal on
@@ -339,7 +339,7 @@ The call `rm_meixner_pollaczek(n,lambda)` is the same as `rm_meixner_pollaczek(n
 
 A pair `(α, β)` of recurrence coefficient vectors.
 """
-function rm_meixner_pollaczek(N::Int, lambda::Real, phi::Real)
+function rm_meixner_pollaczek(N::Integer, lambda::Real, phi::Real)
     @assert N >= 0&&lambda > 0.0 && phi > 0.0 "parameter(s) out of range"
     N == 0 && return Array{Float64, 1}(undef, 0), Array{Float64, 1}(undef, 0)
     n = 1:N
@@ -355,7 +355,7 @@ function rm_meixner_pollaczek(N::Int, lambda::Real, phi::Real)
     ab[1, 2] = gamma(lam2) / (2 * sinphi)^lam2
     return ab[:, 1], ab[:, 2]
 end
-rm_meixner_pollaczek(N::Int, lambda::Real) = rm_meixner_pollaczek(N, lambda, pi / 2)
+rm_meixner_pollaczek(N::Integer, lambda::Real) = rm_meixner_pollaczek(N, lambda, pi / 2)
 
 """
     rm_chebyshev1(N)
@@ -371,7 +371,7 @@ polynomials.
 
 The pair `(alpha, beta)` of recurrence coefficient vectors.
 """
-function rm_chebyshev1(N::Int)
+function rm_chebyshev1(N::Integer)
     @assert N >= 0 "N has to be non-negative"
     α = zeros(Float64, N)
     if N == 1
@@ -387,9 +387,9 @@ end
 ###################################################################
 ###################################################################
 
-#     rm_hahn(N::Int,a::Real,b::Real)
-#     rm_hahn(N::Int,a::Real)
-#     rm_hahn(N::Int)
+#     rm_hahn(N::Integer,a::Real,b::Real)
+#     rm_hahn(N::Integer,a::Real)
+#     rm_hahn(N::Integer)
 #
 #  Creates `N` recurrence coefficients for monic Hahn polynomials.
 #
@@ -404,7 +404,7 @@ end
 #     which produces the recurrence coefficients of the discrete
 #     Chebyshev polynomials for the points 0,1,2,...,N.
 # """
-# function rm_hahn(N::Int,a::Real,b::Real)
+# function rm_hahn(N::Integer,a::Real,b::Real)
 #     N-=1
 #     @assert N>=0 && a>=-1. && b>=-1. "parameter(s) out of range"
 #     N==0 ? (return Array{Real,1}(undef,0), Array{Real,1}(undef,0)) : ()
@@ -428,5 +428,5 @@ end
 #     end
 #     return ab[:,1], ab[:,2]
 # end
-# rm_hahn(N::Int,a::Real) = rm_hahn(N,a,a)
-# rm_hahn(N::Int) = rm_hahn(N,0.,0.)
+# rm_hahn(N::Integer,a::Real) = rm_hahn(N,a,a)
+# rm_hahn(N::Integer) = rm_hahn(N,0.,0.)

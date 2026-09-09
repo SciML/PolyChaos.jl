@@ -490,7 +490,7 @@ mean(x::AbstractVector, op::AbstractOrthoPoly) = x[1] * computeSP2(0, op.β)
 
 function mean(x::AbstractVector, mop::MultiOrthoPoly)
     nunc = length(mop.uni)
-    return x[1] * computeSP(zeros(Int64, nunc), mop)
+    return x[1] * computeSP(zeros(Int, nunc), mop)
 end
 
 """

@@ -27,7 +27,7 @@ function computeSP(
     ) &&
         throw(InconsistencyError("inconsistent number of recurrence coefficients and/or nodes/weights"))
 
-    a = Vector{Int64}()
+    a = Vector{Int}()
 
     for aa in a_
         !iszero(aa) && push!(a, aa)
@@ -123,7 +123,7 @@ function computeSP(
     minimum(a_) < 0 && throw(DomainError(minimum(a_), "no negative degrees allowed"))
     # this works because ``<Φ_i,Φ_j,Φ_0,...,Φ_0> = <Φ_i,Φ_j>``
     # hence, avoiding unnecessary operations that introduce numerical gibberish
-    # a = Vector{Int64}()
+    # a = Vector{Int}()
     # for aa in a_
     #     !iszero(aa) && push!(a,aa)
     # end

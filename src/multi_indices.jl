@@ -26,7 +26,7 @@ julia> size(calculateMultiIndices(2, 2))
 (6, 2)
 ```
 """
-function calculateMultiIndices(d::Int, n::Int)
+function calculateMultiIndices(d::Integer, n::Integer)
     # d denotes dimension of random variables/number of sources of uncertainty,
     # n the maximum degree of multivariate basis
     # function to calculate indices of multivariate basis following the algorithm
@@ -35,11 +35,11 @@ function calculateMultiIndices(d::Int, n::Int)
     n < 0 && throw(DomainError(n, "maximum degree must be non-negative"))
     d <= 0 && throw(DomainError(d, "number of uncertainties must be positive"))
     # catch case n == 0 --> No-d==0
-    n == 0 && return zeros(Int64, 1, d)
+    n == 0 && return zeros(Int, 1, d)
     # non-pathological cases begin here
     No = numberPolynomials(d, n)
-    inds = vcat(zeros(Int64, 1, d), Matrix(1I, d, d), zeros(Int64, No - d - 1, d))  #initiate index matrix for basis
-    pi = ones(Int64, No, d)
+    inds = vcat(zeros(Int, 1, d), Matrix(1I, d, d), zeros(Int, No - d - 1, d))  #initiate index matrix for basis
+    pi = ones(Int, No, d)
 
     for k in 2:No
         g = 0
@@ -68,7 +68,7 @@ end
     `(d+n)!/(d!+n!)`
 """
 
-function numberPolynomials(d::Int64, n::Int64)
+function numberPolynomials(d::Integer, n::Integer)
     x, y = max(d, n), min(d, n)
     return UInt128(prod(UInt128(x + 1):UInt128(d + n)) ÷ factorial(UInt128(y)))
 end
@@ -95,7 +95,7 @@ function findUnivariateIndices(i::Int, ind::AbstractMatrix{Int})
     deg = ind[end, end]
     deg < 0 && throw(DomainError(deg, "invalid degree"))
     col = ind[:, i]
-    myind = zeros(Int64, deg)
+    myind = zeros(Int, deg)
     for deg_ in 1:deg
         myind[deg_] = findfirst(x -> x == deg_, col)
     end
