@@ -18,7 +18,7 @@ module PolyChaos
     import FFTW: ifft
     import Combinatorics: with_replacement_combinations
     import Base: show
-    import AdaptiveRejectionSampling: RejectionSampler, run_sampler!
+    import AdaptiveRejectionSampling
     import Statistics
     import GaussQuadrature: special_eigenproblem!
 

@@ -253,8 +253,14 @@ function sampleMeasure(
 
     if method == "adaptiverejection"
         # works only if w is log-concave
-        sampler = RejectionSampler(w, dom)
-        return run_sampler!(sampler, n)
+        if isdefined(AdaptiveRejectionSampling, :RejectionSampler)
+            sampler = AdaptiveRejectionSampling.RejectionSampler(w, dom)
+            return AdaptiveRejectionSampling.run_sampler!(sampler, n)
+        end
+
+        objective = AdaptiveRejectionSampling.Objective(x -> log(w(x)), 0.0)
+        sampler = AdaptiveRejectionSampling.ARSampler(objective, dom)
+        return AdaptiveRejectionSampling.sample!(sampler, n)
     elseif method == "rejection"
         # all purpose method but needs a solid envelope PDF
         throw(error("method $method not yet implemented"))
