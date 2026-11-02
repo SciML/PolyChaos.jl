@@ -2,7 +2,7 @@
 
 julia_version = "1.13.3"
 manifest_format = "2.1"
-project_hash = "e790b7ed67311b56ed19f15ffd7bc0b28f74eea4"
+project_hash = "c6f0520eb2e093e3187d258a100b27a3f6a8398f"
 
 [[deps.ADTypes]]
 deps = ["PrecompileTools"]
@@ -1659,9 +1659,9 @@ version = "1.41.7"
 
 [[deps.PolyChaos]]
 deps = ["AdaptiveRejectionSampling", "Combinatorics", "Distributions", "FFTW", "GaussQuadrature", "LinearAlgebra", "PrecompileTools", "QuadGK", "SparseArrays", "SpecialFunctions", "Statistics"]
-path = "/home/runner/_work/PolyChaos.jl/PolyChaos.jl"
+path = "/home/runner/work/PolyChaos.jl/PolyChaos.jl"
 uuid = "8d666b04-775d-5f6e-b778-5ac7c70f65a3"
-version = "2.1.3"
+version = "2.2.0"
 
 [[deps.PreallocationTools]]
 deps = ["Adapt", "ArrayInterface", "PrecompileTools", "SciMLPublic"]
